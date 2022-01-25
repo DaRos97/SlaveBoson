@@ -1,8 +1,18 @@
 import numpy as np
-from numpy import linalg as LA
+from scipy import linalg as LA
 from scipy.integrate import dblquad
 import inputs as inp
 
+#Get k1max,k2max
+def getMaxK(g2):
+    temp = g2.ravel(order='C')
+    argmax = np.argmax(temp)
+    kp = inp.sum_pts
+    argm = argmax//(kp**2)
+    argmax = argmax-argm*kp**2
+    argk1 = argmax//kp
+    argk2 = argmax-argk1*kp
+    return argm,argk1,argk2
 ########## SUMS
 #Function which returns e^(-i(k \dot a)) with k the 
 #   momentum and a the position vector. m is the unit
@@ -28,20 +38,20 @@ def eigG2_arr(k1, k2, params):
     G = np.zeros((m,m,len(k1),len(k2)),dtype=complex)
     #1nn
     if m == 3:
-        G[0,1] = -J1*eta*((-1)**(ans)*exp_k(k1,k2,0,-1,m)-exp_k(k1,k2,0,1,m))
-        G[0,2] = -J1*eta*(exp_k(k1,k2,1,1,m)-(-1)**(ans)*exp_k(k1,k2,-1,-1,m))
-        G[1,2] = -J1*eta*(-exp_k(k1,k2,1,0,m)+(-1)**(ans)*exp_k(k1,k2,-1,0,m))
+        G[0,1] = -J1*(eta_*(-1)**(ans)*exp_k(k1,k2,0,-1,m)-eta_*exp_k(k1,k2,0,1,m))
+        G[0,2] = -J1*(eta*exp_k(k1,k2,1,1,m)-eta*(-1)**(ans)*exp_k(k1,k2,-1,-1,m))
+        G[1,2] = -J1*(-eta_*exp_k(k1,k2,1,0,m)+eta_*(-1)**(ans)*exp_k(k1,k2,-1,0,m))
     elif m == 6:
-        G[0,1] = -J1*eta*(-1)**(ans-2)*exp_k(k1,k2,0,-1,m)
+        G[0,1] = -J1*eta_*(-1)**(ans-2)*exp_k(k1,k2,0,-1,m)
         G[0,2] = -J1*eta*(-(-1)**(ans-2)*exp_k(k1,k2,-1,-1,m))
-        G[0,4] = -J1*eta*(-exp_k(k1,k2,0,1,m))
+        G[0,4] = -J1*eta_*(-exp_k(k1,k2,0,1,m))
         G[0,5] = -J1*eta*exp_k(k1,k2,1,1,m)
-        G[1,2] = -J1*eta*(-exp_k(k1,k2,1,0,m)+(-1)**(ans-2)*exp_k(k1,k2,-1,0,m))
+        G[1,2] = -J1*eta_*(-exp_k(k1,k2,1,0,m)+(-1)**(ans-2)*exp_k(k1,k2,-1,0,m))
         G[1,3] = -J1*eta*exp_k(k1,k2,0,-1,m)
-        G[2,3] = -J1*eta*(-1)*exp_k(k1,k2,-1,-1,m)
-        G[3,4] = -J1*eta*(-1)**(ans-2)*exp_k(k1,k2,0,-1,m)
+        G[2,3] = -J1*eta_*(-1)*exp_k(k1,k2,-1,-1,m)
+        G[3,4] = -J1*eta_*(-1)**(ans-2)*exp_k(k1,k2,0,-1,m)
         G[3,5] = -J1*eta*exp_k(k1,k2,-1,-1,m)*(-1)**(ans-2)
-        G[4,5] = -J1*eta*(-exp_k(k1,k2,1,0,m)-(-1)**(ans-2)*exp_k(k1,k2,-1,0,m))
+        G[4,5] = -J1*eta_*(-exp_k(k1,k2,1,0,m)-(-1)**(ans-2)*exp_k(k1,k2,-1,0,m))
     #c.c.
     #G = G + G.T
     res = np.zeros((m,len(k1),len(k2)))
@@ -65,23 +75,25 @@ def sum_en(x, params,g2):
 
 def sum_lam(ratio,params,g2):
     m = inp.m[params[3]]
-    max1 = inp.maxK1[params[3]]
-    max2 = inp.maxK2[params[3]]
-    K1 = np.linspace(0,max1,inp.sum_pts)
-    K2 = np.linspace(0,max2,inp.sum_pts)
+#    max1 = inp.maxK1[params[3]]
+#    max2 = inp.maxK2[params[3]]
+#    K1 = np.linspace(0,max1,inp.sum_pts)
+#    K2 = np.linspace(0,max2,inp.sum_pts)
+    norm = len(g2.ravel())
     res = (ratio/np.sqrt(ratio**2-g2)).ravel().sum()
-    res /= (inp.sum_pts**2)
-    return res/m
+    res /= norm
+    return res
 
 def sum_mf(ratio,params,g2):
     m = inp.m[params[3]]
-    max1 = inp.maxK1[params[3]]
-    max2 = inp.maxK2[params[3]]
-    K1 = np.linspace(0,max1,inp.sum_pts)
-    K2 = np.linspace(0,max2,inp.sum_pts)
+#    max1 = inp.maxK1[params[3]]
+#    max2 = inp.maxK2[params[3]]
+#    K1 = np.linspace(0,max1,inp.sum_pts)
+#    K2 = np.linspace(0,max2,inp.sum_pts)
+    norm = len(g2.ravel())
     res = (np.sqrt(ratio**2-g2)).ravel().sum()
-    res /= (inp.sum_pts**2)
-    return res/m
+    res /= norm
+    return res
 
 ########## INTEGRALS
 #Same as exp_k above but with kx and ky scalars instead of arrays
@@ -94,23 +106,24 @@ def eigG2(k1, k2, params):
     J1, J2, phi, ans = params
     m = inp.m[ans]
     eta = np.exp(-1j*phi)
+    eta_ = np.conjugate(eta)
     G = np.zeros((m,m),dtype=complex)
     #1nn
     if m == 3:
-        G[0,1] = -J1*eta*((-1)**ans-exp_k2(k1,k2,0,1,m))
-        G[0,2] = -J1*eta*(exp_k2(k1,k2,0,1,m)-(-1)**ans*exp_k2(k1,k2,-1,0,m))
-        G[1,2] = -J1*eta*((-1)**ans*exp_k2(k1,k2,-1,0,m)-1)
+        G[0,1] = -J1*(eta_*(-1)**(ans)*exp_k2(k1,k2,0,-1,m)-eta_*exp_k2(k1,k2,0,1,m))
+        G[0,2] = -J1*(eta*exp_k2(k1,k2,1,1,m)-eta*(-1)**(ans)*exp_k2(k1,k2,-1,-1,m))
+        G[1,2] = -J1*(-eta_*exp_k2(k1,k2,1,0,m)+eta_*(-1)**(ans)*exp_k2(k1,k2,-1,0,m))
     elif m == 6:
-        G[0,1] = -J1*eta*(-1)**(ans-2)
-        G[0,2] = -J1*eta*(-exp_k2(k1,k2,-1,0,m))
-        G[0,4] = -J1*eta*(-exp_k2(k1,k2,0,1,m))
-        G[0,5] = -J1*eta*(exp_k2(k1,k2,0,1,m))
-        G[1,2] = -J1*eta*(-1+exp_k2(k1,k2,-1,0,m))
-        G[1,3] = -J1*eta
-        G[2,3] = -J1*eta*(-1)
-        G[3,4] = -J1*eta*(-1)**(ans-2)
-        G[3,5] = -J1*eta*(exp_k2(k1,k2,-1,0,m))
-        G[4,5] = -J1*eta*(-1-exp_k2(k1,k2,-1,0,m))
+        G[0,1] = -J1*eta_*(-1)**(ans-2)*exp_k2(k1,k2,0,-1,m)
+        G[0,2] = -J1*eta*(-(-1)**(ans-2)*exp_k2(k1,k2,-1,-1,m))
+        G[0,4] = -J1*eta_*(-exp_k2(k1,k2,0,1,m))
+        G[0,5] = -J1*eta*exp_k2(k1,k2,1,1,m)
+        G[1,2] = -J1*eta_*(-exp_k2(k1,k2,1,0,m)+(-1)**(ans-2)*exp_k2(k1,k2,-1,0,m))
+        G[1,3] = -J1*eta*exp_k2(k1,k2,0,-1,m)
+        G[2,3] = -J1*eta_*(-1)*exp_k2(k1,k2,-1,-1,m)
+        G[3,4] = -J1*eta_*(-1)**(ans-2)*exp_k2(k1,k2,0,-1,m)
+        G[3,5] = -J1*eta*exp_k2(k1,k2,-1,-1,m)*(-1)**(ans-2)
+        G[4,5] = -J1*eta_*(-exp_k2(k1,k2,1,0,m)-(-1)**(ans-2)*exp_k2(k1,k2,-1,0,m))
     #c.c.
     res = np.zeros(m)
     G = G - np.conjugate(G).T
@@ -132,7 +145,7 @@ def int_en(x,params):
     res /= (max1*max2)
     return res/m
 
-def int_lam(ratio,params):
+def int_lam(ratio,params,g2):
     m = inp.m[params[3]]
     max1 = inp.maxK1[params[3]]
     max2 = inp.maxK2[params[3]]
@@ -145,7 +158,7 @@ def int_lam(ratio,params):
     res /= (max1*max2)
     return res/m
 
-def int_mf(ratio,params):
+def int_mf(ratio,params,g2):
     m = inp.m[params[3]]
     max1 = inp.maxK1[params[3]]
     max2 = inp.maxK2[params[3]]

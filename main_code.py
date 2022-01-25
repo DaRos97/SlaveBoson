@@ -7,7 +7,7 @@ from tqdm import tqdm
 import time
 start_time = time.time()
 
-dirname = 'data3/'
+dirname = 'Data/'
 
 #Fixed parameters
 z1 = inp.z1
@@ -18,17 +18,23 @@ S = inp.S
 phi_pts = inp.phi_pts
 phi_max = inp.phi_max
 range_phi = np.linspace(0,phi_max,phi_pts)
+kp = inp.sum_pts
 
 for ans in range(4):    #sum over the ansatze
     print('Using ansatz: ',inp.text_ans[ans])
     m = inp.m[ans]  #unit cell of that ansatz
     E_gs = np.zeros((2,phi_pts))    #array for phi and 
                                     #corresponding energy value
-    K1 = np.linspace(0,inp.maxK1[ans],inp.sum_pts)  #Kx in BZ
-    K2 = np.linspace(0,inp.maxK2[ans],inp.sum_pts)  #Ky in BZ
+    K1 = np.linspace(0,inp.maxK1[ans],kp)  #Kx in BZ
+    K2 = np.linspace(0,inp.maxK2[ans],kp)  #Ky in BZ
     for p,phi in tqdm(enumerate(range_phi)):    #sum over phi pts
         params = (J1, J2, phi, ans)
         #Minimum value of lam/xi, given by the sqrt of the maximum of G2
+#        g2 = fs.eigG2_arr(K1,K2,params)
+#        am,ak1,ak2 = fs.getMaxK(g2)
+        
+#        K1p = np.append(np.append(K1,np.linspace(1.5,2.5,kp)),np.linspace(4,4.5,kp))
+#        K2p = np.append(np.append(K2,np.linspace(0,0.5,kp)),np.linspace(7,inp.maxK2[ans],kp))
         g2 = fs.eigG2_arr(K1,K2,params)
         minRatio = -np.sqrt(max(g2.ravel()))
         #Evaluate ratio from the stationary condition on lam
@@ -37,22 +43,15 @@ for ans in range(4):    #sum over the ansatze
                 method='bounded',
                 bounds=(-10000,minRatio),
                 options={
-                    'maxiter':100,
-                    'xatol':1e-7}
+                    'xatol':1e-15}
                 )
-
         ratio = res.x
+        if ratio < -9000:
+            print("Possible error")
         #Evaluate xi by minimizing the energy knowing the ratio
         en_rt = fs.sum_mf(ratio,params,g2)
-        def E_mf(xi):
-            return (xi*(en_rt + z1*J1*xi + ratio*(2*S+1)) + J1*z1*(S**2)/2)/(S*(S+1))
-        res2 = minimize_scalar( E_mf,
-                method='bounded',
-                bounds=(0,1000),
-                options={
-                    'maxiter':100,
-                    'xatol':1e-7}
-                )
+        E_mf = lambda xi: (xi*(en_rt + z1*J1*xi + ratio*(2*S+1)) + J1*z1*(S**2)/2)/(S*(S+1))
+        res2 = minimize_scalar( E_mf, method='brent')
         xi = res2.x
         lam = ratio*xi
         E_gs[0,p] = phi

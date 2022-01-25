@@ -1,12 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-S = 0.5
+S = 0.025
 text_ans = ['(0,0)','(pi,0)','(pi,pi)','(0,pi)']
 colors = ['b*','r*','m*','g*']
 colors2 = ['y*','k*','r*','b*']
 fig = plt.figure(figsize=(12,8))
-dirname = ['data/','data3/']
+dirname = ['data/','Data/']
 plt.subplot(1,2,1)
 for i in range(4):
     text = dirname[0] + text_ans[i] + 'E_gs-' + str(S).replace('.',',') + '.npy'
