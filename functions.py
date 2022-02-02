@@ -24,7 +24,7 @@ def exp_k(kx,ky,a1,a2,m):
     res = np.zeros((len(kx),len(ky)),dtype=complex)
     for i,I in enumerate(kx):
         for j,J in enumerate(ky):
-            res[i,j] = np.exp(-1j*(I*ax+J*ay)/2)
+            res[i,j] = np.exp(-1j*(I*ax+J*ay))
     return res
 #Evaluates the eigenvalues of (G^dag G) for the four different
 #   ansatze and for arrays of momenta k1,k2 in the BZ. 
@@ -37,9 +37,9 @@ def eigG2_arr(k1, k2, params):
     eta_ = np.conjugate(eta)
     G = np.zeros((m,m,len(k1),len(k2)),dtype=complex)
     if m == 3:
-        G[0,1] = -J1*(eta_*(-1)**(ans)*exp_k(k1,k2,0,-1,m)-eta_*exp_k(k1,k2,0,1,m))
-        G[0,2] = -J1*(eta*exp_k(k1,k2,1,1,m)-eta*(-1)**(ans)*exp_k(k1,k2,-1,-1,m))
-        G[1,2] = -J1*(-eta_*exp_k(k1,k2,1,0,m)+eta_*(-1)**(ans)*exp_k(k1,k2,-1,0,m))
+        G[0,1] = -2*J1*(eta_*(-1)**(ans)-eta_*exp_k(k1,k2,0,1,m))
+        G[0,2] = -2*J1*(eta*exp_k(k1,k2,0,1,m)-eta*(-1)**(ans)*exp_k(k1,k2,-1,0,m))
+        G[1,2] = -2*J1*(-eta_+eta_*(-1)**(ans)*exp_k(k1,k2,-1,0,m))
         #G[0,1] = -J1*(eta_*(-1)**(ans)*exp_k(k1,k2,0,-1,m)-eta*exp_k(k1,k2,0,1,m))
         #G[0,2] = -J1*(eta*exp_k(k1,k2,1,1,m)-eta_*(-1)**(ans)*exp_k(k1,k2,-1,-1,m))
         #G[1,2] = -J1*(-eta*exp_k(k1,k2,1,0,m)+eta_*(-1)**(ans)*exp_k(k1,k2,-1,0,m))

@@ -9,8 +9,8 @@ maxK2 = [2*np.pi/np.sqrt(3),2*np.pi/np.sqrt(3),np.pi/np.sqrt(3),np.pi/np.sqrt(3)
 text_ans = ['(0,0)','(pi,0)','(pi,pi)','(0,pi)']
 
 #variable
-S = 0.025
-sum_pts = 200
+S = 0.5
+sum_pts = 100
 phi_pts = 40
 phi_max = np.pi/3
 

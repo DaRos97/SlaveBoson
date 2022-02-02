@@ -7,7 +7,7 @@ from tqdm import tqdm
 import time
 start_time = time.time()
 
-dirname = 'Data2/'
+dirname = 'Data3/'
 
 #Fixed parameters
 z1 = inp.z1
@@ -18,7 +18,7 @@ phi_max = inp.phi_max
 range_phi = np.linspace(0,phi_max,phi_pts)
 kp = inp.sum_pts
 
-for ans in range(4):    #sum over the ansatze
+for ans in range(2):    #sum over the ansatze
     print('Using ansatz: ',inp.text_ans[ans])
     m = inp.m[ans]  #unit cell of that ansatz
     E_gs = np.zeros((2,phi_pts))    #array for phi and 
@@ -42,7 +42,7 @@ for ans in range(4):    #sum over the ansatze
             print("Minimization error in ratio")
         #Evaluate xi by minimizing the energy knowing the ratio
         en_rt = fs.sum_mf(ratio,ans,g2)
-        E_mf = lambda xi: (xi*(en_rt + z1*J1*xi + ratio*(2*S+1)) + J1*z1*(S**2)/2)/(S*(S+1))
+        E_mf = lambda xi: (xi*(en_rt + 2*z1*J1*xi + ratio*(2*S+1)) + J1*z1*(S**2))/(S*(S+1))
         res2 = minimize_scalar( E_mf, method='brent')
         if not(res2.success):
             print("Minimization error in xi")
