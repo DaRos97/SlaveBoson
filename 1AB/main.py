@@ -35,11 +35,10 @@ print("Initial energy with parameters ",A,B,L," is ",Energy_i)
 t = time.time()
 sigma = fs.Sigma(A,B,L,Pa[:,cicle-1])
 print("Initial sigma:",sigma)
-print("time: ",time.time()-t)
+print("Sigma time: ",time.time()-t)
 
 T1 = time.time()
 Stay = True
-T1 = time.time()
 while Stay:
     ti = time.time()
     print(Fore.RED,"initiating cicle ",cicle,Style.RESET_ALL)
