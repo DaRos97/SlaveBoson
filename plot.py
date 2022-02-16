@@ -8,8 +8,8 @@ fig = plt.figure(figsize=(12,8))
 dirname = ['Data/','Data2/','Data3/']
 
 #ax1 = plt.subplot(1,2,1)
-for i in range(2):
-    text = dirname[2] + text_ans[i] + 'E_gs-' + str(S).replace('.',',') + '.npy'
+for i in range(4):
+    text = dirname[0] + text_ans[i] + 'E_gs-' + str(S).replace('.',',') + '.npy'
     data = np.load(text)
     plt.plot(data[0],data[1],colors[i],label=text_ans[i])
 plt.title('S = '+str(S))
