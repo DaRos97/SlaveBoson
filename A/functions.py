@@ -47,16 +47,19 @@ def eig2G(P,args):#3x3 ansatx
     for i in range(kp):
         for j in range(kp):
             D_ = np.conjugate(D[:,:,i,j]).T
-            res[:,i,j] = np.nan_to_num(np.sqrt(L**2-LA.eigvalsh(np.matmul(D_,D[:,:,i,j]))))
+            temp = LA.eigvalsh(np.matmul(D_,D[:,:,i,j]))
+            res[0,i,j] = np.sqrt(L**2-temp[0]) if L**2-temp[0] > 0 else 0
+            res[1,i,j] = np.sqrt(L**2-temp[1]) if L**2-temp[1] > 0 else 0
+            res[2,i,j] = np.sqrt(L**2-temp[2]) if L**2-temp[2] > 0 else 0
     #print("Time eig2G: ",time.time()-ti)
-    return res
+    return res.ravel().sum()/(3*kp**2)
 
 def tot_E(P,args):
     J1,J2,J3,ans = args
-    Jfn = args[2-ans]
     zfn = inp.z[ans]
+    Jfn = args[2-ans]
     E2 = 2*(inp.z1*J1*P[0]**2+zfn*Jfn*P[1]**2)-P[2]*(2*S+1)
-    res = eig2G(P,args).ravel().sum()/(3*kp**2) + E2
+    res = eig2G(P,args) + E2
     return res
 
 def Sigma(P,args):
@@ -65,20 +68,19 @@ def Sigma(P,args):
     J1,J2,J3,ans = args
     Jfn = args[2-ans]
     zfn = inp.z[ans]
-    k = [4*inp.z1*P[0]*J1,4*zfn*P[1]*Jfn,-2*S-1]
     ran = inp.der_range
-    e = np.ndarray(inp.der_pts)
     for i in range(len(P)):
+        e = np.ndarray(inp.der_pts)
         rangeP = np.linspace(P[i]-ran[i],P[i]+ran[i],inp.der_pts)
         pp = np.array(P)
         for j in range(inp.der_pts):
             pp[i] = rangeP[j]
-            e[j] = eig2G(pp,args).ravel().sum()/(3*kp**2)
+            e[j] = tot_E(pp,args)
         de = np.gradient(e)
         dx = np.gradient(rangeP)
         der = de/dx
         f = interp1d(rangeP,der)
-        res += (k[i]+f(P[i]))**2
+        res += f(P[i])**2
     #print(Fore.BLUE+"Time Sigma: ",time.time()-ti,Style.RESET_ALL)
     return res
 

@@ -10,18 +10,18 @@ z = [z3,z2]
 #minimization
 cutoff = 1e-4
 #derivative
-der_pts = 3
+der_pts = 2
 der_range = [0.01,0.01,0.01]       #derivative range for A1 and L
 #phase diagram
-PD_pts = 2
+PD_pts = 10
 iJ2 = 0
 fJ2 = 0.3
 iJ3 = 0
 fJ3 = 0.3
-rJ2 = np.linspace(iJ2,fJ2,PD_pts)
-rJ3 = np.linspace(iJ3,fJ3,PD_pts)
+rJ2 = [[0],np.linspace(iJ2,fJ2,PD_pts)]
+rJ3 = [np.linspace(iJ3,fJ3,PD_pts),[0]]
 #summation over BZ
-sum_pts = 21
+sum_pts = 51
 maxK1 = np.pi
 maxK2 = 2*np.pi/np.sqrt(3)
 K1 = np.linspace(0,maxK1,sum_pts)  #Kx in BZ
