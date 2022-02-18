@@ -1,89 +1,156 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import linalg as LA
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d,interp2d
 import inputs as inp
 import time
 from colorama import Fore,Style
 #Some parameters from inputs.py
 kp = inp.sum_pts
-k = (inp.K1,inp.K2)
+k3 = (inp.K1,inp.K23)
+k6 = (inp.K1,inp.K26)
 S = inp.S
 J1 = inp.J1
-
-#Function which returns e^(-i(k \dot a)) with k the 
-#   momentum and a the position vector. m is the unit
-#   cell size in real space, which can be 3 or 6.
-#   a1 points to the right and a2 to up-left.
-def exp_k(a1,a2):
+#grid points
+grid_pts = 21
+kg = (np.linspace(0,inp.maxK1,grid_pts),np.linspace(0,inp.maxK2,grid_pts))
+def exp_kg(a1,a2):
     ax = a1+a2*(-1/2)
     ay = a2*(np.sqrt(3)/2)
-    res = np.ndarray((kp,kp),dtype=complex)
-    for i in range(kp):
-        for j in range(kp):
-            res[i,j] = np.exp(-1j*(k[0][i]*ax+k[1][j]*ay))
+    res = np.ndarray((grid_pts,grid_pts),dtype=complex)
+    for i in range(grid_pts):
+        for j in range(grid_pts):
+            res[i,j] = np.exp(-1j*(kg[0][i]*ax+kg[1][j]*ay))
     return res
-#Evaluates the eigenvalues of (G^dag G) for the four different
-#   ansatze and for arrays of momenta k1,k2 in the BZ. 
-#   Params contains the couplings J1, J2, the DM phase phi 
-#   and theansatz considered.
-def eig2G(P,args):#3x3 ansatx
-    ti = time.time()
+
+def En3(P,args):#3x3 ansatx
     A1 = P[0]
     Afn = P[1]
     L = P[2]
     J1,J2,J3,ans = args
-    D = np.zeros((3,3,kp,kp),dtype=complex)
-    D[0,0] += (1-ans)*J3*Afn*exp_k(1,0)
-    D[0,1] += J1*A1*(exp_k(0,1)-1*(-1)**ans) - ans*J2*Afn*(exp_k(1,1)+exp_k(-1,0))
-    D[0,2] += J1*A1*((-1)**ans*exp_k(-1,0)-exp_k(0,1)) + ans*J2*Afn*(1+exp_k(-1,1))
-    D[1,1] += -(1-ans)*J3*Afn*exp_k(1,1)
-    D[1,2] += J1*A1*(1-(-1)**ans*exp_k(-1,0)) - ans*J2*Afn*(exp_k(0,1)+exp_k(-1,-1))
-    D[2,2] += (1-ans)*J3*Afn*exp_k(0,1)
+    m = 3
+    D = np.zeros((m,m,grid_pts,grid_pts),dtype=complex)
+    D[0,0] += (1-ans)*J3*Afn*exp_kg(1,0)
+    D[0,1] += J1*A1*(exp_kg(0,1)-1*(-1)**ans) - ans*J2*Afn*(exp_kg(1,1)+exp_kg(-1,0))
+    D[0,2] += J1*A1*((-1)**ans*exp_kg(-1,0)-exp_kg(0,1)) + ans*J2*Afn*(1+exp_kg(-1,1))
+    D[1,1] += -(1-ans)*J3*Afn*exp_kg(1,1)
+    D[1,2] += J1*A1*(1-(-1)**ans*exp_kg(-1,0)) - ans*J2*Afn*(exp_kg(0,1)+exp_kg(-1,-1))
+    D[2,2] += (1-ans)*J3*Afn*exp_kg(0,1)
     D[1,0] += -np.conjugate(D[0,1])
     D[2,0] += -np.conjugate(D[0,2])
     D[2,1] += -np.conjugate(D[1,2])
-    res = np.zeros((3,kp,kp))
-    for i in range(kp):
-        for j in range(kp):
+    #grid of points
+    res = np.zeros((m,grid_pts,grid_pts))
+    for i in range(grid_pts):
+        for j in range(grid_pts):
             D_ = np.conjugate(D[:,:,i,j]).T
             temp = LA.eigvalsh(np.matmul(D_,D[:,:,i,j]))
-            res[0,i,j] = np.sqrt(L**2-temp[0]) if L**2-temp[0] > 0 else 0
-            res[1,i,j] = np.sqrt(L**2-temp[1]) if L**2-temp[1] > 0 else 0
-            res[2,i,j] = np.sqrt(L**2-temp[2]) if L**2-temp[2] > 0 else 0
-    #print("Time eig2G: ",time.time()-ti)
-    return res.ravel().sum()/(3*kp**2)
-
-def tot_E(P,args):
+            for l in range(m):
+                res[l,i,j] = np.sqrt(L**2-temp[l]) if L**2-temp[l] > 0 else 0
+    func = (interp2d(kg[0],kg[1],res[0]),interp2d(kg[0],kg[1],res[1]),interp2d(kg[0],kg[1],res[2]))
+    result = 0
+    for i in range(m):
+        temp = func[i](k3[0],k3[1])
+        result += temp.ravel().sum()
+    return result/(m*kp**2)
+def Tot_E3(P,args):
     J1,J2,J3,ans = args
     zfn = inp.z[ans]
     Jfn = args[2-ans]
     E2 = 2*(inp.z1*J1*P[0]**2+zfn*Jfn*P[1]**2)-P[2]*(2*S+1)
-    res = eig2G(P,args) + E2
+    res = En3(P,args) + E2
     return res
 
-def Sigma(P,args):
-    ti = time.time()
+def Sigma3(P,args):
     res = 0
     J1,J2,J3,ans = args
     Jfn = args[2-ans]
     zfn = inp.z[ans]
-    ran = inp.der_range
+    ran = inp.der_range3
     for i in range(len(P)):
         e = np.ndarray(inp.der_pts)
         rangeP = np.linspace(P[i]-ran[i],P[i]+ran[i],inp.der_pts)
         pp = np.array(P)
         for j in range(inp.der_pts):
             pp[i] = rangeP[j]
-            e[j] = tot_E(pp,args)
+            e[j] = Tot_E3(pp,args)
         de = np.gradient(e)
         dx = np.gradient(rangeP)
         der = de/dx
         f = interp1d(rangeP,der)
         res += f(P[i])**2
-    #print(Fore.BLUE+"Time Sigma: ",time.time()-ti,Style.RESET_ALL)
+    return res
+############################################################################################
+def exp_k6(a1,a2):
+    ax = a1+a2*(-1/2)*2
+    ay = a2*(np.sqrt(3)/2)*2
+    res = np.ndarray((kp,kp),dtype=complex)
+    for i in range(kp):
+        for j in range(kp):
+            res[i,j] = np.exp(-1j*(k6[0][i]*ax+k6[1][j]*ay))
     return res
 
+def en6(P,args):
+    A1 = P[0]
+    A2 = P[1]
+    A3 = P[2]
+    L = P[3]
+    m = 6
+    J1,J2,J3,ans = args
+    D = np.zeros((m,m,kp,kp),dtype=complex)
+    D[0,1] += J1*A1 - J2*A2*exp_k6(-1,0)
+    D[0,2] += -J1*A1*exp_k6(-1,0) + J2*A2
+    D[0,4] += J1*A1*exp_k6(0,1) + J2*A2*exp_k6(1,1)
+    D[0,5] += -J1*A1*exp_k6(0,1) - J2*A2*exp_k6(-1,1)
+    D[1,2] += J1*A1*(1+exp_k6(-1,0))
+    D[1,3] += -J1*A1+J2*A2*exp_k6(-1,0)
+    D[1,4] += J3*A3*(exp_k6(1,1)+exp_k6(-1,0))
+    D[1,5] += J2*A2*(exp_k6(-1,0)-exp_k6(0,1))
+    D[2,3] += J1*A1-J2*A2*exp_k6(1,0)
+    D[2,4] += J2*A2*(1+exp_k6(1,1))
+    D[2,5] += J3*A3*(1-exp_k6(0,1))
+    D[3,4] += J1*A1+J2*A2*exp_k6(1,0)
+    D[3,5] += J1*A1*exp_k6(-1,0)+J2*A2
+    D[4,5] += J1*A1*(1-exp_k6(-1,0))
+    #c.c
+    for i in range(m):
+        for j in range(m):
+            D[i,j] -= np.conjugate(D[j,i])
+    #diag elements
+    D[0,0] += J3*A3*exp_k6(1,0)
+    D[3,3] += -J3*A3*exp_k6(1,0)
+    res = np.zeros((m,kp,kp))
+    for i in range(kp):
+        for j in range(kp):
+            D_ = np.conjugate(D[:,:,i,j]).T
+            temp = LA.eigvalsh(np.matmul(D_,D[:,:,i,j]))
+            for l in range(m):
+                res[l,i,j] = np.sqrt(L**2-temp[l]) if L**2-temp[l] > 0 else 0
+    return res.ravel().sum()/(m*kp**2)
+
+def tot_E6(P,args):
+    J1,J2,J3,ans = args
+    E2 = 2*(inp.z1*J1*P[0]**2+inp.z2*J2*P[1]**2+inp.z3*J3*P[2]**2)-P[3]*(2*S+1)
+    res = en6(P,args) + E2
+    return res
+
+def Sigma6(P,args):
+    res = 0
+    J1,J2,J3,ans = args
+    ran = inp.der_range6
+    for i in range(len(P)): #4
+        e = np.ndarray(inp.der_pts)
+        rangeP = np.linspace(P[i]-ran[i],P[i]+ran[i],inp.der_pts)
+        pp = np.array(P)
+        for j in range(inp.der_pts):
+            pp[i] = rangeP[j]
+            e[j] = tot_E6(pp,args)
+        de = np.gradient(e)
+        dx = np.gradient(rangeP)
+        der = de/dx
+        f = interp1d(rangeP,der)
+        res += f(P[i])**2
+    return res
 
 
 

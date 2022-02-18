@@ -2,14 +2,15 @@ import numpy as np
 import inputs as inp
 import matplotlib.pyplot as plt
 
+S = 0.2
+pts = 5
+dirname = 'DataS'+str(S).replace('.','')+'/'
 Jmax = 0.3
-dirname = 'Data3/'
-pts = 10
 dataE = np.ndarray((2,pts,pts))
 dataS = np.ndarray((2,pts,pts))
 for ans in range(2):
-    dataE[ans] = np.load(dirname+'Energies_(J2,J3)-'+inp.text_ans[ans]+'.npy')
-    dataS[ans] = np.load(dirname+'Sigmas_(J2,J3)-'+inp.text_ans[ans]+'.npy')
+    dataE[ans] = np.load(dirname+'Energies_(J2,J3)-'+inp.text_ans[ans]+'pts='+str(int(pts))+'a.npy')
+    dataS[ans] = np.load(dirname+'Sigmas_(J2,J3)-'+inp.text_ans[ans]+'pts='+str(int(pts))+'a.npy')
 
 E = np.zeros((pts,pts),dtype=int)
 S = np.zeros((pts,pts))
