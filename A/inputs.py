@@ -2,11 +2,12 @@ import numpy as np
 
 S = 0.2
 #derivative
-der_pts = 2
-der_range3 = [0.01,0.01,0.01]
+der_pts = 5
+der_range3 = [0.1,0.1,0.1]
 der_range6 = [0.01,0.01,0.01,0.01]
 PD_pts = 5
 sum_pts = 51
+grid_pts = 11
 #fixed
 J1 = 1
 z1 = 4
