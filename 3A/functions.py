@@ -162,6 +162,109 @@ def SigmaA(P,args):
         f = interp1d(rangeP,der)
         res += f(P[i])**2
     return res,minL
+####################################### AB
+def Eab(P):
+    A = P[0]
+    B = P[1]
+    L = P[2]
+    N = np.zeros((6,6,grid_pts,grid_pts),dtype=complex)
+    N[0,1] = -J1/2*B*(1+exp_kg(0,1))
+    N[0,2] = -J1/2*B*(exp_kg(0,1)+exp_kg(-1,0))
+    N[1,2] = -J1/2*B*(1+exp_kg(-1,0))
+    N[3,4] = N[0,1]
+    N[3,5] = N[0,2]
+    N[4,5] = N[1,2]
+    N[0,4] = J1/2*A*(exp_kg(0,1)-1)
+    N[0,5] = J1/2*A*(exp_kg(-1,0)-exp_kg(0,1))
+    N[1,5] = J1/2*A*(1-exp_kg(-1,0))
+    N[1,3] = -np.conjugate(N[0,4])
+    N[2,3] = -np.conjugate(N[0,5])
+    N[2,4] = -np.conjugate(N[1,5])
+    res = np.zeros((3,grid_pts,grid_pts))
+    for i in range(grid_pts):
+        for j in range(grid_pts):
+            N[:,:,i,j] = N[:,:,i,j] + np.conjugate(N[:,:,i,j]).T
+            for l in range(6):
+                N[l,l,i,j] = L
+            for m in range(3,6):
+                for n in range(6):
+                    N[m,n,i,j] *= -1
+            temp = LA.eigvals(N[:,:,i,j])
+            res[:,i,j] = np.sort(temp.real)[3:]             #problem of imaginary part -> is not 0
+    func = (interp2d(kg[0],kg[1],res[0]),interp2d(kg[0],kg[1],res[1]),interp2d(kg[0],kg[1],res[2]))
+    result = 0
+    for i in range(3):
+        temp = func[i](k3[0],k3[1])
+        result += temp.ravel().sum()
+    return result/(3*kp**2)
+
+def Tot_Eab(P):
+    A,B,L = P
+    L = maxL(P)
+    eN = Eab((A,B,L))
+    E2 = 2*inp.J1*(A**2-B**2)-L*(2*S+1)
+    res = eN + E2
+    return res,L
+def maxL(P):
+    #maximization wrt L
+    minL = minimize_scalar(lambda l:-E3Lab((P[0],P[1],l)),
+                bounds = (0,1),
+                method = 'bounded'
+                ).x
+    L = minL
+    return L
+def E3Lab(P):
+    A,B,L = P
+    eN = Eab(P)
+    E2 = 2*inp.J1*(A**2-B**2)-L*(2*S+1)
+    res = eN + E2
+    return res
+def SigmaLab(P):
+    pts = inp.der_pts
+    res = 0
+    p = [P[0],P[1],P[2]]
+    k = [4*p[0]*J1,-4*p[1]*J1,-2*S-1]
+    ran = inp.der_range3
+    e = np.ndarray(pts)
+    for i in range(len(p)):
+        rangeP = np.linspace(p[i]-ran[i],p[i]+ran[i],pts)
+        pp = p
+        for j in range(pts):
+            pp[i] = rangeP[j]
+            e[j] = Eab(pp)
+        de = np.gradient(e)
+        dx = np.gradient(rangeP)
+        der = de/dx
+        f = interp1d(rangeP,der)
+        res += (k[i]+f(p[i]))**2
+    return res
+    res = 0
+    #maximization wrt L
+    minL = minimize_scalar(lambda l:-E3L(P,(J1,J2,J3,ans,l)),
+                bounds = (0,1),
+                method = 'bounded'
+                ).x
+    L = minL
+    args = (J1,J2,J3,ans,L)
+    Jfn = args[2-ans]
+    zfn = inp.z[ans]
+    ran = inp.der_range3
+    for i in range(len(P)):
+        e = np.ndarray(inp.der_pts)
+        rangeP = np.linspace(P[i]-ran[i],P[i]+ran[i],inp.der_pts)
+        pp = np.array(P)
+        for j in range(inp.der_pts):
+            pp[i] = rangeP[j]
+            e[j] = Tot_E3L(pp,args)[0]
+        de = np.gradient(e)
+        dx = np.gradient(rangeP)
+        der = de/dx
+        f = interp1d(rangeP,der)
+        res += f(P[i])**2
+    return res,minL
+
+
+
 ############################################################################################
 def exp_k6(a1,a2):
     ax = a1+a2*(-1/2)*2
@@ -233,6 +336,5 @@ def Sigma6(P,args):
         f = interp1d(rangeP,der)
         res += f(P[i])**2
     return res
-
 
 

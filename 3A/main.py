@@ -39,6 +39,7 @@ for ans in range(2):
                         'xtol':1e-4})
                 initialP = [result.x[0],0,result.x[1]]
             E_arr[j2,j3] = fs.Tot_E3(initialP,Args)
+            ### print messages
             #S_arr[j2,j3] = fs.Sigma3(initialP,Args)
             #print("Sigma of this step: ",S_arr[j2,j3])
             print("Energy of this step: ",E_arr[j2,j3])
