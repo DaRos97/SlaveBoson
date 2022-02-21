@@ -102,7 +102,7 @@ def minL(P,args):
     res = minimize_scalar(lambda l: -totEl(P,l,args),
             method = 'bounded',
             bounds = (mL,10),
-            options={'disp':False}
+            options={'xatol':1e-8}
             )
     L = res.x
     return L,mL
