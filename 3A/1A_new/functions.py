@@ -47,12 +47,13 @@ def sumE(A,L):
         result += temp.ravel().sum()
     return result/(m*kp**2)
 ####
-def Sigma(A,L):
+def Sigma(P):
     #get L
-    L = minimize_scalar(lambda l: derL(A,l),
-                bounds = (0,10),
-                method = 'bounded'
-                ).x
+    A, L = P
+    #L = minimize_scalar(lambda l: derL(A,l),
+    #            bounds = (0,10),
+    #            method = 'bounded'
+    #            ).x
     #derivative wrt A
     der_pts = inp.der_pts
     der_ran = inp.der_range[0]
@@ -65,6 +66,7 @@ def Sigma(A,L):
     der = dE/da
     func = interp1d(ranA,der)
     res = func(A)**2
+    res += derL(A,L)**2
     return res
 ####
 def derL(A,L):

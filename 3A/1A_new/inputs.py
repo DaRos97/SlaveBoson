@@ -2,13 +2,13 @@ import numpy as np
 
 S = 0.5
 #derivative
-der_pts = 5
+der_pts = 20
 der_range = [0.0001,0.01,0.0001]
 der_range3 = [0.1,0.1,0.1]
 der_range6 = [0.01,0.01,0.01,0.01]
 PD_pts = 5
 sum_pts = 101
-grid_pts = 31
+grid_pts = 11
 #minimization
 cutoff = 1e-8
 #fixed

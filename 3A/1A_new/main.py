@@ -12,23 +12,27 @@ Bnds = ((0,1),(0,10))      #A, L
 #just 3x3 ansatz
 Ainitial = 0.3       #initial guess A, L
 Ai = Ainitial
-L = 0.4
+Linitial = 0.4
+L = Linitial
 Stay = True
 rd = 0
 rd2 = 0
-reps = 2
+reps = 4
 while Stay:
+    print("Starting new cicle with Ai = ",Ai," and L = ",L)
     ti = t()
-    result = minimize_scalar(lambda x:fs.Sigma(x,L),
-        #(Ai,Li),
-        method = 'bounded',#'Nelder-Mead',
-        bounds=Bnds[0]
-        #options={
-        #    'adaptive':True}
+    result = minimize(fs.Sigma,
+        (Ai,L),
+        method = 'Nelder-Mead',#'bounded',#
+        bounds = Bnds,
+        options={
+            'disp':True,
+        #    'xatol':1e-5
+            'adaptive':True}
         )
-    Af = result.x
-    s = fs.Sigma(Af,L)
-    L = fs.getL(Af)
+    Af,L = result.x
+    s = fs.Sigma((Af,L))
+    #L = fs.getL(Af)
     E = fs.totE(Af,L)
     print(Fore.GREEN+"Sigma = :",s," and energy = ",E,"\nParams = ",Af,L,Fore.RESET)
     if s<inp.cutoff and Af > 0.001:
@@ -38,20 +42,18 @@ while Stay:
         print(Fore.RED+"Changing Pi since we are stuck"+Fore.RESET)
         Ai = Ainitial+0.05*(rd2+1)/reps
         rd2 += 1
-        print("Starting new cicle with Ai = ",Ai," and L = ",L)
     elif s>inp.cutoff:
         Ai = Af
-        print("Starting new cicle with Ai = ",Ai," and L = ",L)
         rd2 += 1
     else:
-        print("arrived at A = 0, try again")
+        print(Fore.BLUE,"arrived at A = 0, try again",Fore.RESET)
         rd += 1
         Ai = Ainitial+0.05*rd
     print("time: ",t()-ti)
-    exit()
 ### print messages
+print('\n')
 print("Exited minimization with Sigma = ",s)
-print("Initial guess: ",Ai,", L = ",L)
+print("Initial guess: ",Ainitial,", L = ",Linitial)
 print(Fore.GREEN+"Final parameters: ",Af,", L = ",L,Style.RESET_ALL)
 print("Energy : ",E)
 
