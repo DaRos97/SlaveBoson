@@ -30,12 +30,10 @@ def sumE(A,L):
     N[0,1] = J1*A*(exp_k(0,1)-1)
     N[0,2] = J1*A*(exp_k(-1,0)-exp_k(0,1))
     N[1,2] = J1*A*(1-exp_k(-1,0))
-    N[1,0] = -np.conjugate(N[0,1])
-    N[2,0] = -np.conjugate(N[0,2])
-    N[2,1] = -np.conjugate(N[1,2])
     res = np.zeros((m,grid_pts,grid_pts))
     for i in range(grid_pts):
         for j in range(grid_pts):
+            N[:,:,i,j] -= np.conjugate(N[:,:,i,j]).T
             N_ = np.conjugate(N[:,:,i,j]).T
             temp = LA.eigvalsh(np.matmul(N[:,:,i,j],N_))
             for l in range(m):
@@ -47,11 +45,26 @@ def sumE(A,L):
         result += temp.ravel().sum()
     return result/(m*kp**2)
 ####
-def Sigma(P):
+def minL(A):
+    m = 3
+    N = np.zeros((m,m,grid_pts,grid_pts),dtype=complex)
+    N[0,1] = J1*A*(exp_k(0,1)-1)
+    N[0,2] = J1*A*(exp_k(-1,0)-exp_k(0,1))
+    N[1,2] = J1*A*(1-exp_k(-1,0))
+    res = np.zeros((m,grid_pts,grid_pts))
+    for i in range(grid_pts):
+        for j in range(grid_pts):
+            N[:,:,i,j] -= np.conjugate(N[:,:,i,j]).T
+            N_ = np.conjugate(N[:,:,i,j]).T
+            res[:,i,j] = LA.eigvalsh(np.matmul(N[:,:,i,j],N_))
+    return np.sqrt(np.amax(res.ravel()))
+
+####
+def Sigma(A):
     #get L
-    A, L = P
+    #L = minL(A) #since I know we are in a LRO phase
     #L = minimize_scalar(lambda l: derL(A,l),
-    #            bounds = (0,10),
+    #            bounds = (mL,100),
     #            method = 'bounded'
     #            ).x
     #derivative wrt A
@@ -60,13 +73,12 @@ def Sigma(P):
     E = np.ndarray(der_pts)
     ranA = np.linspace(A-der_ran,A+der_ran,der_pts)
     for j in range(der_pts):
-        E[j] = totE(ranA[j],L)
+        E[j] = totE(ranA[j])
     dE = np.gradient(E)
     da = np.gradient(ranA)
     der = dE/da
     func = interp1d(ranA,der)
     res = func(A)**2
-    res += derL(A,L)**2
     return res
 ####
 def derL(A,L):
@@ -83,7 +95,8 @@ def derL(A,L):
     res = np.abs(func(L))
     return res
 ####
-def totE(A,L):
+def totE(A):
+    L = minL(A)
     eN = sumE(A,L)
     E2 = inp.z1*inp.J1*A**2 - L*(2*S+1) + inp.z1*J1*inp.S**2/2
     res = eN + E2

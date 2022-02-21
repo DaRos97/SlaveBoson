@@ -21,20 +21,23 @@ reps = 4
 while Stay:
     print("Starting new cicle with Ai = ",Ai," and L = ",L)
     ti = t()
-    result = minimize(fs.Sigma,
-        (Ai,L),
-        method = 'Nelder-Mead',#'bounded',#
-        bounds = Bnds,
+    result = minimize_scalar(lambda x:fs.Sigma(x),#fs.totE(x),#fs.Sigma(x)[0],
+        #(Ai,L),
+        method = 'bounded',#'Nelder-Mead',#'bounded',#
+        bounds = Bnds[0],
         options={
-            'disp':True,
-        #    'xatol':1e-5
-            'adaptive':True}
-        )
-    Af,L = result.x
-    s = fs.Sigma((Af,L))
+            'xatol':1e-5
+        #    'adaptive':True}
+        })
+    Af = result.x
+    L = fs.minL(Af)
+    print(Fore.RED,Af,L,fs.totE(Af),Fore.RESET)
+    s = fs.Sigma(Af)
+    print(Fore.BLUE,Af,L,s,Fore.RESET)
     #L = fs.getL(Af)
-    E = fs.totE(Af,L)
+    E = fs.totE(Af)
     print(Fore.GREEN+"Sigma = :",s," and energy = ",E,"\nParams = ",Af,L,Fore.RESET)
+    Ai = Af
     if s<inp.cutoff and Af > 0.001:
         print("exiting cicle")
         Stay = False

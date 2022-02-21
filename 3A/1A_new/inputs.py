@@ -2,7 +2,7 @@ import numpy as np
 
 S = 0.5
 #derivative
-der_pts = 20
+der_pts = 5
 der_range = [0.0001,0.01,0.0001]
 der_range3 = [0.1,0.1,0.1]
 der_range6 = [0.01,0.01,0.01,0.01]
