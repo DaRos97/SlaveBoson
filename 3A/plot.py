@@ -15,10 +15,10 @@ dataP = np.ndarray((2,3,pts,pts))
 dataL = np.ndarray((2,2,pts,pts))
 Dtxt = inp.text_params
 for ans in range(2):
-    dataE[ans] = np.load(dirname+Dtxt[0]+'_(J2,J3)-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'a.npy')
-    dataS[ans] = np.load(dirname+Dtxt[1]+'_(J2,J3)-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'a.npy')
-    dataP[ans] = np.load(dirname+Dtxt[2]+'_(J2,J3)-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'a.npy')
-    dataL[ans] = np.load(dirname+Dtxt[3]+'_(J2,J3)-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'a.npy')
+    dataE[ans] = np.load(dirname+Dtxt[0]+'-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'.npy')
+    dataS[ans] = np.load(dirname+Dtxt[1]+'-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'.npy')
+    dataP[ans] = np.load(dirname+Dtxt[2]+'-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'.npy')
+    dataL[ans] = np.load(dirname+Dtxt[3]+'-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'.npy')
 #organize energies
 E = np.zeros((pts,pts),dtype=int)
 Ans = np.zeros((pts,pts),dtype=int)

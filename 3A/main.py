@@ -5,15 +5,14 @@ from time import time as t
 from colorama import Fore, Style
 from scipy.optimize import minimize, minimize_scalar
 
-Save = True
-dirname = 'DataS'+str(inp.S).replace('.','')+'/'
 Ti = t()
 J1 = inp.J1
 Bnds = ((0,1),(0,1),(0,1))      #A1,A2,A3
-
+Pinitial = (0.5,0.1,0.1)       #initial guess of A1,A2,A3 from classical values?? see art...
+non_converging_points = 0
+reps = 3
 for ans in range(2):
     Ttti = t()
-    Pinitial = (0.5,0.1,0.1)       #initial guess of A1,A2,A3 from classical values?? see art...
     Pi = Pinitial
     E_arr = np.zeros((inp.PD_pts,inp.PD_pts))
     S_arr = np.zeros((inp.PD_pts,inp.PD_pts))
@@ -27,7 +26,7 @@ for ans in range(2):
             Stay = True
             rd = 0
             rd2 = 0
-            tempS = []; tempE = []; tempP = []; tempL = []; tempmL = [];
+            tempE = []; tempS = []; tempP = []; tempL = []; tempmL = [];
             while Stay:
                 ti = t()
                 print("Initial guess: ",Pi)
@@ -42,11 +41,11 @@ for ans in range(2):
                 Pf = result.x
                 #checks
                 Pf[ans+1] = 0
-                if j3 == 0:
+                if J3 == 0:
                     Pf[2] == 0
-                if j2 == 0:
+                if J2 == 0:
                     Pf[1] == 0
-                S = [fs.Sigma(Pf,Args)]
+                S = fs.Sigma(Pf,Args)
                 E,L,mL = fs.totE(Pf,Args)
                 print("After minimization:\n\tparams = ",Pf,"\n\tL,mL = ",L,mL,"\n\tSigma = ",S,"\n\tEnergy = ",E)
                 if S<inp.cutoff:
@@ -58,24 +57,25 @@ for ans in range(2):
                     S_arr[j2,j3] = S
                     P_arr[:,j2,j3] = Pf
                     L_arr[:,j2,j3] = [L,mL]
-                elif rd <= 5:
-                    tempP += [Pf]
+                elif rd <= reps:
                     tempE += [E]
                     tempS += [S]
+                    tempP += [Pf]
                     tempL += [L]
-                    tempml += [mL]
+                    tempmL += [mL]
                     rd += 1
-                    for i in range(3):
-                        Pi[i] = Pinitial[i] + 0.05*rd
+                    Pi = (Pinitial[0]+0.05*rd,Pinitial[1]+0.05*rd,Pinitial[2]+0.05*rd)
                     print(Fore.BLUE+"Changing initial parameters to ",Pi,Fore.RESET)
                 else:
-                    print(FORE.GREEN+"It's taking too long, pass to other point"+Fore.RESET)
+                    print(Fore.GREEN+"It's taking too long, pass to other point")
                     Stay = False
                     arg = np.argmin(tempE)
                     E_arr[j2,j3] = tempE[arg]
                     S_arr[j2,j3] = tempS[arg]
                     P_arr[:,j2,j3] = tempP[arg]
                     L_arr[:,j2,j3] = [tempL[arg],tempmL[arg]]
+                    print("Keeping the best result:\n\tparams = ",P_arr[:,j2,j3],"\n\tL,mL = ",L_arr[:,j2,j3],"\n\tSigma = ",S_arr[j2,j3],"\n\tEnergy = ",E_arr[j2,j3],Fore.RESET)
+                    non_converging_points += 1
             print(Fore.YELLOW+"time of (j2,j3) point: ",t()-Tti,Fore.RESET)
     #compute missing points
     for i in range(1,inp.PD_pts):
@@ -86,11 +86,10 @@ for ans in range(2):
                 E_arr[j,i] = E_arr[j,0] + inp.rJ[ans][1-ans][i]*inp.z[ans+1]*inp.S**2/2
     #save externally
     Data = [E_arr,S_arr,P_arr,L_arr]
-    if Save:
-        print(Fore.BLUE+"Saving values in ",dirname,Fore.RESET)
+    if inp.Save:
+        print(Fore.BLUE+"Saving values in ",inp.dirname,Fore.RESET)
         for i in range(len(inp.text_params)):
-            text = dirname+inp.text_params[i]+'_(J2,J3)-'+inp.text_ans[ans]+'PDpts='+str(int(inp.PD_pts))+'a.npy'
-            np.save(text,Data[i])
+            np.save(inp.text_file[ans][i],Data[i])
     print(Fore.YELLOW+"time of ansatz: ",t()-Ttti,Fore.RESET)
-
+print(Fore.GREEN+"Non converging points: ",non_converging_points,Fore.RESET)
 print(Fore.YELLOW+"Total time: ",t()-Ti,Style.RESET_ALL)
