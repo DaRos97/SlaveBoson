@@ -2,7 +2,7 @@ import numpy as np
 
 S = 0.5
 #derivative
-der_pts = 3
+der_pts = 2
 der_range = [0.001,0.001,0.001,0.001]
 PD_pts = 3
 sum_pts = 101
@@ -14,11 +14,11 @@ z2 = 4
 z3 = 2
 z = (z1,z2,z3)
 #minimization
-cutoff = 1e-4
+cutoff = 1e-6
 #phase diagram
-iJ2 = 0
+iJ2 = 0.
 fJ2 = 0.3
-iJ3 = 0
+iJ3 = 0.
 fJ3 = 0.3
 rJ2 = np.linspace(iJ2,fJ2,PD_pts)
 rJ3 = np.linspace(iJ3,fJ3,PD_pts)
@@ -30,3 +30,4 @@ K23 = np.linspace(0,maxK2,sum_pts)  #Ky in BZ
 K26 = np.linspace(0,maxK2/2,sum_pts)
 #text
 text_ans = ['(0,0)','(pi,0)','(pi,pi)','(0,pi)']
+text_params = ['Energies','Sigmas','Params','Ls']
