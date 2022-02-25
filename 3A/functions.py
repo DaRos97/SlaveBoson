@@ -6,6 +6,10 @@ from scipy.interpolate import interp1d,interp2d
 import inputs as inp
 import time
 from colorama import Fore,Style
+from pathlib import Path
+import csv
+from pandas import read_csv
+
 #Some parameters from inputs.py
 kp = inp.sum_pts
 k3 = (inp.K1,inp.K23)
@@ -106,4 +110,49 @@ def minL(P,args):
             )
     L = res.x
     return L,mL
+#########################################################################
+def CheckCsv(filename):
+    my_file = Path(filename)
+    if my_file.is_file():
+        with open(my_file,'r') as f:
+            reader = csv.DictReader(f)
+            headers = reader.fieldnames
+            a = 1
+            for ind in range(len(headers)):
+                if inp.header[ind] != headers[ind]:
+                    a *= 0
+        if a:
+            return 0
+    with open(my_file,'w') as f:
+        writer = csv.DictWriter(f, fieldnames = inp.header)
+        writer.writeheader()
+
+def computeRanges(filename,ans):
+    my_file = Path(filename)
+    data = read_csv(my_file)
+    J2 = data['J2'].tolist()
+    J3 = data['J3'].tolist()
+    rJ2 = inp.rJ2[ans]
+    rJ3 = inp.rJ3[ans]
+    a2 = min(len(J2),len(rJ2))
+    a3 = min(len(J3),len(rJ3))
+
+def compute_points(filename,ans):
+    my_file = Path(filename)
+    data = read_csv(my_file)
+    J2 = data['J2'].tolist()
+    J3 = data['J3'].tolist()
+    E = data['Energy'].tolist()
+    S = data['Sigma'].tolist()
+    A1 = data['A1'].tolist()
+    A2 = data['A2'].tolist()
+    A3 = data['A3'].tolist()
+    L = data['L'].tolist()
+    mL = data['mL'].tolist()
+    dict_list: List[Dict[str,float]] = []
+
+    with open(my_file,'a') as f:
+        writer = DictWriter(f, fieldnames = inp.header)
+        for dic in dict_list:
+            writer.writerow(dic)
 

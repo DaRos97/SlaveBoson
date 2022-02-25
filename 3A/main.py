@@ -4,6 +4,7 @@ import inputs as inp
 from time import time as t
 from colorama import Fore, Style
 from scipy.optimize import minimize, minimize_scalar
+import csv 
 
 Ti = t()
 J1 = inp.J1
@@ -11,9 +12,13 @@ Bnds = ((0,1),(0,1),(0,1))      #A1,A2,A3
 Pinitial = (0.5,0.1,0.1)       #initial guess of A1,A2,A3 from classical values?? see art...
 non_converging_points = 0
 reps = 3
+header = inp.header
+csvfile = inp.csvfile
 for ans in range(2):
     Ttti = t()
     Pi = Pinitial
+    fs.CheckCsv(csvfile[ans])       #checks if the file exists and if not initializes it with the header
+    #rJ2,rJ3 = fs.computeRanges(csvfile[ans],ans)
     E_arr = np.zeros((inp.PD_pts,inp.PD_pts))
     S_arr = np.zeros((inp.PD_pts,inp.PD_pts))
     P_arr = np.zeros((3,inp.PD_pts,inp.PD_pts))
@@ -27,6 +32,7 @@ for ans in range(2):
             rd = 0
             rd2 = 0
             tempE = []; tempS = []; tempP = []; tempL = []; tempmL = [];
+            DataDic = {}
             while Stay:
                 ti = t()
                 print("Initial guess: ",Pi)
@@ -41,9 +47,9 @@ for ans in range(2):
                 Pf = result.x
                 #checks
                 Pf[ans+1] = 0
-                if J3 == 0:
+                if abs(J3) < 1e-15:
                     Pf[2] == 0
-                if J2 == 0:
+                if abs(J2) < 1e-15:
                     Pf[1] == 0
                 S = fs.Sigma(Pf,Args)
                 E,L,mL = fs.totE(Pf,Args)
@@ -57,6 +63,9 @@ for ans in range(2):
                     S_arr[j2,j3] = S
                     P_arr[:,j2,j3] = Pf
                     L_arr[:,j2,j3] = [L,mL]
+                    data = [J2,J3,E,S,Pf[0],Pf[1],Pf[2],L,mL]
+                    for ind in range(len(data)):
+                        DataDic[header[ind]] = data[ind]
                 elif rd <= reps:
                     tempE += [E]
                     tempS += [S]
@@ -74,17 +83,25 @@ for ans in range(2):
                     S_arr[j2,j3] = tempS[arg]
                     P_arr[:,j2,j3] = tempP[arg]
                     L_arr[:,j2,j3] = [tempL[arg],tempmL[arg]]
+                    data = [J2,J3,tempE[arg],tempS[arg],Pf[0],Pf[1],Pf[2],tempL[arg],tempmL[arg]]
+                    for ind in range(len(data)):
+                        DataDic[header[ind]] = data[ind]
                     print("Keeping the best result:\n\tparams = ",P_arr[:,j2,j3],"\n\tL,mL = ",L_arr[:,j2,j3],"\n\tSigma = ",S_arr[j2,j3],"\n\tEnergy = ",E_arr[j2,j3],Fore.RESET)
                     non_converging_points += 1
+            #save externally to .csv
+            with open(csvfile[ans],'a') as f:
+                writer = csv.DictWriter(f, fieldnames = header)
+                writer.writerow(DataDic)
             print(Fore.YELLOW+"time of (j2,j3) point: ",t()-Tti,Fore.RESET)
     #compute missing points
+    #fs.compute_points(csvfile[ans],ans)
     for i in range(1,inp.PD_pts):
         for j in range(inp.PD_pts):
             if ans == 0:
-                E_arr[i,j] = E_arr[0,j] + inp.rJ[ans][1-ans][i]*inp.z[ans+1]*inp.S**2/2
+                E_arr[i,j] = E_arr[0,j] + (inp.rJ[0][1][i] - inp.rJ[0][1][0])*inp.z[1]*inp.S**2/2         #WRONG
             else:
-                E_arr[j,i] = E_arr[j,0] + inp.rJ[ans][1-ans][i]*inp.z[ans+1]*inp.S**2/2
-    #save externally
+                E_arr[j,i] = E_arr[j,0] + (inp.rJ[1][0][i] - inp.rJ[1][0][0])*inp.z[2]*inp.S**2/2
+    #save externally to .npy
     Data = [E_arr,S_arr,P_arr,L_arr]
     if inp.Save:
         print(Fore.BLUE+"Saving values in ",inp.dirname,Fore.RESET)

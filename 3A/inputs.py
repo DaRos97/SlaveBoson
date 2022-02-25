@@ -14,10 +14,10 @@ z2 = 4
 z3 = 2
 z = (z1,z2,z3)
 #minimization
-cutoff = 1e-8
+cutoff = 1e-6
 #phase diagram
-iJ2 = -0.6
-fJ2 = 0#0.3
+iJ2 = -0.3
+fJ2 = 0.3
 iJ3 = -0.3
 fJ3 = 0.3
 rJ2 = [[0],np.linspace(iJ2,fJ2,PD_pts)]
@@ -34,5 +34,10 @@ text_ans = ['(0,0)','(pi,0)','(pi,pi)','(0,pi)']
 text_params = ['Energies','Sigmas','Params','Ls']
 Save = True
 dirname = 'DataS'+str(S).replace('.','')+'/'
-text_file = [[dirname+text_params[i]+'-'+text_ans[ans]+'PDpts='+str(int(PD_pts))+'a.npy' for i in range(len(text_params))] for ans in range(2)]
+text_file = [[dirname+text_params[i]+'-'+text_ans[ans]+'PDpts='+str(int(PD_pts))+'.npy' for i in range(len(text_params))] for ans in range(2)]
+#csv
+header = ['J2','J3','Energy','Sigma','A1','A2','A3','L','mL']
+csvfile = [dirname+text_ans[ans]+'.csv' for ans in range(2)]
+
+
 
