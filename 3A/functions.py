@@ -126,16 +126,19 @@ def CheckCsv(filename):
     with open(my_file,'w') as f:
         writer = csv.DictWriter(f, fieldnames = inp.header)
         writer.writeheader()
+    return 0
 
-def computeRanges(filename,ans):
+def ComputeRanges(filename,ans):
     my_file = Path(filename)
-    data = read_csv(my_file)
-    J2 = data['J2'].tolist()
-    J3 = data['J3'].tolist()
-    rJ2 = inp.rJ2[ans]
-    rJ3 = inp.rJ3[ans]
-    a2 = min(len(J2),len(rJ2))
-    a3 = min(len(J3),len(rJ3))
+    data = read_csv(my_file,usecols=['J3'])
+    J3 = data['J3']
+    rJ3 = inp.rJ
+    resJ = []
+    for j in J3:
+        ind_j = np.where(rJ2 == j2)
+        if len(ind_j2) == 0:
+            resJ.append(rJ3[ind_j]      #not found
+    return resJ
 
 def compute_points(filename,ans):
     my_file = Path(filename)
