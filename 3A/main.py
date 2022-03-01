@@ -110,3 +110,4 @@ for ans in range(2):
     print(Fore.YELLOW+"time of ansatz: ",t()-Ttti,Fore.RESET)
 print(Fore.GREEN+"Non converging points: ",non_converging_points,Fore.RESET)
 print(Fore.YELLOW+"Total time: ",t()-Ti,Style.RESET_ALL)
+

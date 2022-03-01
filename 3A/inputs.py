@@ -40,4 +40,8 @@ header = ['J2','J3','Energy','Sigma','A1','A2','A3','L','mL']
 csvfile = [dirname+text_ans[ans]+'.csv' for ans in range(2)]
 
 
-
+#ans = 0
+Ji = -0.3
+Jf = 0.3
+Jpts = 5
+rJ = np.linspace(Ji,Jf,Jpts)
