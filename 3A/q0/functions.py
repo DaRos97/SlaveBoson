@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 from scipy import linalg as LA
 from scipy.optimize import minimize_scalar
 from scipy.interpolate import interp1d,interp2d
+import time
+from colorama import Fore,Style
+from pathlib import Path
 import sys
 import os
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 import inputs1 as inp
-import time
-from colorama import Fore,Style
-from pathlib import Path
 import csv
 from pandas import read_csv
 
@@ -33,16 +33,13 @@ def exp_k(a1,a2):
 ####
 def eigs(P,args):
     A1 = P[0]
-    A3 = -P[1]
+    A2 = -P[1]
     J1,J2,J3 = args
     m = 3
     D = np.zeros((m,m,grid_pts,grid_pts),dtype=complex)
-    D[0,0] += J3*A3*exp_k(1,0)
-    D[0,1] += J1*A1*(exp_k(0,1)-1)
-    D[0,2] += J1*A1*(exp_k(-1,0)-exp_k(0,1))
-    D[1,1] += -J3*A3*exp_k(1,1)
-    D[1,2] += J1*A1*(1-exp_k(-1,0))
-    D[2,2] += J3*A3*exp_k(0,1)
+    D[0,1] += J1*A1*(exp_k(0,1)+1) - J2*A2*(exp_k(1,1)+exp_k(-1,0))
+    D[0,2] += J1*A1*(exp_k(-1,0)+exp_k(0,1)) + J2*A2*(1+exp_k(-1,1))
+    D[1,2] += J1*A1*(1+exp_k(-1,0)) - J2*A2*(exp_k(0,1)+exp_k(-1,-1))
     D[1,0] -= np.conjugate(D[0,1])
     D[2,0] -= np.conjugate(D[0,2])
     D[2,1] -= np.conjugate(D[1,2])
@@ -55,9 +52,9 @@ def eigs(P,args):
     return res
 ####
 def sumEigs(P,L,args):
-    temp = eigs(P,args)
+    temp1 = eigs(P,args)
     m = 3
-    res = np.sqrt(L**2-temp)
+    res = np.sqrt(L**2-temp1)
     func = (interp2d(kg[0],kg[1],res[0]),interp2d(kg[0],kg[1],res[1]),interp2d(kg[0],kg[1],res[2]))
     result = 0
     for i in range(m):
@@ -74,7 +71,7 @@ def totEl(P,L,args):
     J1,J2,J3 = args
     J = (J1,J2,J3)
     res = 0
-    Pp = (P[0],0,P[1])
+    Pp = (P[0],P[1],0)
     for i in range(len(Pp)):
         res += inp.z[i]*Pp[i]**2*J[i] + inp.z[i]*J[i]*inp.S**2/2
     res -= L*(2*inp.S+1)
@@ -129,14 +126,14 @@ def CheckCsv(filename):
 
 def ComputeRanges(filename):
     my_file = Path(filename)
-    data = read_csv(my_file,usecols=['J3'])
-    J3 = data['J3']
-    rJ3 = inp.rJ
+    data = read_csv(my_file,usecols=['J2'])
+    J2 = data['J2']
+    rJ2 = inp.rJ
     resJ = []
-    for j3 in rJ3:
-        ind_j = np.where(J3 == j3)
+    for j2 in rJ2:
+        ind_j = np.where(J2 == j2)
         if len(ind_j[0]) == 0:
-            resJ.append(j3)      #not found
+            resJ.append(j2)      #not found
     print(resJ)
     return resJ
 

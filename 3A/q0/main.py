@@ -9,13 +9,13 @@ from colorama import Fore, Style
 from scipy.optimize import minimize, minimize_scalar
 import csv 
 #######
-ans = 0
+ans = 1
 print(Fore.GREEN+"\nUsing ansatz ",inp.text_ans[ans])
 #######
 Ti = t()
 J1 = inp.J1
-Bnds = ((0,1),(0,1))      #A1,A3  --> sure? Put neg values possible
-Pinitial = (0.5,0.1)       #initial guess of A1,A3 from classical values?? see art...
+Bnds = ((0,1),(0,1))      #A1,A2  --> sure? Put neg values possible
+Pinitial = (0.5,0.1)       #initial guess of A1,A2 from classical values?? see art...
 Pi = Pinitial
 non_converging_points = 0
 reps = 3
@@ -24,11 +24,12 @@ csvfile = inp.csvfile[ans]
 
 fs.CheckCsv(csvfile)       #checks if the file exists and if not initializes it with the header
 rJ = fs.ComputeRanges(csvfile)
-J2 = 0.
-rJ2 = np.linspace(inp.Ji,inp.Jf,inp.Jpts)
+J3 = 0.
+rJ3 = np.linspace(inp.Ji,inp.Jf,inp.Jpts)
 
 Data = []
-for j3,J3 in enumerate(rJ):
+for j2,J2 in enumerate(rJ):
+    Args = (J1,J2,J3)
     Tti = t()
     print(Fore.RED+"\nEvaluating energy of (J2,J3) = (",J2,",",J3,")",Style.RESET_ALL)
     Stay = True
@@ -37,8 +38,7 @@ for j3,J3 in enumerate(rJ):
     DataDic = {}
     while Stay:
         ti = t()
-        print("Initial guess: (A1,A3) = ",Pi)
-        Args = (J1,J2,J3)
+        print("Initial guess: (A1,A2) = ",Pi)
         result = minimize(lambda x:fs.Sigma(x,Args),
             Pi,
             method = 'Nelder-Mead',
@@ -48,7 +48,7 @@ for j3,J3 in enumerate(rJ):
             )
         Pf = result.x
         #checks
-        if abs(J3) < 1e-15:
+        if abs(J2) < 1e-15:
             Pf[1] = 0.
         S = fs.Sigma(Pf,Args)
         E,L,mL = fs.totE(Pf,Args)
@@ -58,7 +58,7 @@ for j3,J3 in enumerate(rJ):
             Stay = False
             #save values
             Pi = Pf
-            data = [J2,J3,E,S,Pf[0],0.,Pf[1],L,mL]
+            data = [J2,J3,E,S,Pf[0],Pf[1],0.,L,mL]
             for ind in range(len(data)):
                 DataDic[header[ind]] = data[ind]
         elif rd <= reps:
@@ -75,20 +75,21 @@ for j3,J3 in enumerate(rJ):
             Pi = Pinitial
             Stay = False
             arg = np.argmin(tempE)
-            data = [J2,J3,tempE[arg],tempS[arg],tempP[arg][0],0.,tempP[arg][1],tempL[arg],tempmL[arg]]
+            data = [J2,J3,tempE[arg],tempS[arg],tempP[arg][0],tempP[arg][1],0.,tempL[arg],tempmL[arg]]
             for ind in range(len(data)):
                 DataDic[header[ind]] = data[ind]
             print("Keeping the best result:\n\tparams = ",data[4],data[5],data[6],"\n\tL,mL = ",data[7],data[8],"\n\tSigma = ",data[3],"\n\tEnergy = ",data[2],Fore.RESET)
             non_converging_points += 1
     Data.append(DataDic)
     #compute other points
-    for Jj2 in rJ2:
+    for Jj3 in rJ3:
         tempDD = dict(DataDic)
-        tempDD['Energy'] = DataDic['Energy'] + Jj2*inp.z[1]*inp.S**2/2
-        tempDD['J2'] = Jj2
+        tempDD['Energy'] = DataDic['Energy'] + Jj3*inp.z[2]*inp.S**2/2
+        tempDD['J3'] = Jj3
         Data.append(tempDD)
     print(Fore.YELLOW+"time of (j2,j3) point: ",t()-Tti,Fore.RESET)
 #####   save externally to .csv
+print('\nSaving externally to ',csvfile)
 for l in range(len(Data)):      #probably easier way of doing this
     with open(csvfile,'a') as f:
         writer = csv.DictWriter(f, fieldnames = header)

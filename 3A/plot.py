@@ -1,27 +1,28 @@
 import numpy as np
 import inputs as inp
 import matplotlib.pyplot as plt
+from pandas import read_csv
+from colorama import Fore
 
 #read data from files
-S = 0.5
-pts = int(input("number of points: "))
-dirname = 'DataS'+str(S).replace('.','')+'/'
-Jmin = -0.3
-Jmax = 0.3
-Jr = Jmax-Jmin
-dataE = np.ndarray((2,pts,pts))
-dataS = np.ndarray((2,pts,pts))
-dataP = np.ndarray((2,3,pts,pts))
-dataL = np.ndarray((2,2,pts,pts))
-Dtxt = inp.text_params
-for ans in range(2):
-    dataE[ans] = np.load(dirname+Dtxt[0]+'-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'.npy')
-    dataS[ans] = np.load(dirname+Dtxt[1]+'-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'.npy')
-    dataP[ans] = np.load(dirname+Dtxt[2]+'-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'.npy')
-    dataL[ans] = np.load(dirname+Dtxt[3]+'-'+inp.text_ans[ans]+'PDpts='+str(int(pts))+'.npy')
+data1 = read_csv(inp.csvfile[0],usecols=['J2','J3','Energies','L','mL'])
+data2 = read_csv(inp.csvfile[1],usecols=['J2','J3','Energies','L','mL'])
+if len(data1['J2']) != len(data2['J2']):
+    print(Fore.RED+'Error, not same points evaluated'+Fore.RESET)
+    exit()
+## new dict
+Data = []
+Npts = len(data1['J2'])
+new_header = ['J2','J3','Ansatz','SL']  #(J2,J3) coordinates, Ansatz = 0/1 for 3x3/q0 ansatz, SL = 0,1 for SL/LRO
+for j2 in range(Npts):
+    for j3 in range(Npts):
+        dic = {}
+        data = [data1['J2'][j2],data1['J3'][j3]]
+        if 
+        for I,txt in enumerate(new_header):
+            dic[txt] = data[I]
 #organize energies
-E = np.zeros((pts,pts),dtype=int)
-Ans = np.zeros((pts,pts),dtype=int)
+minE = np.zeros((pts,pts),dtype=int)
 SL = np.zeros((pts,pts),dtype=int)
 for i in range(pts):
     for j in range(pts):

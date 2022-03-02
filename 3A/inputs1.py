@@ -4,10 +4,9 @@ S = 0.5
 #derivative
 der_pts = 2
 der_range = [0.001,0.001,0.001]
-Jpts = 7
-#Jbpts = 100
+Jpts = 5
 sum_pts = 101
-grid_pts = 7
+grid_pts = 5
 #fixed
 J1 = 1
 z1 = 4
@@ -30,6 +29,6 @@ K23 = np.linspace(0,maxK2,sum_pts)  #Ky in BZ
 text_ans = ['3x3','q0','(pi,pi)','(0,pi)']
 #csv
 header = ['J2','J3','Energy','Sigma','A1','A2','A3','L','mL']
-csvfile = ['S'+str(S).replace('.','')+text_ans[ans]+'.csv' for ans in range(2)]
+csvfile = [text_ans[ans]+'/S'+str(S).replace('.','')+'-'+text_ans[ans]+'.csv' for ans in range(2)]
 
 
