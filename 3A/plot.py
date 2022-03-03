@@ -2,62 +2,65 @@ import numpy as np
 import inputs as inp
 import matplotlib.pyplot as plt
 from pandas import read_csv
+import pandas as pd
 from colorama import Fore
+from scipy.interpolate import interp2d
 
 #read data from files
-data1 = read_csv(inp.csvfile[0],usecols=['J2','J3','Energies','L','mL'])
-data2 = read_csv(inp.csvfile[1],usecols=['J2','J3','Energies','L','mL'])
-if len(data1['J2']) != len(data2['J2']):
-    print(Fore.RED+'Error, not same points evaluated'+Fore.RESET)
-    exit()
-## new dict
-Data = []
-Npts = len(data1['J2'])
-new_header = ['J2','J3','Ansatz','SL']  #(J2,J3) coordinates, Ansatz = 0/1 for 3x3/q0 ansatz, SL = 0,1 for SL/LRO
-for j2 in range(Npts):
-    for j3 in range(Npts):
-        dic = {}
-        data = [data1['J2'][j2],data1['J3'][j3]]
-        if 
-        for I,txt in enumerate(new_header):
-            dic[txt] = data[I]
-#organize energies
-minE = np.zeros((pts,pts),dtype=int)
-SL = np.zeros((pts,pts),dtype=int)
-for i in range(pts):
-    for j in range(pts):
-        if dataE[0,i,j] < dataE[1,i,j]:
-            E[i,j] = dataE[0,i,j]
-            Ans[i,j] = 0
-            SL[i,j] = 0 if np.abs(dataL[0,0,i,j]-dataL[0,1,i,j]) < 1e-3 else 1
-        else:
-            E[i,j] = dataE[1,i,j]
-            SL[i,j] = 0 if np.abs(dataL[1,0,i,j]-dataL[1,1,i,j]) < 1e-3 else 1
-            Ans[i,j] = 2
+D3x3 = read_csv(inp.csvfile[0],usecols=['J2','J3','Energy','L','mL'])
+j2 = []
+for i in range(len(D3x3)):
+    J2 = D3x3['J2'][i]
+    if i == 0:
+        j2.append(J2)
+        ind = 0
+        continue
+    if np.abs(J2 - j2[ind]) > 1e-10 and J2 > j2[ind]:
+        j2.append(J2)
+        ind += 1
+j2 = np.array(j2)
+j3 = np.array(j2)
+Npts = len(j2)
+E = np.ndarray((Npts,Npts))
+for i in range(Npts):
+    for j in range(Npts):
+        for ii in range(Npts**2):
+            if np.abs(j2[i]-D3x3['J2'][ii]) < 1e-10 and np.abs(j3[j]-D3x3['J3'][ii]) < 1e-10:
+                indE = ii
+        E[i,j] = D3x3['Energy'][indE]
+func1 = interp2d(j2,j3,E)
+#####
+Dq0 = read_csv(inp.csvfile[1],usecols=['J2','J3','Energy','L','mL'])
+j2 = []
+for i in range(len(Dq0)):
+    J2 = Dq0['J2'][i]
+    if i == 0:
+        j2.append(J2)
+        ind = 0
+        continue
+    if np.abs(J2 - j2[ind]) > 1e-10 and J2 > j2[ind]:
+        j2.append(J2)
+        ind += 1
+j2 = np.array(j2)
+j3 = np.array(j2)
+Npts = len(j2)
+E = np.ndarray((Npts,Npts))
+for i in range(Npts):
+    for j in range(Npts):
+        for ii in range(Npts**2):
+            if np.abs(j2[i]-Dq0['J2'][ii]) < 1e-10 and np.abs(j3[j]-Dq0['J3'][ii]) < 1e-10:
+                indE = ii
+        E[i,j] = Dq0['Energy'][indE]
+func2 = interp2d(j2,j3,E)
 
-Color = ['orange','r','c','b']
-Label = ['(0,0)-LRO','(0,0)-SL','(0,pi)-LRO','(0,pi)-SL']
-plt.figure(figsize=(10,8))
-#grid
-JM = Jmax + Jr/(pts-1)/2
-Jm = Jmin - Jr/(pts-1)/2
-for i in range(pts+1):
-    plt.plot((Jm+Jr/(pts-1)*i,Jm+Jr/(pts-1)*i),(Jm,JM),'k')
-    plt.plot((Jm,JM),(Jm+Jr/(pts-1)*i,Jm+Jr/(pts-1)*i),'k')
-for i in range(pts):
-    for j in range(pts):
-        plt.fill_between(
-                np.linspace(Jm+Jr/(pts-1)*i,Jm+Jr/(pts-1)*(i+1),10),
-                np.linspace(Jm+Jr/(pts-1)*(j+1),Jm + Jr/(pts-1)*(j+1),10),
-                Jm+Jr/(pts-1)*j,
-                color=Color[Ans[i,j]+SL[i,j]],
-                label= Label[Ans[i,j]+SL[i,j]])
-for i in range(pts):
-    for j in range(pts):
-        plt.scatter(Jmin+Jr/(pts-1)*i,Jmin+Jr/(pts-1)*j,marker='.',color = 'k')
-for i in range(4):
-    plt.text(JM+Jr/(pts-1)/2,Jmax-Jr/(pts-1)*i,Label[i],color=Color[i])
+plt.figure(figsize=(12,8))
+x = np.linspace(j2[0],j2[-1],1000)
+y = np.linspace(j2[0],j2[-1],1000)
+plt.subplot(1,2,1)
+plt.contourf(x,y,func1(x,y))
+plt.colorbar()
+plt.subplot(1,2,2)
+plt.contourf(x,y,func2(x,y))
+plt.colorbar()
 
-plt.xlabel("$J_2$",size=20)
-plt.ylabel("$J_{3e}$",size=20)
 plt.show()
