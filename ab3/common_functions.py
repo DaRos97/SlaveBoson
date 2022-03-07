@@ -153,7 +153,7 @@ def modify_csv(J2,J3,ans,dic):
             break
     P = []
     for txt in inp.header[ans][5:]:
-        P.append(dic[txt][ind2])
+        P.append(dic[txt])
     P = tuple(P)
     if dic['Sigma'] < data['Sigma'][ind] and dic['L'] + np.abs(P).sum() > 0.1:
         for txt in inp.header[ans][2:]:

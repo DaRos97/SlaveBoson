@@ -18,7 +18,7 @@ print(Fore.GREEN+'Computing ansatz ',inp.text_ans[ans],Fore.RESET)
 Ti = t()
 J1 = inp.J1
 Bnds = inp.Bnds[ans]
-Pinitial = (0.52,0.14,0.11,0.24,2e-4)#tuple([(Bnds[i][1]+Bnds[i][0])/2 for i in range(len(Bnds))])
+Pinitial = (0.52,0.14,0.11,0.24,2e-4) if ans < 3 else (0.52,0.12,0.05)
 Pi = tuple(Pinitial)
 non_converging_points = 0
 reps = inp.repetitions

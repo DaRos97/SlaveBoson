@@ -47,6 +47,6 @@ header = [['J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B3'],  #3x3
           ['J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2'],  #(0,pi)
           ['J2','J3','Energy','Sigma','L','A1','B1','B2'],  #(pi,pi)
           ['J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','B3','phiA1']]  #cuboc1
-csvfile = [dirname+'S'+str(S).replace('.','')+'-'+text_ans[ans]+'.csv' for ans in range(2)]
+csvfile = [dirname+'S'+str(S).replace('.','')+'-'+text_ans[ans]+'.csv' for ans in range(4)]
 
 cutoff_pts = 1e-12

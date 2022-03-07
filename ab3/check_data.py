@@ -3,7 +3,7 @@ from pandas import read_csv
 import inputs as inp
 from colorama import Fore
 
-ans = 0
+ans = int(input("ans: "))
 filename = inp.csvfile[ans]
 data = read_csv(filename)
 
