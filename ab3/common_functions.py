@@ -11,12 +11,10 @@ from pandas import read_csv
 
 #Some parameters from inputs.py
 kp = inp.sum_pts
-k3 = (inp.K1,inp.K23)
 S = inp.S
 J1 = inp.J1
 #grid points
 grid_pts = inp.grid_pts
-kg = (np.linspace(0,inp.maxK1,grid_pts),np.linspace(0,inp.maxK2,grid_pts))
 ####
 def sumEigs(P,L,args):
     ans = args[3]
@@ -28,25 +26,32 @@ def sumEigs(P,L,args):
         N = an.q0(P,L,args)
     elif ans == 2:
         m = 6
+        N = an.zeroPi(P,L,args)
+    elif ans == 3:
+        m = 6
+        N = an.PiPi(P,L,args)
+    elif ans == 4:
+        m = 6
         N = an.cuboc1(P,L,args)
     res = np.zeros((m,grid_pts,grid_pts))
     for i in range(grid_pts):
         for j in range(grid_pts):
             temp = LA.eigvals(N[:,:,i,j])
-            if np.amax(np.abs(np.imag(temp))) > 1e-4:   #not cool
+            if np.amax(np.abs(np.imag(temp))) > inp.complex_cutoff:   #not cool
                 return 0
             res[:,i,j] = np.sort(np.real(temp))[m:] #also imaginary part if L smaller than mL
     result = 0
+    txt_m = 'm3' if m==3 else 'm6'
     for i in range(m):
-        func = interp2d(kg[0],kg[1],res[i])
-        temp = func(k3[0],k3[1])
+        func = interp2d(inp.kg[txt_m][0],inp.kg[txt_m][1],res[i])
+        temp = func(inp.Kp[txt_m][0],inp.Kp[txt_m][1])
         result += temp.ravel().sum()
     return result/(m*kp**2)
 ####
 def totE(P,args):
     res = minimize_scalar(lambda l: -totEl(P,l,args),
             method = 'bounded',
-            bounds = (0,1.5),
+            bounds = (0.4,1.5),
             options={'xatol':1e-8}
             )
     L = res.x
@@ -66,8 +71,17 @@ def totEl(P,L,args):
         for i in range(3):
             res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
     elif ans == 2:
-        for i in range(len(P)-1):           ####missing
-            res += 0
+        Pp = (P[0],P[1],P[2],P[3],P[4],0)
+        for i in range(3):
+            res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
+    elif ans == 3:
+        Pp = (P[0],0,0,P[1],P[2],0)
+        for i in range(3):
+            res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
+    elif ans == 4:
+        Pp = (P[0],P[1],P[2],P[3],P[4],P[5])
+        for i in range(3):
+            res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
     res -= L*(2*inp.S+1)
     res += sumEigs(P,L,args)
     return res
@@ -88,8 +102,6 @@ def Sigma(P,args):
         der = de/dx
         f = interp1d(rangeP,der)
         res += f(P[i])**2
-    #print(P)
-    #print(res,'\n')
     return res
 
 #################################################################
@@ -113,23 +125,40 @@ def CheckCsv(ans):
 ####
 def is_new(J2,J3,ans):
     my_file = Path(inp.csvfile[ans])
-    data = read_csv(my_file,usecols=['J2','J3'])
+    data = read_csv(my_file)
     for ind2,j2 in enumerate(data['J2']):
         dif2 = np.abs(J2-j2)
         dif3 = np.abs(J3-data['J3'][ind2])
         if dif2 < inp.cutoff_pts and dif3 < inp.cutoff_pts:
-            dataS = read_csv(my_file,usecols=['Sigma'])
-            S = dataS['Sigma'][ind2]
-            dataP = read_csv(my_file,usecols=inp.header[ans][5:])
+            S = data['Sigma'][ind2]
+            L = data['L'][ind2]
             P = []
             for txt in inp.header[ans][5:]:
-                P.append(dataP[txt][ind2])
+                P.append(data[txt][ind2])
             P = tuple(P)
-            a = 0
-            for p in P:
-                a += np.abs(p)
-            if S < inp.cutoff and a > 0.1:
-                return False,P
+            if S < inp.cutoff and L + np.abs(P).sum() > 0.1:
+                return False,P,False
             else:
-                return True,0
-    return True,0
+                return True,P,True
+    return True,[0],False
+
+def modify_csv(J2,J3,ans,dic):
+    my_file = Path(inp.csvfile[ans])
+    data = read_csv(my_file)
+    for ind2, j2 in enumerate(data['J2']):
+        dif2 = np.abs(J2-j2)
+        dif3 = np.abs(J3-data['J3'][ind2])
+        if dif2 < inp.cutoff_pts and dif3 < inp.cutoff_pts:
+            ind = ind2
+            break
+    P = []
+    for txt in inp.header[ans][5:]:
+        P.append(dic[txt][ind2])
+    P = tuple(P)
+    if dic['Sigma'] < data['Sigma'][ind] and dic['L'] + np.abs(P).sum() > 0.1:
+        for txt in inp.header[ans][2:]:
+            data[txt][ind2] = dic[txt]
+        data.to_csv(inp.csvfile[ans],index = False)
+
+
+
