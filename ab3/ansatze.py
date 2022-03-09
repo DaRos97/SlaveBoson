@@ -176,7 +176,7 @@ def PiPi(P,L,args):
     J1 /= 2
     J2 /= 2
     J3 /= 2
-    A1,A2,A3,B1,B2 = P
+    A1,B1,B2 = P
     B1_ = -B1
     B2_ = -B2
     N = np.zeros((2*m,2*m,grid_pts,grid_pts),dtype=complex)

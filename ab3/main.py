@@ -26,8 +26,8 @@ header = inp.header[ans]
 csvfile = inp.csvfile[ans]
 cf.CheckCsv(ans)
 
-for j2,J2 in enumerate(inp.rJ2):
-    for j3,J3 in enumerate(inp.rJ3):
+for j2,J2 in enumerate([-0.3]):#inp.rJ2):
+    for j3,J3 in enumerate([-0.15]):#inp.rJ3):
         #check if this point has already been computed successfully
         is_n, P, rep = cf.is_new(J2,J3,ans)
         if not is_n:
@@ -36,6 +36,8 @@ for j2,J2 in enumerate(inp.rJ2):
         if P[0] != 0:
             Pi = P
         Args = (J1,J2,J3,ans)
+        a = t()
+        print(Pi,'\nSigma:',cf.Sigma(Pi,Args),'\ntime:',t()-a)
         Tti = t()
         print(Fore.RED+"\nEvaluating energy of (J2,J3) = (",J2,",",J3,")",Fore.RESET)
         Stay = True
@@ -55,6 +57,7 @@ for j2,J2 in enumerate(inp.rJ2):
                     'fatol':1e-6,
                     'adaptive':True}
                 )
+            print(result.nfev,result.nit)
             Pf = result.x
             S = result.fun
             E,L = cf.totE(Pf,Args)
@@ -94,7 +97,7 @@ for j2,J2 in enumerate(inp.rJ2):
             with open(csvfile,'a') as f:
                 writer = csv.DictWriter(f, fieldnames = header)
                 writer.writerow(DataDic)
-        print(Fore.YELLOW+"time of (j2,j3) point: ",t()-Tti,Fore.RESET)
+        print(Fore.YELLOW+"time of (j2,j3) point: ",(t()-Tti)/60,Fore.RESET)
 
 print(Fore.GREEN+"Non converging points: ",non_converging_points,' of ',len(inp.rJ2)*len(inp.rJ3),Fore.RESET)
-print(Fore.YELLOW+"Total time: ",t()-Ti,Fore.RESET)
+print(Fore.YELLOW+"Total time: ",(t()-Ti)/60,Fore.RESET)
