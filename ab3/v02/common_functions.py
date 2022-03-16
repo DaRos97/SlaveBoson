@@ -17,6 +17,7 @@ J1 = inp.J1
 grid_pts = inp.grid_pts
 ####
 def sumEigs(P,L,args):
+    m = 6
     ans = args[3]
     N = an.Nk(P,L,args)
     res = np.zeros((m,grid_pts,grid_pts))
@@ -24,7 +25,6 @@ def sumEigs(P,L,args):
         for j in range(grid_pts):
             temp = LA.eigvals(N[:,:,i,j])
             if np.amax(np.abs(np.imag(temp))) > inp.complex_cutoff:   #not cool
-                print("aia")
                 return 0
             res[:,i,j] = np.sort(np.real(temp))[m:] #also imaginary part if not careful
     result = 0
@@ -80,8 +80,6 @@ def Sigma(P,args):
         der = de/dx
         f = interp1d(rangeP,der)
         res += f(P[i])**2
-        print(f(P[i])**2)
-    print()
     return res
 
 #################################################################

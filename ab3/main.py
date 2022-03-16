@@ -26,15 +26,15 @@ header = inp.header[ans]
 csvfile = inp.csvfile[ans]
 cf.CheckCsv(ans)
 
-for j2,J2 in enumerate([-0.3]):#inp.rJ2):
-    for j3,J3 in enumerate([-0.15]):#inp.rJ3):
+for j2,J2 in enumerate([-0.35]):#inp.rJ2):
+    for j3,J3 in enumerate([-0.35]):#inp.rJ3):
         #check if this point has already been computed successfully
         is_n, P, rep = cf.is_new(J2,J3,ans)
         if not is_n:
             Pi = P
             continue
         if P[0] != 0:
-            Pi = P
+            Pi = (P[0],-P[1],-P[2],-P[3],P[4])
         Args = (J1,J2,J3,ans)
         a = t()
         print(Pi,'\nSigma:',cf.Sigma(Pi,Args),'\ntime:',t()-a)
@@ -57,7 +57,6 @@ for j2,J2 in enumerate([-0.3]):#inp.rJ2):
                     'fatol':1e-6,
                     'adaptive':True}
                 )
-            print(result.nfev,result.nit)
             Pf = result.x
             S = result.fun
             E,L = cf.totE(Pf,Args)

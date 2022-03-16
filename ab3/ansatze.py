@@ -22,8 +22,6 @@ def sqrt3(P,L,args):
     J2 /= 2.
     J3 /= 2.
     A1,A3,B1,B2,B3 = P
-    A3 *= -1.
-    B1 *= -1.
     N = np.zeros((2*m,2*m,grid_pts,grid_pts),dtype=complex)
     #B1 and B2
     N[0,1] = J1*B1*(1+exp_k(0,1)) + J2*B2*(exp_k(1,1)+exp_k(-1,0))
@@ -47,13 +45,13 @@ def sqrt3(P,L,args):
     for i in range(grid_pts):
         for j in range(grid_pts):
             N[:,:,i,j] += np.conjugate(N[:,:,i,j].T)
-    ##diagonal terms
+    ##diagonal terms -> B3 and L
     N[0,0] = J3*B3*exp_k(1,0) + L
     N[1,1] = J3*B3*exp_k(1,1) + L
     N[2,2] = J3*B3*exp_k(0,1) + L
-    N[3,3] = N[0,0]     ###true?
-    N[4,4] = N[1,1]
-    N[5,5] = N[2,2]
+    N[3,3] = np.conjugate(N[0,0])     ###true?
+    N[4,4] = np.conjugate(N[1,1])
+    N[5,5] = np.conjugate(N[2,2])
     #multiply by tau 3
     for i in range(m,2*m):
         for j in range(2*m):
@@ -67,9 +65,6 @@ def q0(P,L,args):
     J2 /= 2
     J3 /= 2
     A1,A2,B1,B2,B3 = P
-    A2 *= -1.
-    B1 *= -1.
-    B2 *= -1.
     N = np.zeros((2*m,2*m,grid_pts,grid_pts),dtype=complex)
     #B1 and B2
     N[0,1] = J1*B1*(1+exp_k(0,1)) + J2*B2*(exp_k(1,1)+exp_k(-1,0))
@@ -93,9 +88,9 @@ def q0(P,L,args):
     N[0,0] = J3*B3*exp_k(1,0) + L
     N[1,1] = J3*B3*exp_k(1,1) + L
     N[2,2] = J3*B3*exp_k(0,1) + L
-    N[3,3] = N[0,0]     ###true?
-    N[4,4] = N[1,1]
-    N[5,5] = N[2,2]
+    N[3,3] = np.conjugate(N[0,0])     ###true?
+    N[4,4] = np.conjugate(N[1,1])
+    N[5,5] = np.conjugate(N[2,2])
     #multiply by tau 3
     for i in range(m,2*m):
         for j in range(2*m):

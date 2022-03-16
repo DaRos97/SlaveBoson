@@ -4,9 +4,9 @@ S = 0.5
 #derivative
 der_pts = 2
 der_range = [0.0001,0.0001,0.0001,0.0001,1e-4]
-step = 0.15
+step = 0.3
 sum_pts = 101
-grid_pts = 7
+grid_pts = 5
 #fixed
 J1 = 1
 z1 = 4
@@ -35,10 +35,8 @@ maxK26 = np.pi/np.sqrt(3)
 K1 = np.linspace(0,maxK1,sum_pts)  #Kx in BZ
 K23 = np.linspace(0,maxK2,sum_pts)  #Ky in BZ
 K26 = np.linspace(0,maxK26,sum_pts)  #Ky in BZ
-Kp = {'m3': (K1,K23),
-      'm6': (K1,K26)}
-kg = {'m3': (np.linspace(0,maxK1,grid_pts),np.linspace(0,maxK2,grid_pts)),
-      'm6': (np.linspace(0,maxK1,grid_pts),np.linspace(0,maxK26,grid_pts))}
+Kp = (K1,K26)
+kg = (np.linspace(0,maxK1,grid_pts),np.linspace(0,maxK26,grid_pts))
 #text
 text_ans = ['3x3','q0','(0,pi)','(pi,pi)','cuboc1']
 dirname = 'Data/'

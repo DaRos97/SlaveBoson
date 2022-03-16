@@ -92,7 +92,7 @@ def Sigma(P,args):
     ran = inp.der_range
     for i in range(len(P)):
         e = np.ndarray(inp.der_pts)
-        rangeP = np.linspace(P[i]-ran,P[i]+ran,inp.der_pts)
+        rangeP = np.linspace(P[i]-ran[i],P[i]+ran[i],inp.der_pts)
         pp = np.array(P)
         for j in range(inp.der_pts):
             pp[i] = rangeP[j]
@@ -102,6 +102,8 @@ def Sigma(P,args):
         der = de/dx
         f = interp1d(rangeP,der)
         res += f(P[i])**2
+        print(f(P[i])**2)
+    print()
     return res
 
 #################################################################

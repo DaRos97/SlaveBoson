@@ -18,7 +18,7 @@ print(Fore.GREEN+'Computing ansatz ',inp.text_ans[ans],Fore.RESET)
 Ti = t()
 J1 = inp.J1
 Bnds = inp.Bnds[ans]
-Pinitial = (0.52,0.14,0.11,0.24,2e-4) if ans < 3 else (0.52,0.12,0.05)
+Pinitial = (0.40258554,0.005359,0.09607105,0.02918694,0.06484434)#(0.52,0.14,0.11,0.24,0.01) if ans < 3 else (0.52,0.12,0.05)
 Pi = tuple(Pinitial)
 non_converging_points = 0
 reps = inp.repetitions
@@ -26,18 +26,17 @@ header = inp.header[ans]
 csvfile = inp.csvfile[ans]
 cf.CheckCsv(ans)
 
-for j2,J2 in enumerate([-0.35]):#inp.rJ2):
-    for j3,J3 in enumerate([-0.35]):#inp.rJ3):
-        #check if this point has already been computed successfully
+for j2,J2 in enumerate(inp.rJ2):
+    for j3,J3 in enumerate(inp.rJ3):
         is_n, P, rep = cf.is_new(J2,J3,ans)
         if not is_n:
+            print("already computed point")
             Pi = P
             continue
         if P[0] != 0:
-            Pi = (P[0],-P[1],-P[2],-P[3],P[4])
+            print("trying again this point")
+            Pi = P
         Args = (J1,J2,J3,ans)
-        a = t()
-        print(Pi,'\nSigma:',cf.Sigma(Pi,Args),'\ntime:',t()-a)
         Tti = t()
         print(Fore.RED+"\nEvaluating energy of (J2,J3) = (",J2,",",J3,")",Fore.RESET)
         Stay = True
