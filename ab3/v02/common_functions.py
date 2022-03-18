@@ -8,6 +8,7 @@ from colorama import Fore
 from pathlib import Path
 import csv
 from pandas import read_csv
+import time
 
 #Some parameters from inputs.py
 kp = inp.sum_pts
@@ -18,7 +19,6 @@ grid_pts = inp.grid_pts
 ####
 def sumEigs(P,L,args):
     m = 6
-    ans = args[3]
     N = an.Nk(P,L,args)
     res = np.zeros((m,grid_pts,grid_pts))
     for i in range(grid_pts):
@@ -38,7 +38,7 @@ def totE(P,args):
     res = minimize_scalar(lambda l: -totEl(P,l,args),
             method = 'bounded',
             bounds = (0.4,1.5),
-            options={'xatol':1e-8}
+            options={'xatol':inp.prec_L}
             )
     L = res.x
     minE = -res.fun
@@ -48,13 +48,13 @@ def totEl(P,L,args):
     J1,J2,J3,ans = args
     J = (J1,J2,J3)
     res = 0
-    if ans == 0:
+    if ans == 0:    #3x3
         Pp = (P[0],0,P[1],P[2],P[3],P[4])
-    elif ans == 1:
+    elif ans == 1:  #q0
         Pp = (P[0],P[1],0,P[2],P[3],P[4])
-    elif ans == 2:
+    elif ans == 2:  #0,pi
         Pp = (P[0],P[1],P[2],P[3],P[4],0)
-    elif ans == 3:
+    elif ans == 3:  #pi,pi
         Pp = (P[0],0,0,P[1],P[2],0)
     elif ans == 4:
         Pp = (P[0],P[1],P[2],P[3],P[4],P[5])
@@ -65,6 +65,7 @@ def totEl(P,L,args):
     return res
 ####
 def Sigma(P,args):
+    t=time.time()
     J1,J2,J3,ans = args
     res = 0
     ran = inp.der_range
@@ -80,6 +81,8 @@ def Sigma(P,args):
         der = de/dx
         f = interp1d(rangeP,der)
         res += f(P[i])**2
+    print(P)
+    print(res,"time: ",time.time()-t,"\n")
     return res
 
 #################################################################

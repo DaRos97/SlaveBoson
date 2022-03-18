@@ -88,8 +88,8 @@ def Nk(P,L,args):
     N[2,5] = J3*(b3*exp_k(g1)    + b3i_*exp_k(g1_))
     N[m,m] = N[0,0]
     N[m+3,m+3] = N[3,3]
-    for i in range(m-1):
-        for j in range(1,m):
+    for i in range(m):    #also diagonal stuff
+        for j in range(i,m):
             N[i+m,j+m] = N[i,j]     ##### wrong for chiral ansatze
     ######################################## A
     a1 = A1
@@ -111,9 +111,6 @@ def Nk(P,L,args):
     N[3,m+4] = - J1*a1pi*exp_k(e1)   -   J2*a2*exp_k(f1_)
     N[3,m+5] =   J1*a1p*exp_k(e2_)  +   J2*a2pi*exp_k(f2_)
     N[4,m+5] = -J1*(a1*exp_k(e3_) + a1pi*exp_k(e3))
-    for i in range(m-1):
-        for j in range(m+1,2*m):
-            N[j,i] = -np.conjugate(N[i,j])
     # A3
     a3 = A3*np.exp(1j*phiA3)
     a3i = A3*np.exp(1j*(phiA3+p1*np.pi))
@@ -121,6 +118,10 @@ def Nk(P,L,args):
     N[1,m+4] = J3*(a3*exp_k(g2) - a3*exp_k(g2_))
     N[2,m+5] = J3*(a3*exp_k(g1) - a3i*exp_k(g1_))
     N[3,m+3] = J3*(a3i*exp_k(g3) - a3i*exp_k(g3_))
+    #not the diagonal
+    for i in range(m-1):
+        for j in range(m+1+i,2*m):
+            N[j-m,i+m] = -np.conjugate(N[i,j])
     # HERMITIAN MATRIX
     for i in range(2*m-1):
         for j in range(1,2*m):

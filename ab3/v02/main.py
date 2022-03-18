@@ -18,83 +18,62 @@ print(Fore.GREEN+'Computing ansatz ',inp.text_ans[ans],Fore.RESET)
 Ti = t()
 J1 = inp.J1
 Bnds = inp.Bnds[ans]
-Pinitial = (0.40258554,0.005359,0.09607105,0.02918694,0.06484434)#(0.52,0.14,0.11,0.24,0.01) if ans < 3 else (0.52,0.12,0.05)
-Pi = tuple(Pinitial)
+Pinitial = [(0.52,0.31,0.21,0.39,0.18),(0.52,0.2,0.2,0.2,-0.3),(0.5,0.,0.,0.,0.)]
+Pi = tuple(Pinitial[ans])
 non_converging_points = 0
-reps = inp.repetitions
 header = inp.header[ans]
 csvfile = inp.csvfile[ans]
 cf.CheckCsv(ans)
 
 for j2,J2 in enumerate(inp.rJ2):
     for j3,J3 in enumerate(inp.rJ3):
+        print(Fore.RED+"\nEvaluating energy of (J2,J3) = (",J2,",",J3,")",Fore.RESET)
         is_n, P, rep = cf.is_new(J2,J3,ans)
         if not is_n:
-            print("already computed point")
+            print(Fore.GREEN+"already computed point"+Fore.RESET)
             Pi = P
             continue
         if P[0] != 0:
-            print("trying again this point")
+            print(Fore.RED+"Trying again this point"+Fore.RESET)
             Pi = P
         Args = (J1,J2,J3,ans)
         Tti = t()
-        print(Fore.RED+"\nEvaluating energy of (J2,J3) = (",J2,",",J3,")",Fore.RESET)
         Stay = True
         rd = 0
-        tempE = []; tempS = []; tempP = []; tempL = [];
         DataDic = {}
-        while Stay:
-            ti = t()
-            print("Initial guess: ",header[5:]," = ",Pi)
-            result = minimize(lambda x:cf.Sigma(x,Args),
-                Pi,
-                method = 'Nelder-Mead',
-                bounds = Bnds,
-                tol = 1e-6,
-                options = {
-                    'xatol':1e-6,
-                    'fatol':1e-6,
-                    'adaptive':True}
-                )
-            Pf = result.x
-            S = result.fun
-            E,L = cf.totE(Pf,Args)
-            tempE += [E]
-            tempS += [S]
-            tempP += [Pf]
-            tempL += [L]
-            print("After minimization:\n\tparams ",header[5:]," = ",Pf,"\n\tL = ",L,"\n\tSigma = ",S,"\n\tEnergy = ",E)
-            if S<inp.cutoff:
-                print("exiting minimization")
-                Stay = False
-                #save values
-                Pi = Pf
-                data = [J2,J3,E,S,L]
-                for ind in range(len(data)):
-                    DataDic[header[ind]] = data[ind]
-                for ind2 in range(len(Pf)):
-                    DataDic[header[5+ind2]] = Pf[ind2]
-            elif rd < reps:
-                rd += 1
-                Pi = Pf
-                print(Fore.BLUE+"Changing initial parameters to ",Pi,Fore.RESET)
-            else:
-                print(Fore.GREEN+"It's taking too long, pass to other point")
-                Pi = Pinitial
-                Stay = False
-                arg = np.argmin(tempE)
-                data = [J2,J3,tempE[arg],tempS[arg],tempL[arg]]
-                for ind in range(len(data)):
-                    DataDic[header[ind]] = data[ind]
-                for ind2 in range(len(Pf)):
-                    DataDic[header[5+ind2]] = tempP[arg][ind2]
-                non_converging_points += 1
+        result = minimize(lambda x:cf.Sigma(x,Args),
+            Pi,
+            method = 'Nelder-Mead',
+            bounds = Bnds,
+            tol = 1e-6,
+            options = {
+                'maxiter':100*len(Pi),
+                'xatol':1e-6,
+                'fatol':1e-6,
+                'adaptive':True}
+            )
+        Pf = result.x
+        S = result.fun
+        E,L = cf.totE(Pf,Args)
+        print("After minimization:\n\tparams ",header[5:]," = ",Pf,"\n\tL = ",L,"\n\tSigma = ",S,"\n\tEnergy = ",E)
+        #save values
+        Pi = Pf
+        data = [J2,J3,E,S,L]
+        for ind in range(len(data)):
+            DataDic[header[ind]] = data[ind]
+        for ind2 in range(len(Pf)):
+            DataDic[header[5+ind2]] = Pf[ind2]
         if rep:
             cf.modify_csv(J2,J3,ans,DataDic)
         else:
             with open(csvfile,'a') as f:
                 writer = csv.DictWriter(f, fieldnames = header)
                 writer.writerow(DataDic)
+        if S<inp.cutoff:
+            print("successful")
+        else:
+            print("did not converge")
+            non_converging_points += 1
         print(Fore.YELLOW+"time of (j2,j3) point: ",(t()-Tti)/60,Fore.RESET)
 
 print(Fore.GREEN+"Non converging points: ",non_converging_points,' of ',len(inp.rJ2)*len(inp.rJ3),Fore.RESET)
