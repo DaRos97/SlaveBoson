@@ -43,5 +43,6 @@ for i in range(ln):
     j3 = data[0]['J3'][i]
     plt.scatter(j2,j3,marker=Marker[res[i][1]],color=Color[res[i][0]])
 
-
+for i in range(Nans):
+    plt.text(0.35,0.3-i/6,inp.text_ans[i],color=Color[i])
 plt.show()

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 txt = inp.csvfile
 data = []
-Nans = 2
+Nans = 4
 for ans in range(Nans):
     data.append(read_csv(txt[ans]))
 ln = len(data[0])
