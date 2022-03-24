@@ -50,15 +50,15 @@ def totEl(P,args):
     J1,J2,J3,ans = args
     J = (J1,J2,J3)
     res = 0
-    if ans == 0:    #3x3
+    if ans == '3x3':
         Pp = (P[0],0,P[1],P[2],P[3],P[4])
-    elif ans == 1:  #q0
+    elif ans == 'q0':
         Pp = (P[0],P[1],0,P[2],P[3],P[4])
-    elif ans == 2:  #0,pi
+    elif ans == '0-pi':
         Pp = (P[0],P[1],P[2],P[3],P[4],0)
-    elif ans == 3:  #pi,pi
+    elif ans == 'pi-pi':
         Pp = (P[0],0,0,P[1],P[2],0)
-    elif ans == 4:
+    elif ans == 'cb1':
         Pp = (P[0],P[1],P[2],P[3],P[4],P[5])
     for i in range(3):
         res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
@@ -83,66 +83,27 @@ def Sigma(P,args):
         der = de/dx
         f = interp1d(rangeP,der)
         res += f(P[i])**2
-    #print(P)
-    #print(res,"time: ",time.time()-t,"\n")
     return res
 
 #################################################################
-def CheckCsv(ans):
-    my_file = Path(inp.csvfile[ans])
+def CheckCsv(csvf):
+    my_file = Path(csvf)
+    ans = []
     if my_file.is_file():
         with open(my_file,'r') as f:
-            reader = csv.DictReader(f)
-            headers = reader.fieldnames
-            a = 1
-            for ind in range(len(headers)):
-                if inp.header[ans][ind] != headers[ind]:
-                    a *= 0
-        if a:
-            return 0
-    with open(my_file,'w') as f:
-        writer = csv.DictWriter(f, fieldnames = inp.header[ans])
-        writer.writeheader()
-    return 0
-
-####
-def is_new(J2,J3,ans):
-    my_file = Path(inp.csvfile[ans])
-    data = read_csv(my_file)
-    for ind2,j2 in enumerate(data['J2']):
-        dif2 = np.abs(J2-j2)
-        dif3 = np.abs(J3-data['J3'][ind2])
-        if dif2 < inp.cutoff_pts and dif3 < inp.cutoff_pts:
-            S = data['Sigma'][ind2]
-            L = data['L'][ind2]
-            P = []
-            for txt in inp.header[ans][5:]:
-                P.append(data[txt][ind2])
-            P = tuple(P)
-            if S < inp.cutoff and L + np.abs(P).sum() > 0.1:
-                return False,P,False
-            else:
-                return True,P,True
-    return True,[0],False
-
-def modify_csv(J2,J3,ans,dic):
-    my_file = Path(inp.csvfile[ans])
-    data = read_csv(my_file)
-    for ind2, j2 in enumerate(data['J2']):
-        dif2 = np.abs(J2-j2)
-        dif3 = np.abs(J3-data['J3'][ind2])
-        if dif2 < inp.cutoff_pts and dif3 < inp.cutoff_pts:
-            ind = ind2
-            break
-    P = []
-    for txt in inp.header[ans][5:]:
-        P.append(dic[txt])
-    P = tuple(P)
-    if dic['Sigma'] < data['Sigma'][ind] and dic['L'] + np.abs(P).sum() > 0.1:
-        for txt in inp.header[ans][2:]:
-            data[txt][ind2] = dic[txt]
-        data.to_csv(inp.csvfile[ans],index = False)
-
+            lines = f.readlines()
+            N = len(lines)//4+1
+            for i in range(N):
+                ans.append(lines[i*4+1].split(',')[0])
+    res = []
+    for a in inp.text_ans:
+        t = 1
+        for b in ans:
+            if a == b:
+                t *= 0
+        if t:
+            res.append(a)
+    return res
 
 def checkResult(P,args):
     res = []

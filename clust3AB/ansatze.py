@@ -29,34 +29,34 @@ def Nk(P,L,args):
     J2 /= 2.
     J3 /= 2.
     #params
-    if inp.text_ans[ans] == '3x3':
+    if ans == '3x3':
         A1,A3,B1,B2,B3 = P
         A2 = 0
         phiA1p, phiA2, phiA2p, phiA3 = (np.pi, 0, 0, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, np.pi)
         p1 = 0
-    elif inp.text_ans[ans] == 'q0':
+    elif ans == 'q0':
         A1,A2,B1,B2,B3 = P
         A3 = 0
         phiA1p, phiA2, phiA2p, phiA3 = (0, 0, 0, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
         p1 = 0
-    elif inp.text_ans[ans] == '0-pi':
+    elif ans == '0-pi':
         A1,A2,A3,B1,B2 = P
         B3 = 0
         phiA1p, phiA2, phiA2p, phiA3 = (0, 0, 0, np.pi)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
         p1 = 1
-    elif inp.text_ans[ans] == 'pi-pi':
+    elif ans == 'pi-pi':
         A1,B1,B2 = P
         A2,A3,B3 = (0, 0, 0)
         phiA1p, phiA2, phiA2p, phiA3 = (np.pi, 0, np.pi, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
         p1 = 1
-    elif inp.text_ans[ans] == 'cb1':
+    elif ans == 'cb1':
         A1,A2,A3,B1,B2,B3,phiA1p,phiB2 = P
         phiA2, phiA2p, phiA3 = (phiA1p/2, phiA1p/2, (phiA1p+np.pi)/2)
-        phiB1, phiB1p, phiB2p, phiB3 = (0, 0, -phiB2, 0)
+        phiB1, phiB1p, phiB2p, phiB3 = (np.pi, np.pi, -phiB2, 0)
         p1 = 1
     ################
     N = np.zeros((2*m,2*m,grid_pts,grid_pts), dtype=complex)

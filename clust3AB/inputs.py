@@ -6,20 +6,20 @@ der_pts = 2
 der_range = [1e-5 for i in range(8)]
 Jpts = 11
 sum_pts = 51
-grid_pts = 7
+grid_pts = 3
 #fixed
 J1 = 1
 z = (4,4,2)
 #minimization
 initialPoint = {'3x3':  (0.52,0.26,0.18,0.31,0.12),
                 'q0':  (0.51,0.2,0.18,0.19,0.043),
-                'cb1':  (0.5,0.2,0.1,0.2,0.1,0.05,np.pi/2,np.pi/2)}
+                'cb1':  (0.51,0.05,0.12,0.1,0.01,0.06,1.95,np.pi)}
 Bnds = {'3x3':  ((0,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5)),    #3x3 -> A1,A3,B1,B2,B3
         'q0':   ((0,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5)),    #q0 -> A1,A2,B1,B2,B3
         '0-pi': ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5)),        #0-pi -> A1,A2,A3,B1,B2
         'pi-pi':((0,1),(-0.5,0.5),(-0.5,0.5)),                      #pi-pi -> A1,B1,B2
         'oct':  ((0,1),(-0.5,0.5),(-0.5,0.5)),                      #octa ->
-        'cb1':  ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi),(-np.pi,np.pi)),  #cb1 -> A1,A2,A3,B1,B2,B3,phiA,phiB
+        'cb1':  ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi),(0,2*np.pi)),  #cb1 -> A1,A2,A3,B1,B2,B3,phiA,phiB
         'cb2':  ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi),(-np.pi,np.pi))}  #cb2 -> A1,A2,A3,B1,B2,phiB1,phiA2(?)
 prec_L = 1e-6       #precision required in L maximization
 cutoff = 1e-8       #accettable value of Sigma to accept result as converged
@@ -43,8 +43,8 @@ kg = (np.linspace(0,maxK1,grid_pts),np.linspace(0,maxK2,grid_pts))
 text_ans = ['3x3','q0','cb1']
 dirname = 'Data/'
 #csv
-header = {'3x3':    ['J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B3'],  #3x3
-          'q0':     ['J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3'],  #q0
-          'cb1':    ['J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','B3','phiA1','phiB2']}  #cuboc1
+header = {'3x3':    ['ans','J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B3'],  #3x3
+          'q0':     ['ans','J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3'],  #q0
+          'cb1':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','B3','phiA1','phiB2']}  #cuboc1
 csvfile = [dirname+text_ans[ans]+'.csv' for ans in range(len(text_ans))]
 
