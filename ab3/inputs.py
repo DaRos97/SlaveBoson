@@ -18,7 +18,9 @@ Bnds = [((0,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5)),  #3x3 -> A1,A3,B1,B2,B3
         ((0,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5)),  #q0 -> A1,A2,B1,B2,B3
         ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5)),  #(0,pi) -> A1,A2,A3,B1,B2
         ((0,1),(-0.5,0.5),(-0.5,0.5)),  #(pi,pi) -> A1,B1,B2
-        ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi),(-np.pi,np.pi))]  #cuboc2 -> A1,A2,A3,B1,B2,phiB1,phiA2(?)
+        ((0,1),(-0.5,0.5),(-0.5,0.5)),  #octa -> A1,B1,B2
+        ((0,1),(-0.5,0.5),(-0.5,0.5)),  #cb1 -> A1,B1,B2
+        ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi),(-np.pi,np.pi))]  #cb2 -> A1,A2,A3,B1,B2,phiB1,phiA2(?)
 prec_L = 1e-6       #precision required in L maximization
 cutoff = 1e-8       #accettable value of Sigma to accept result as converged
 complex_cutoff = 1e-4       #max value of complex terms in diagonalization
