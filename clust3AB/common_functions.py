@@ -144,4 +144,28 @@ def modify_csv(J2,J3,ans,dic):
         data.to_csv(inp.csvfile[ans],index = False)
 
 
+def checkResult(P,args):
+    res = []
+    for i in range(len(P)):
+        pp = np.array(P)
+        Der = []
+        der = []
+        ptsP = np.linspace(P[i]-inp.der_range[i],P[i]+inp.der_range[i],3)
+        for j in range(3):
+            pp[i] = ptsP[j]
+            der.append(totE(pp,args)[0])        #uses at each energy evaluation the best lambda
+        for l in range(2):
+            de = np.gradient(der[l:l+2])
+            dx = np.gradient(ptsP[l:l+2])
+            derivative = de/dx
+            f = interp1d(ptsP[l:l+2],derivative)
+            Der.append(f((ptsP[l]+ptsP[l+1])/2))
+        ptsPP = [(ptsP[l]+ptsP[l+1])/2 for l in range(2)]
+        dde = np.gradient(Der)
+        ddx = np.gradient(ptsPP)
+        dderivative = dde/ddx
+        f = interp1d(ptsPP,dderivative)
+        res.append(f(P[i]))
+    return res
+
 

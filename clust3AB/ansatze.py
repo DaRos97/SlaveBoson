@@ -23,43 +23,40 @@ def exp_k(a):
     return res
 #### all ansatze
 def Nk(P,L,args):
-    m = 6   #always, also for 3x3 and q0 ansatze -> same BZ
+    m = 6
     J1,J2,J3,ans = args
     J1 /= 2.
     J2 /= 2.
     J3 /= 2.
     #params
-    if ans == 0:     #3x3
+    if inp.text_ans[ans] == '3x3':
         A1,A3,B1,B2,B3 = P
         A2 = 0
         phiA1p, phiA2, phiA2p, phiA3 = (np.pi, 0, 0, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, np.pi)
         p1 = 0
-    elif ans == 1:  #q0
+    elif inp.text_ans[ans] == 'q0':
         A1,A2,B1,B2,B3 = P
         A3 = 0
         phiA1p, phiA2, phiA2p, phiA3 = (0, 0, 0, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
         p1 = 0
-    elif ans == 2:  #(0,pi)
+    elif inp.text_ans[ans] == '0-pi':
         A1,A2,A3,B1,B2 = P
         B3 = 0
         phiA1p, phiA2, phiA2p, phiA3 = (0, 0, 0, np.pi)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
         p1 = 1
-    elif ans == 3:  #(pi,pi)
+    elif inp.text_ans[ans] == 'pi-pi':
         A1,B1,B2 = P
         A2,A3,B3 = (0, 0, 0)
         phiA1p, phiA2, phiA2p, phiA3 = (np.pi, 0, np.pi, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
         p1 = 1
-    elif ans == 4: #cuboc2
-        A1,A2,A3,B1,B2,phiB1,phiA2 = P
-        B3 = 0
-        phiB1 *= -1
-        phiA2 *= -1
-        phiA1p, phiA2p, phiA3 = (0, -phiA2, 0)
-        phiB1p, phiB2, phiB2p, phiB3 = (-phiB1, 0, 0, 0)
+    elif inp.text_ans[ans] == 'cb1':
+        A1,A2,A3,B1,B2,B3,phiA1p,phiB2 = P
+        phiA2, phiA2p, phiA3 = (phiA1p/2, phiA1p/2, (phiA1p+np.pi)/2)
+        phiB1, phiB1p, phiB2p, phiB3 = (0, 0, -phiB2, 0)
         p1 = 1
     ################
     N = np.zeros((2*m,2*m,grid_pts,grid_pts), dtype=complex)
@@ -90,11 +87,23 @@ def Nk(P,L,args):
     N[3,3] = J3*(b3i_*exp_k(g3_) + b3i*exp_k(g3))
     N[1,4] = J3*(b3_*exp_k(g2_)  + b3*exp_k(g2))
     N[2,5] = J3*(b3*exp_k(g1)    + b3i_*exp_k(g1_))
-    N[m,m] = N[0,0]
-    N[m+3,m+3] = N[3,3]
-    for i in range(m):    #also diagonal stuff
-        for j in range(i,m):
-            N[i+m,j+m] = N[i,j]     ##### wrong for chiral ansatze
+    ####other half square
+    N[m+0,m+1] = J1*b1p*exp_k(e1)  + J2*b2*exp_k(f1_)
+    N[m+0,m+2] = J1*b1p_*exp_k(e2_)  + J2*b2p*exp_k(f2_)
+    N[m+0,m+4] = J1*b1*exp_k(e1_)  + J2*exp_k(f1)*(b2p if not p1 else b2p_)
+    N[m+0,m+5] = J1*b1_*exp_k(e2)    + J2*exp_k(f2)*(b2_ if not p1 else b2)
+    N[m+1,m+2] = J1*(b1*exp_k(e3_) + b1p*exp_k(e3))
+    N[m+1,m+3] = J1*b1_*exp_k(e1)    + J2*exp_k(f1_)*(b2pi_ if not p1 else b2pi)
+    N[m+1,m+5] = J2*(b2*exp_k(f3_) + b2p*exp_k(f3))
+    N[m+2,m+3] = J1*b1*exp_k(e2_)  + J2*exp_k(f2_)*(b2i if not p1 else b2i_)
+    N[m+2,m+4] = J2*(b2p_*exp_k(f3_) + b2i_*exp_k(f3))
+    N[m+3,m+4] = J1*b1pi*exp_k(e1) + J2*b2*exp_k(f1_)
+    N[m+3,m+5] = J1*b1p_*exp_k(e2_)  + J2*b2pi_*exp_k(f2_)
+    N[m+4,m+5] = J1*(b1*exp_k(e3_) + b1pi*exp_k(e3))
+    N[m+0,m+0] = J3*(b3*exp_k(g3_)  + b3_*exp_k(g3))
+    N[m+3,m+3] = J3*(b3i*exp_k(g3_) + b3i_*exp_k(g3))
+    N[m+1,m+4] = J3*(b3*exp_k(g2_)  + b3_*exp_k(g2))
+    N[m+2,m+5] = J3*(b3_*exp_k(g1)    + b3i*exp_k(g1_))
     ######################################## A
     a1 = A1
     a1p = A1*np.exp(1j*phiA1p)
