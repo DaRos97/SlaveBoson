@@ -37,12 +37,18 @@ for i in range(Jpts):
     for j in range(Jpts):
         J.append((Ji+(Jf-Ji)/(Jpts-1)*i,Ji+(Jf-Ji)/(Jpts-1)*j))
 #summation over BZ
-maxK1 = np.pi
+maxK1 = 2*np.pi
 maxK2 = 2*np.pi/np.sqrt(3)
 K1 = np.linspace(0,maxK1,sum_pts)  #Kx in BZ
 K2 = np.linspace(0,maxK2,sum_pts)  #Ky in BZ
 Kp = (K1,K2)
 kg = (np.linspace(0,maxK1,grid_pts),np.linspace(0,maxK2,grid_pts))
+#matrices
+Mkg = np.zeros((2,grid_pts,grid_pts),dtype=complex)
+for i in range(grid_pts):
+    Mkg[0,i,:] = kg[0]
+    Mkg[1,:,i] = kg[1]
+
 #text
 #csv
 header = {'3x3':    ['ans','J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B3'],  #3x3

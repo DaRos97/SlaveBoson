@@ -15,11 +15,8 @@ g2 = (-1/2,np.sqrt(3)/2);   g2_ = (1/2,-np.sqrt(3)/2)
 g3 = (1,0);                 g3_ = (-1,0)
 ####
 def exp_k(a):
-    ax, ay = a
-    res = np.ndarray((grid_pts,grid_pts),dtype=complex)
-    for i in range(grid_pts):
-        for j in range(grid_pts):
-            res[i,j] = np.exp(1j*(inp.kg[0][i]*ax+inp.kg[1][j]*ay))
+    arr = np.array(a)
+    res = np.exp(1j*np.tensordot(arr,inp.Mkg,axes=1))
     return res
 #### all ansatze
 def Nk(P,L,args):
@@ -112,6 +109,8 @@ def Nk(P,L,args):
     a2i = A2*np.exp(1j*(phiA2+p1*np.pi))
     a2p = A2*np.exp(1j*phiA2p)
     a2pi = A2*np.exp(1j*(phiA2p+p1*np.pi))
+    a3 = A3*np.exp(1j*phiA3)
+    a3i = A3*np.exp(1j*(phiA3+p1*np.pi))
     N[0,m+1] = - J1*a1p*exp_k(e1)   -   J2*a2*exp_k(f1_)
     N[0,m+2] =   J1*a1p*exp_k(e2_)  +   J2*a2p*exp_k(f2_)
     N[0,m+4] = - J1*a1*exp_k(e1_)   -(-1)**p1   *J2*a2p*exp_k(f1)
@@ -125,24 +124,33 @@ def Nk(P,L,args):
     N[3,m+5] =   J1*a1p*exp_k(e2_)  +   J2*a2pi*exp_k(f2_)
     N[4,m+5] = -J1*(a1*exp_k(e3_) + a1pi*exp_k(e3))
     # A3
-    a3 = A3*np.exp(1j*phiA3)
-    a3i = A3*np.exp(1j*(phiA3+p1*np.pi))
     N[0,m+0] = J3*(a3*exp_k(g3) - a3*exp_k(g3_))
     N[1,m+4] = J3*(a3*exp_k(g2) - a3*exp_k(g2_))
     N[2,m+5] = J3*(a3*exp_k(g1) - a3i*exp_k(g1_))
     N[3,m+3] = J3*(a3i*exp_k(g3) - a3i*exp_k(g3_))
     #not the diagonal
-    for i in range(m-1):
-        for j in range(m+1+i,2*m):
-            N[j-m,i+m] = -np.conjugate(N[i,j])
-    # HERMITIAN MATRIX
+    N[1,m] =   J1*a1p*exp_k(e1_)   +   J2*a2*exp_k(f1)
+    N[2,m] = -  J1*a1p*exp_k(e2)  -   J2*a2p*exp_k(f2)
+    N[4,m] =  J1*a1*exp_k(e1)   +(-1)**p1   *J2*a2p*exp_k(f1_)
+    N[5,m] =  - J1*a1*exp_k(e2_)    -(-1)**p1   *J2*a2*exp_k(f2_)
+    N[2,m+1] = J1*(a1*exp_k(e3) + a1p*exp_k(e3_))
+    N[3,m+1] = -  J1*a1*exp_k(e1_)    -(-1)**p1   *J2*a2pi*exp_k(f1)
+    N[5,m+1] = J2*(a2*exp_k(f3) + a2p*exp_k(f3_))
+    N[3,m+2] =  J1*a1*exp_k(e2)   +(-1)**p1   *J2*a2i*exp_k(f2)
+    N[4,m+2] = -J2*(a2p*exp_k(f3) + a2i*exp_k(f3_))
+    N[4,m+3] =  J1*a1pi*exp_k(e1_)   +   J2*a2*exp_k(f1)
+    N[5,m+3] =  - J1*a1p*exp_k(e2)  -   J2*a2pi*exp_k(f2)
+    N[5,m+4] = J1*(a1*exp_k(e3) + a1pi*exp_k(e3_))
+    N[4,m+1] = -J3*(a3*exp_k(g2_) - a3*exp_k(g2))
+    N[5,m+2] = -J3*(a3*exp_k(g1_) - a3i*exp_k(g1))
+    #################################### HERMITIAN MATRIX
     for i in range(2*m-1):
         for j in range(1,2*m):
             N[j,i] = np.conjugate(N[i,j])
-    # L
+    #################################### L
     for i in range(2*m):
         N[i,i] += L
-    #multiply by tau 3
+    ####################################multiply by tau 3
     for i in range(m,2*m):
         for j in range(2*m):
             N[i,j] *= -1
