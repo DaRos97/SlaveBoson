@@ -13,16 +13,13 @@ J2, J3 = inp.J[int(sys.argv[1])]
 #######
 csvfile = inp.dirname+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 ansatze = cf.CheckCsv(csvfile)
-print(ansatze)
 Ti = t()
 for ans in ansatze:
-    print("using ansatz ",ans)
+    print("Using ansatz: ",ans)
     header = inp.header[ans]
-    print(header)
     Args = (J1,J2,J3,ans)
     Tti = t()
     Pi = inp.initialPoint[ans]
-    print(Pi)
     DataDic = {}
     HessDic = {}
     result = minimize(lambda x:cf.Sigma(x,Args),
@@ -37,7 +34,6 @@ for ans in ansatze:
     Pf = tuple(result.x)
     E,L = cf.totE(Pf,Args)
     S = result.fun
-    print(E,S,L,'\n',Pf)
     ########check
     hessian = cf.checkHessian(Pf,Args)
     for i in range(len(Pf)):
@@ -57,6 +53,6 @@ for ans in ansatze:
         writer.writeheader()
         writer.writerow(HessDic)
     print(DataDic)
-    print("Time of ans: ",(t()-Tti)/60,'\n')              ################
+    print("Time of ans",ans,": ",(t()-Tti)/60,'\n')              ################
 
 print("Total time: ",(t()-Ti)/60)                           ################

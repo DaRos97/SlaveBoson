@@ -2,7 +2,7 @@ import numpy as np
 
 text_ans = ['3x3','q0','cb1']
 #dirname = '/home/users/r/rossid/git/clust3AB/Data/'    ###########
-dirname = 'Data/'                                       ###########
+dirname = 'tempData/'                                       ###########
 ####
 S = 0.5
 #derivative
@@ -27,7 +27,7 @@ Bnds = {'3x3':  ((0,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5)),    #3x3 -> A1,A
         'cb1':  ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi),(0,2*np.pi)),  #cb1 -> A1,A2,A3,B1,B2,B3,phiA,phiB
         'cb2':  ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi),(-np.pi,np.pi))}  #cb2 -> A1,A2,A3,B1,B2,phiB1,phiA2(?)
 prec_L = 1e-6       #precision required in L maximization
-complex_cutoff = 1e-4       #max value of complex terms in diagonalization
+complex_cutoff = 1e-5       #max value of complex terms in diagonalization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
 #phase diagram
 Ji = -0.03
