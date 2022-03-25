@@ -92,7 +92,8 @@ def CheckCsv(csvf):
     if my_file.is_file():
         with open(my_file,'r') as f:
             lines = f.readlines()
-            N = len(lines)//4+1
+            N = (len(lines)-1)//4 +1
+            print(N)
             for i in range(N):
                 ans.append(lines[i*4+1].split(',')[0])
     res = []
@@ -105,7 +106,7 @@ def CheckCsv(csvf):
             res.append(a)
     return res
 
-def checkResult(P,args):
+def checkHessian(P,args):
     res = []
     for i in range(len(P)):
         pp = np.array(P)
@@ -127,6 +128,6 @@ def checkResult(P,args):
         dderivative = dde/ddx
         f = interp1d(ptsPP,dderivative)
         res.append(f(P[i]))
-    return res
+    return np.array(res)
 
 
