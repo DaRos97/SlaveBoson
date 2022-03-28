@@ -59,7 +59,7 @@ def totEl(P,args):
     elif ans == 'pi-pi':
         Pp = (P[0],0,0,P[1],P[2],0)
     elif ans == 'cb1':
-        Pp = (P[0],P[1],P[2],P[3],P[4],P[5])
+        Pp = (P[0],0,0,P[1],P[2],P[3])
     for i in range(3):
         res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
     res -= L*(2*inp.S+1)
@@ -93,8 +93,8 @@ def CheckCsv(csvf):
         with open(my_file,'r') as f:
             lines = f.readlines()
             N = (len(lines)-1)//4 +1
-            print(N)
             for i in range(N):
+#                if lines[i*4+1].split(',')[4] < inp.cutoff:
                 ans.append(lines[i*4+1].split(',')[0])
     res = []
     for a in inp.text_ans:

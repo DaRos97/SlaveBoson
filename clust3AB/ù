@@ -20,6 +20,7 @@ def Nk(P,L,args):
     J1 /= 2.
     J2 /= 2.
     J3 /= 2.
+    print(J1,J2,J3)
     #params
     if ans == '3x3':
         A1,A3,B1,B2,B3 = P
@@ -30,7 +31,7 @@ def Nk(P,L,args):
     elif ans == 'q0':
         A1,A2,B1,B2,B3 = P
         A3 = 0
-        phiA1p, phiA2, phiA2p, phiA3 = (0, np.pi, np.pi, 0)
+        phiA1p, phiA2, phiA2p, phiA3 = (0, 0, 0, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
         p1 = 0
     elif ans == '0-pi':
@@ -46,11 +47,9 @@ def Nk(P,L,args):
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
         p1 = 1
     elif ans == 'cb1':
-        A1,B1,B2,B3,phiA1p = P
-        A2 = 0
-        A3 = 0
-        phiA2, phiA2p, phiA3 = (0,0,0)
-        phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
+        A1,A2,A3,B1,B2,B3,phiA1p,phiB2 = P
+        phiA2, phiA2p, phiA3 = (phiA1p/2, phiA1p/2, (phiA1p+np.pi)/2)
+        phiB1, phiB1p, phiB2p, phiB3 = (np.pi, np.pi, -phiB2, 0)
         p1 = 1
     ################
     N = np.zeros((2*m,2*m,grid_pts,grid_pts), dtype=complex)
@@ -143,7 +142,7 @@ def Nk(P,L,args):
     #################################### HERMITIAN MATRIX
     for i in range(2*m):
         for j in range(i,2*m):
-            N[j,i] += np.conjugate(N[i,j])
+            N[j,i] = np.conjugate(N[i,j])
     #################################### L
     for i in range(2*m):
         N[i,i] += L
