@@ -1,8 +1,9 @@
 import numpy as np
 
 text_ans = ['3x3','q0','cb1']
-dirname = '/home/users/r/rossid/git/clust3AB/Data/'    ###########
-#dirname = 'TempData/'                                       ###########
+#dirname = '/home/users/r/rossid/git/clust3AB/Data/'    ###########
+dirname = '../Data/'                                       ###########
+refDirname = dirname+'Data_9P/'
 ####
 S = 0.5
 #derivative
@@ -11,7 +12,8 @@ der_range = [1e-8 for i in range(8)]
 Jpts = 11
 sum_pts = 101
 grid_pts = 9    ############
-cutoff = 1e-8   ############      #accettable value of Sigma to accept result as converged
+cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
+delta = 0.001
 #fixed
 J1 = 1
 z = (4,4,2)
@@ -26,8 +28,8 @@ Bnds = {'3x3':  ((0,1),(0,1),(0.,0.5),(0.,0.5),(0.,0.5)),    #3x3 -> A1,A3,B1,B2
         'oct':  ((0,1),(-0.5,0.5),(-0.5,0.5)),                      #octa ->
         'cb1':  ((0,1),(-0.5,0.5),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi)),  #cb1 -> A1,A2,A3,B1,B2,B3,phiA,phiB
         'cb2':  ((0,1),(-1,1),(-1,1),(-0.5,0.5),(-0.5,0.5),(-np.pi,np.pi),(-np.pi,np.pi))}  #cb2 -> A1,A2,A3,B1,B2,phiB1,phiA2(?)
-prec_L = 1e-8       #precision required in L maximization
-complex_cutoff = 1e-8       #max value of complex terms in diagonalization
+prec_L = 1e-10       #precision required in L maximization
+complex_cutoff = 1e-10       #max value of complex terms in diagonalization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
 #phase diagram
 Ji = -0.03
@@ -37,8 +39,8 @@ for i in range(Jpts):
     for j in range(Jpts):
         J.append((Ji+(Jf-Ji)/(Jpts-1)*i,Ji+(Jf-Ji)/(Jpts-1)*j))
 #summation over BZ
-maxK1 = 2*np.pi
-maxK2 = 2*np.pi/np.sqrt(3)
+maxK1 = 2*np.pi             -delta
+maxK2 = 2*np.pi/np.sqrt(3)  -delta
 K1 = np.linspace(0,maxK1,sum_pts)  #Kx in BZ
 K2 = np.linspace(0,maxK2,sum_pts)  #Ky in BZ
 Kp = (K1,K2)

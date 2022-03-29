@@ -11,25 +11,26 @@ import sys
 J1 = inp.J1
 J2, J3 = inp.J[int(sys.argv[1])]
 #######
-csvfile = inp.dirname+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
+csvfile = inp.dirname+'Data_'+str(inp.grid_pts)+'/J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 ansatze = cf.CheckCsv(csvfile)
 Ti = t()
+Pinitial = cf.checkInitial(J2,J3)
 for ans in ansatze:
     print("Using ansatz: ",ans)
     header = inp.header[ans]
     Args = (J1,J2,J3,ans)
     Tti = t()
-    Pi = inp.initialPoint[ans]
+    Pi = Pinitial[ans]
     DataDic = {}
     HessDic = {}
     result = minimize(lambda x:cf.Sigma(x,Args),
        Pi,
-       method = 'Nelder-Mead',
+       method = 'Powell',
        bounds = inp.Bnds[ans],
        options = {
-           'maxiter':50*len(Pi),
-           'fatol':inp.cutoff,
-           'adaptive':True}
+#           'maxiter':50*len(Pi),
+           'ftol':inp.cutoff}
+#           'adaptive':True}
        )
     Pf = tuple(result.x)
     E,L = cf.totE(Pf,Args)

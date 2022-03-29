@@ -9,6 +9,7 @@ from pathlib import Path
 import csv
 from pandas import read_csv
 import time
+import os
 
 #Some parameters from inputs.py
 kp = inp.sum_pts
@@ -130,4 +131,18 @@ def checkHessian(P,args):
         res.append(f(P[i]))
     return np.array(res)
 
-
+def checkInitial(J2,J3):
+    for file in os.listdir(inp.refDirname):
+        j2 = float(file[7:-5].split('_')[0])/10000
+        j3 = float(file[7:-5].split('_')[1])/10000
+        if j2 == J2 and j3 == J3:
+            with open(inp.refDirname+file, 'r') as f:
+                lines = f.readlines()
+            N = (len(lines)-1)//4 + 1
+            P = {}
+            for i in range(N):
+                data = lines[i*4+1].split(',')
+                P[data[0]] = data[6:]
+                for j in range(len(P[data[0]])):
+                    P[data[0]][j] = float(P[data[0]][j])
+            return P

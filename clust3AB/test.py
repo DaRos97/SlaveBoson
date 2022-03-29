@@ -9,12 +9,12 @@ import csv
 import sys
 ####### inputs
 J1 = 1
-J2, J3 = (-0.0,-0.0)
+J2, J3 = (0.018,-0.018)
 print("J2,J3=",J2,J3)
 cutoff = inp.cutoff
 #######
 Ti = t()
-ansatze = ['cb1']
+ansatze = ['3x3','q0','cb1']
 for ans in ansatze:
     header = inp.header[ans]
     print("Using ansatz: ",ans)
@@ -26,12 +26,14 @@ for ans in ansatze:
     HessDic = {}
     result = minimize(lambda x:cf.Sigma(x,Args),
        Pi,
-       method = 'Nelder-Mead',
+       method = 'Powell',
        bounds = inp.Bnds[ans],
        options = {
-           'maxiter':70*len(Pi),
-           'fatol':cutoff,
-           'adaptive':True}
+#           'maxiter':70*len(Pi),
+#           'fatol':cutoff,
+           'ftol':cutoff#,
+#           'adaptive':True
+           }
        )
     Pf = tuple(result.x)
     E,L = cf.totE(Pf,Args)
