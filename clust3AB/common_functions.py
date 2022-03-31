@@ -18,22 +18,48 @@ J1 = inp.J1
 #grid points
 grid_pts = inp.grid_pts
 ####
+def newSumEigs(P,L,args):
+    m = 6
+    N = an.Nk(P,L,args,'h')
+    J = np.zeros((2*m,2*m))
+    for i in range(m):
+        J[i,i] = -1
+        J[i+m,i+m] = 1
+    res = np.zeros((2*m,grid_pts,grid_pts))
+    rr = 0
+    for i in range(grid_pts):
+        for j in range(grid_pts):
+            Nk = N[:,:,i,j]
+            e = LA.eigvalsh(Nk)
+            if np.amin(e) < 0:
+                return 0
+            K = LA.cholesky(Nk)
+            K_ = np.conjugate(K.T)
+            temp = np.dot(K,J)
+            temp = np.dot(temp,K_)
+            res[:,i,j] = np.tensordot(J,LA.eigvalsh(temp),1)
+            rr += res[:,i,j].ravel().sum()
+    rr /= (2*m*grid_pts**2)
+    return rr
+
+####
 def sumEigs(P,L,args):
     m = 6
-    N = an.Nk(P,L,args)
+    N = an.Nk(P,L,args,'z')
     res = np.zeros((m,grid_pts,grid_pts))
     for i in range(grid_pts):
         for j in range(grid_pts):
             temp = LA.eigvals(N[:,:,i,j])
             if np.amax(np.abs(np.imag(temp))) > inp.complex_cutoff:   #not cool
                 return 0
-            res[:,i,j] = np.sort(np.real(temp))[m:] #also imaginary part if not careful
+            res[:,i,j] = np.sort(np.real(temp))[m:] #also imaginary part if not carefuli
     result = 0
     for i in range(m):      #look difference without interpolation
         func = interp2d(inp.kg[0],inp.kg[1],res[i])
         temp = func(inp.Kp[0],inp.Kp[1])
         result += temp.ravel().sum()
-    return result/(m*kp**2)
+    result /= (m*kp**2)
+    return result
 ####
 def totE(P,args):
     res = minimize_scalar(lambda l: -totEl(tuple(P)+(l,),args),
@@ -64,7 +90,7 @@ def totEl(P,args):
     for i in range(3):
         res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
     res -= L*(2*inp.S+1)
-    res += sumEigs(P,L,args)
+    res += newSumEigs(P,L,args)
     return res
 ####
 def Sigma(P,args):

@@ -14,7 +14,11 @@ g1 = (-1/2,-np.sqrt(3)/2);  kg1 = np.exp(1j*np.tensordot(g1,inp.Mkg,axes=1));   
 g2 = (-1/2,np.sqrt(3)/2);   kg2 = np.exp(1j*np.tensordot(g2,inp.Mkg,axes=1));   kg2_ = np.conjugate(kg2);
 g3 = (1,0);                 kg3 = np.exp(1j*np.tensordot(g3,inp.Mkg,axes=1));   kg3_ = np.conjugate(kg3);
 #### all ansatze
-def Nk(P,L,args):
+def Nk(P,L,args,ch):
+    if ch == 'h':
+        z = 0
+    elif ch == 'z':
+        z = 1
     m = 6
     J1,J2,J3,ans = args
     J1 /= 2.
@@ -148,9 +152,10 @@ def Nk(P,L,args):
     for i in range(2*m):
         N[i,i] += L
     ####################################multiply by tau 3
-    for i in range(m,2*m):
-        for j in range(2*m):
-            N[i,j] *= -1
+    if z:
+        for i in range(m,2*m):
+            for j in range(2*m):
+                N[i,j] *= -1
     return N
 
 

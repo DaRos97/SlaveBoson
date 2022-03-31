@@ -11,9 +11,9 @@ der_pts = 2
 der_range = [1e-8 for i in range(8)]
 Jpts = 11
 sum_pts = 101
-grid_pts = 9    ############
+grid_pts = 5    ############
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
-delta = 0.001
+delta = 0.00
 #fixed
 J1 = 1
 z = (4,4,2)

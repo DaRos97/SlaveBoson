@@ -14,7 +14,7 @@ print("J2,J3=",J2,J3)
 cutoff = inp.cutoff
 #######
 Ti = t()
-ansatze = ['3x3','q0','cb1']
+ansatze = ['cb1']
 for ans in ansatze:
     header = inp.header[ans]
     print("Using ansatz: ",ans)
