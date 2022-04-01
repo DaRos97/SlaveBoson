@@ -3,16 +3,17 @@ import numpy as np
 m = 6
 S = 0.5
 ####
+grid_pts = 9    ############
 text_ans = ['3x3','q0','cb1']
 dirname = '/home/users/r/rossid/git/Data/'    ###########
 #dirname = '../Data/'                                       ###########
 refDirname = dirname+'Data_7/'
+dataDir = 'Data_'+str(grid_pts)+'/'
 #derivative
 method = 'Powell' #'Nelder-Mead'
 der_range = [1e-8 for i in range(8)]
 Jpts = 11
 sum_pts = 101
-grid_pts = 9    ############
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
 prec_L = 1e-10       #precision required in L maximization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
@@ -46,5 +47,5 @@ header = {'3x3':    ['ans','J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B
 print("Method used: ",method)
 print("Minimization precision:",cutoff)
 print("Grid / Summation pts:",grid_pts,'/',sum_pts)
-print("Derivative pts and distance:",der_pts,der_range[0])
+print("Derivative distance:",der_range[0])
 print("L minimization precision:",prec_L)

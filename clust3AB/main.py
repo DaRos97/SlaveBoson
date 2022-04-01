@@ -12,7 +12,7 @@ J1 = inp.J1
 J2, J3 = inp.J[int(sys.argv[1])]
 print('(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
-csvfile = inp.dirname+'Data_'+str(inp.grid_pts)+'n/J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
+csvfile = inp.dirname+inp.dataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 ansatze = cf.CheckCsv(csvfile)
 Ti = t()
 Pinitial = cf.checkInitial(J2,J3,ansatze)

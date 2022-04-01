@@ -152,9 +152,9 @@ def checkInitial(J2,J3,ansatze):
                 P[data[0]] = data[6:]
                 for j in range(len(P[data[0]])):
                     P[data[0]][j] = float(P[data[0]][j])
+    j2 = np.abs(J2) > inp.cutoff_pts
+    j3 = np.abs(J3) > inp.cutoff_pts
     if len(P) == 0:
-        j2 = np.abs(J2) > inp.cutoff_pts
-        j3 = np.abs(J3) > inp.cutoff_pts
         for ans in ansatze:
             P[ans] = [0.51]             #A1
             if j2 and ans == 'q0':
@@ -168,6 +168,13 @@ def checkInitial(J2,J3,ansatze):
                 P[ans].append(0.01)      #B3
             if ans == 'cb1':
                 P[ans].append(1.95)      #phiA
+    else:
+        nP = {}
+        for ans in P.keys():
+            nP[ans] = []
+            for i in np.nonzero(P[ans])[0]:
+                nP[ans].append(P[ans][i])
+        P = nP
     return P
 
 def findBounds(J2,J3,ansatze):
