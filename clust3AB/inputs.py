@@ -1,16 +1,14 @@
 import numpy as np
 
 m = 6
-
-text_ans = ['3x3','q0','cb1']
-#dirname = '/home/users/r/rossid/git/clust3AB/Data/'    ###########
-dirname = '../Data/'                                       ###########
-refDirname = dirname+'Data_9/'
-####
 S = 0.5
+####
+text_ans = ['3x3','q0','cb1']
+dirname = '/home/users/r/rossid/git/Data/'    ###########
+#dirname = '../Data/'                                       ###########
+refDirname = dirname+'Data_7/'
 #derivative
 method = 'Powell' #'Nelder-Mead'
-der_pts = 2
 der_range = [1e-8 for i in range(8)]
 Jpts = 11
 sum_pts = 101

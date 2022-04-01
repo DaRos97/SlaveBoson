@@ -83,20 +83,14 @@ def Sigma(P,args):
     t = time.time()
     J1,J2,J3,ans = args
     res = 0
-    ran = inp.der_range
     for i in range(len(P)):
-        e = np.ndarray(inp.der_pts)
-        rangeP = np.linspace(P[i]-ran[i],P[i]+ran[i],inp.der_pts)
+        Ps = (P[i] + inp.der_range[i], P[i])
+        e = np.ndarray(2)
         pp = np.array(P)
-        for j in range(inp.der_pts):
-            pp[i] = rangeP[j]
+        for j in range(2):
+            pp[i] = Ps[j]
             e[j] = totE(pp,args)[0]
-        # maybe better with just the difference divided by the range
-        de = np.gradient(e)
-        dx = np.gradient(rangeP)
-        der = de/dx
-        f = interp1d(rangeP,der)
-        res += f(P[i])**2
+        res += ((e[0]-e[1])/inp.der_range[i])**2
     return res
 
 #################################################################
@@ -108,7 +102,8 @@ def CheckCsv(csvf):
             lines = f.readlines()
             N = (len(lines)-1)//4 +1
             for i in range(N):
-                ans.append(lines[i*4+1].split(',')[0])
+                if lines[i*4+1].split(',')[4] < 1e-8:
+                    ans.append(lines[i*4+1].split(',')[0])
     res = []
     for a in inp.text_ans:
         t = 1
@@ -186,11 +181,11 @@ def findBounds(J2,J3,ansatze):
                 P[ans] = P[ans] + ((0,1),)      #A2
             if j3 and ans =='3x3':
                 P[ans] = P[ans] + ((0,1),)      #A3
-            P[ans] = P[ans] + ((-0.5,0.5),)      #B1
+            P[ans] = P[ans] + ((0,0.5),)      #B1
             if j2:
-                P[ans] = P[ans] + ((-0.5,0.5),)      #B2
+                P[ans] = P[ans] + ((0,0.5),)      #B2
             if j3:
-                P[ans] = P[ans] + ((-0.5,0.5),)      #B3
+                P[ans] = P[ans] + ((0,0.5),)      #B3
             if ans == 'cb1':
                 P[ans] = P[ans] + ((-np.pi,np.pi),)      #phiA1
     return P
