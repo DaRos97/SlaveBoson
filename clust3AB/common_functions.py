@@ -12,54 +12,42 @@ import time
 import os
 
 #Some parameters from inputs.py
+m = inp.m
 kp = inp.sum_pts
 S = inp.S
 J1 = inp.J1
 #grid points
 grid_pts = inp.grid_pts
 ####
-def newSumEigs(P,L,args):
-    m = 6
-    N = an.Nk(P,L,args,'h')
-    J = np.zeros((2*m,2*m))
-    for i in range(m):
-        J[i,i] = -1
-        J[i+m,i+m] = 1
-    res = np.zeros((2*m,grid_pts,grid_pts))
-    rr = 0
-    for i in range(grid_pts):
-        for j in range(grid_pts):
-            Nk = N[:,:,i,j]
-            e = LA.eigvalsh(Nk)
-            if np.amin(e) < 0:
-                return 0
-            K = LA.cholesky(Nk)
-            K_ = np.conjugate(K.T)
-            temp = np.dot(K,J)
-            temp = np.dot(temp,K_)
-            res[:,i,j] = np.tensordot(J,LA.eigvalsh(temp),1)
-            rr += res[:,i,j].ravel().sum()
-    rr /= (2*m*grid_pts**2)
-    return rr
-
+J = np.zeros((2*m,2*m))
+for i in range(m):
+    J[i,i] = -1
+    J[i+m,i+m] = 1
 ####
 def sumEigs(P,L,args):
-    m = 6
-    N = an.Nk(P,L,args,'z')
+    N = an.Nk(P,L,args)
     res = np.zeros((m,grid_pts,grid_pts))
     for i in range(grid_pts):
         for j in range(grid_pts):
-            temp = LA.eigvals(N[:,:,i,j])
-            if np.amax(np.abs(np.imag(temp))) > inp.complex_cutoff:   #not cool
+            Nk = N[:,:,i,j]
+            try:
+                K = LA.cholesky(Nk)
+            except LA.LinAlgError:
                 return 0
-            res[:,i,j] = np.sort(np.real(temp))[m:] #also imaginary part if not carefuli
-    result = 0
-    for i in range(m):      #look difference without interpolation
-        func = interp2d(inp.kg[0],inp.kg[1],res[i])
+            except:
+                print("Unexpected error")
+                exit()
+            temp = np.dot(K,J)
+            temp = np.dot(temp,np.conjugate(K.T))
+            res[:,i,j] = np.tensordot(J,LA.eigvalsh(temp),1)[:m]
+    r2 = 0
+    for i in range(m):
+        func = interp2d(inp.kg[0],inp.kg[1],res[i],kind='cubic')
         temp = func(inp.Kp[0],inp.Kp[1])
-        result += temp.ravel().sum()
-    result /= (m*kp**2)
-    return result
+        r2 += temp.ravel().sum()
+    r2 /= (m*kp**2)
+    return r2
+
 ####
 def totE(P,args):
     res = minimize_scalar(lambda l: -totEl(tuple(P)+(l,),args),
@@ -76,25 +64,23 @@ def totEl(P,args):
     P = tuple(P[:-1])
     J1,J2,J3,ans = args
     J = (J1,J2,J3)
+    j2 = np.sign(int(np.abs(J2)*1e8))
+    j3 = np.sign(int(np.abs(J3)*1e8))
     res = 0
     if ans == '3x3':
-        Pp = (P[0],0,P[1],P[2],P[3],P[4])
+        Pp = (P[0],0.,P[1]*j3,P[2*j3]*j3+P[1]*(1-j3),P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2,P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'q0':
-        Pp = (P[0],P[1],0,P[2],P[3],P[4])
-    elif ans == '0-pi':
-        Pp = (P[0],P[1],P[2],P[3],P[4],0)
-    elif ans == 'pi-pi':
-        Pp = (P[0],0,0,P[1],P[2],0)
+        Pp = (P[0],P[1]*j2,0.,P[2*j2]*j2+P[1]*(1-j2),P[3*j2]*j2,P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'cb1':
-        Pp = (P[0],0,0,P[1],P[2],P[3])
+        Pp = (P[0],0,0,P[1],P[2*j2]*j2,P[3*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
     for i in range(3):
         res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
     res -= L*(2*inp.S+1)
-    res += newSumEigs(P,L,args)
+    res += sumEigs(P,L,args)
     return res
 ####
 def Sigma(P,args):
-    #t=time.time()
+    t = time.time()
     J1,J2,J3,ans = args
     res = 0
     ran = inp.der_range
@@ -104,7 +90,8 @@ def Sigma(P,args):
         pp = np.array(P)
         for j in range(inp.der_pts):
             pp[i] = rangeP[j]
-            e[j] = totE(pp,args)[0]        #uses at each energy evaluation the best lambda
+            e[j] = totE(pp,args)[0]
+        # maybe better with just the difference divided by the range
         de = np.gradient(e)
         dx = np.gradient(rangeP)
         der = de/dx
@@ -121,7 +108,6 @@ def CheckCsv(csvf):
             lines = f.readlines()
             N = (len(lines)-1)//4 +1
             for i in range(N):
-#                if lines[i*4+1].split(',')[4] < inp.cutoff:
                 ans.append(lines[i*4+1].split(',')[0])
     res = []
     for a in inp.text_ans:
@@ -157,7 +143,8 @@ def checkHessian(P,args):
         res.append(f(P[i]))
     return np.array(res)
 
-def checkInitial(J2,J3):
+def checkInitial(J2,J3,ansatze):
+    P = {}
     for file in os.listdir(inp.refDirname):
         j2 = float(file[7:-5].split('_')[0])/10000
         j3 = float(file[7:-5].split('_')[1])/10000
@@ -165,10 +152,66 @@ def checkInitial(J2,J3):
             with open(inp.refDirname+file, 'r') as f:
                 lines = f.readlines()
             N = (len(lines)-1)//4 + 1
-            P = {}
             for i in range(N):
                 data = lines[i*4+1].split(',')
                 P[data[0]] = data[6:]
                 for j in range(len(P[data[0]])):
                     P[data[0]][j] = float(P[data[0]][j])
-            return P
+    if len(P) == 0:
+        j2 = np.abs(J2) > inp.cutoff_pts
+        j3 = np.abs(J3) > inp.cutoff_pts
+        for ans in ansatze:
+            P[ans] = [0.51]             #A1
+            if j2 and ans == 'q0':
+                P[ans].append(0.2)      #A2
+            if j3 and ans =='3x3':
+                P[ans].append(0.2)      #A3
+            P[ans].append(0.15)         #B1
+            if j2:
+                P[ans].append(0.1)      #B2
+            if j3:
+                P[ans].append(0.01)      #B3
+            if ans == 'cb1':
+                P[ans].append(1.95)      #phiA
+    return P
+
+def findBounds(J2,J3,ansatze):
+    P = {}
+    j2 = np.abs(J2) > inp.cutoff_pts
+    j3 = np.abs(J3) > inp.cutoff_pts
+    for ans in ansatze:
+        for ans in ansatze:
+            P[ans] = ((0,1),)             #A1
+            if j2 and ans == 'q0':
+                P[ans] = P[ans] + ((0,1),)      #A2
+            if j3 and ans =='3x3':
+                P[ans] = P[ans] + ((0,1),)      #A3
+            P[ans] = P[ans] + ((-0.5,0.5),)      #B1
+            if j2:
+                P[ans] = P[ans] + ((-0.5,0.5),)      #B2
+            if j3:
+                P[ans] = P[ans] + ((-0.5,0.5),)      #B3
+            if ans == 'cb1':
+                P[ans] = P[ans] + ((-np.pi,np.pi),)      #phiA1
+    return P
+
+def arrangeP(P,ans,J2,J3):
+    j2 = np.sign(int(np.abs(J2)*1e8))
+    j3 = np.sign(int(np.abs(J3)*1e8))
+    newP = [P[0]]
+    if ans == '3x3':
+        newP.append(P[1]*j3)
+        newP.append(P[2*j3]*j3+P[1]*(1-j3))
+        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+    elif ans == 'q0':
+        newP.append(P[1]*j2)
+        newP.append(P[2*j2]*j2+P[1]*(1-j2))
+        newP.append(P[3*j2]*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
+    elif ans == 'cb1':
+        newP.append(P[1])
+        newP.append(P[2*j2]*j2)
+        newP.append(P[3*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[-1])
+    return tuple(newP)

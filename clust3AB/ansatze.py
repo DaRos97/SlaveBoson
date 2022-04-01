@@ -2,6 +2,7 @@ import inputs as inp
 import numpy as np
 from scipy import linalg as LA
 
+m = inp.m
 grid_pts = inp.grid_pts
 #### vectors of 1nn, 2nn and 3nn
 e1 = (1/4,np.sqrt(3)/4);    ke1 = np.exp(1j*np.tensordot(e1,inp.Mkg,axes=1));   ke1_ = np.conjugate(ke1);
@@ -14,45 +15,40 @@ g1 = (-1/2,-np.sqrt(3)/2);  kg1 = np.exp(1j*np.tensordot(g1,inp.Mkg,axes=1));   
 g2 = (-1/2,np.sqrt(3)/2);   kg2 = np.exp(1j*np.tensordot(g2,inp.Mkg,axes=1));   kg2_ = np.conjugate(kg2);
 g3 = (1,0);                 kg3 = np.exp(1j*np.tensordot(g3,inp.Mkg,axes=1));   kg3_ = np.conjugate(kg3);
 #### all ansatze
-def Nk(P,L,args,ch):
-    if ch == 'h':
-        z = 0
-    elif ch == 'z':
-        z = 1
-    m = 6
+def Nk(P,L,args):
     J1,J2,J3,ans = args
     J1 /= 2.
     J2 /= 2.
     J3 /= 2.
+    j2 = np.sign(int(np.abs(J2)*1e8))
+    j3 = np.sign(int(np.abs(J3)*1e8))
+    A1 = P[0]
     #params
     if ans == '3x3':
-        A1,A3,B1,B2,B3 = P
         A2 = 0
+        A3 = j3*P[1]
+        B1 = P[2*j3]*j3 + P[1]*(1-j3)
+        B2 = P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2
+        B3 = P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2)
         phiA1p, phiA2, phiA2p, phiA3 = (np.pi, 0, 0, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, np.pi)
         p1 = 0
     elif ans == 'q0':
-        A1,A2,B1,B2,B3 = P
-        A3 = 0
+        A2 = P[1]*j2
+        A3 = 0.
+        B1 = P[2*j2]*j2+P[1]*(1-j2)
+        B2 = P[3*j2]*j2
+        B3 = P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2)
         phiA1p, phiA2, phiA2p, phiA3 = (0, np.pi, np.pi, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
         p1 = 0
-    elif ans == '0-pi':
-        A1,A2,A3,B1,B2 = P
-        B3 = 0
-        phiA1p, phiA2, phiA2p, phiA3 = (0, 0, 0, np.pi)
-        phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
-        p1 = 1
-    elif ans == 'pi-pi':
-        A1,B1,B2 = P
-        A2,A3,B3 = (0, 0, 0)
-        phiA1p, phiA2, phiA2p, phiA3 = (np.pi, 0, np.pi, 0)
-        phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
-        p1 = 1
     elif ans == 'cb1':
-        A1,B1,B2,B3,phiA1p = P
-        A2 = 0
-        A3 = 0
+        A2 = 0.
+        A3 = 0.
+        B1 = P[1]
+        B2 = P[2*j2]*j2
+        B3 = P[3*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2)
+        phiA1p = P[-1]
         phiA2, phiA2p, phiA3 = (0,0,0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
         p1 = 1
@@ -151,11 +147,6 @@ def Nk(P,L,args,ch):
     #################################### L
     for i in range(2*m):
         N[i,i] += L
-    ####################################multiply by tau 3
-    if z:
-        for i in range(m,2*m):
-            for j in range(2*m):
-                N[i,j] *= -1
     return N
 
 
