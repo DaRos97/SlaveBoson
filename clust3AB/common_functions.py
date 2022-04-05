@@ -1,9 +1,9 @@
+import inputs as inp
+import ansatze as an
 import numpy as np
 from scipy import linalg as LA
 from scipy.optimize import minimize_scalar
-from scipy.interpolate import interp1d,interp2d
-import inputs as inp
-import ansatze as an
+from scipy.interpolate import interp2d, interp1d
 from colorama import Fore
 from pathlib import Path
 import csv
@@ -11,6 +11,8 @@ from pandas import read_csv
 import time
 import os
 
+import matplotlib.pyplot as plt
+from matplotlib import cm
 #Some parameters from inputs.py
 m = inp.m
 kp = inp.sum_pts
@@ -72,7 +74,12 @@ def totEl(P,args):
     elif ans == 'q0':
         Pp = (P[0],P[1]*j2,0.,P[2*j2]*j2+P[1]*(1-j2),P[3*j2]*j2,P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'cb1':
-        Pp = (P[0],0,0,P[1],P[2*j2]*j2,P[3*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
+        Pp = (P[0],
+                P[1*j2]*j2,
+                P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2),
+                P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3),
+                P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3),
+                0)
     for i in range(3):
         res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
     res -= L*(2*inp.S+1)
@@ -83,6 +90,7 @@ def Sigma(P,args):
     t = time.time()
     J1,J2,J3,ans = args
     res = 0
+    temp = []
     for i in range(len(P)):
         Ps = (P[i] + inp.der_range[i], P[i])
         e = np.ndarray(2)
@@ -90,7 +98,10 @@ def Sigma(P,args):
         for j in range(2):
             pp[i] = Ps[j]
             e[j] = totE(pp,args)[0]
-        res += ((e[0]-e[1])/inp.der_range[i])**2
+        temp.append(((e[0]-e[1])/inp.der_range[i])**2)
+    print(P)
+    print(temp)
+    res = np.array(temp).sum()
     return res
 
 #################################################################
@@ -102,7 +113,7 @@ def CheckCsv(csvf):
             lines = f.readlines()
             N = (len(lines)-1)//4 +1
             for i in range(N):
-                if lines[i*4+1].split(',')[4] < 1e-8:
+                if float(lines[i*4+1].split(',')[4]) < 1e-8:
                     ans.append(lines[i*4+1].split(',')[0])
     res = []
     for a in inp.text_ans:
@@ -140,34 +151,35 @@ def checkHessian(P,args):
 
 def checkInitial(J2,J3,ansatze):
     P = {}
-    for file in os.listdir(inp.refDirname):
+    for file in os.listdir(inp.refDirname):     #find file in dir
         j2 = float(file[7:-5].split('_')[0])/10000
         j3 = float(file[7:-5].split('_')[1])/10000
-        if j2 == J2 and j3 == J3:
+        if j2 == J2 and j3 == J3:               #once found read it
             with open(inp.refDirname+file, 'r') as f:
                 lines = f.readlines()
             N = (len(lines)-1)//4 + 1
             for i in range(N):
                 data = lines[i*4+1].split(',')
-                P[data[0]] = data[6:]
-                for j in range(len(P[data[0]])):
-                    P[data[0]][j] = float(P[data[0]][j])
-    j2 = np.abs(J2) > inp.cutoff_pts
+                if float(data[4]) < 1e-8:              #if sigma small enough
+                    P[data[0]] = data[6:]
+                    for j in range(len(P[data[0]])):    #cast to float
+                        P[data[0]][j] = float(P[data[0]][j])
+    j2 = np.abs(J2) > inp.cutoff_pts    #bool for j2 not 0
     j3 = np.abs(J3) > inp.cutoff_pts
     if len(P) == 0:
         for ans in ansatze:
             P[ans] = [0.51]             #A1
-            if j2 and ans == 'q0':
+            if j2 and (ans == 'q0' or ans == 'cb1'):
                 P[ans].append(0.2)      #A2
-            if j3 and ans =='3x3':
-                P[ans].append(0.2)      #A3
-            P[ans].append(0.15)         #B1
+            if j3 and (ans =='3x3' or ans == 'cb1'):
+                P[ans].append(0.28)      #A3
+            P[ans].append(0.176)         #B1
             if j2:
                 P[ans].append(0.1)      #B2
-            if j3:
-                P[ans].append(0.01)      #B3
+            if j3 and ans != 'cb1':
+                P[ans].append(0.1)      #B3
             if ans == 'cb1':
-                P[ans].append(1.95)      #phiA
+                P[ans].append(1.95)      #phiA1
     else:
         nP = {}
         for ans in P.keys():
@@ -184,14 +196,14 @@ def findBounds(J2,J3,ansatze):
     for ans in ansatze:
         for ans in ansatze:
             P[ans] = ((0,1),)             #A1
-            if j2 and ans == 'q0':
+            if j2 and (ans == 'q0' or ans == 'cb1'):
                 P[ans] = P[ans] + ((0,1),)      #A2
-            if j3 and ans =='3x3':
+            if j3 and (ans =='3x3' or ans == 'cb1'):
                 P[ans] = P[ans] + ((0,1),)      #A3
             P[ans] = P[ans] + ((0,0.5),)      #B1
             if j2:
                 P[ans] = P[ans] + ((0,0.5),)      #B2
-            if j3:
+            if j3 and ans != 'cb1':
                 P[ans] = P[ans] + ((0,0.5),)      #B3
             if ans == 'cb1':
                 P[ans] = P[ans] + ((-np.pi,np.pi),)      #phiA1
@@ -212,8 +224,9 @@ def arrangeP(P,ans,J2,J3):
         newP.append(P[3*j2]*j2)
         newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'cb1':
-        newP.append(P[1])
         newP.append(P[2*j2]*j2)
-        newP.append(P[3*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
+        newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
         newP.append(P[-1])
     return tuple(newP)

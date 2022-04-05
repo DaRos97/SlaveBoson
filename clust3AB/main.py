@@ -17,6 +17,7 @@ ansatze = cf.CheckCsv(csvfile)
 Ti = t()
 Pinitial = cf.checkInitial(J2,J3,ansatze)
 Bnds = cf.findBounds(J2,J3,ansatze)
+ansatze = ['cb1']
 for ans in ansatze:
     print("Using ansatz: ",ans)
     header = inp.header[ans]
@@ -25,6 +26,8 @@ for ans in ansatze:
     Pi = Pinitial[ans]
     DataDic = {}
     HessDic = {}
+    print(Pi)
+    print(Bnds[ans])
     result = minimize(lambda x:cf.Sigma(x,Args),
        Pi,
        method = inp.method,

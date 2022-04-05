@@ -5,7 +5,7 @@ import os
 import sys
 
 N = int(sys.argv[1])
-dirname = '../Data/Data_'+sys.argv[1]+'P/'
+dirname = '../Data/Data_'+sys.argv[1]+'/'
 minE = []
 E = []
 for file in os.listdir(dirname):
@@ -35,7 +35,7 @@ plt.figure(figsize=(16,16))
 plt.subplot(2,2,1)
 for p in range(pts):
     conv = '^'
-    if float(minE[p][4]) < 1e-6:
+    if float(minE[p][4]) < 1e-8:
         conv = 'o'
     plt.scatter(float(minE[p][1]),float(minE[p][2]),color=Color[minE[p][0]],marker = conv)
 for i in range(3):
@@ -43,7 +43,7 @@ for i in range(3):
     plt.title(E[0][i][0])
     for p in range(pts):
         conv='^'
-        if float(E[p][i][4]) < 1e-6:
+        if float(E[p][i][4]) < 1e-8:
             conv = 'o'
         plt.scatter(float(E[p][i][1]),float(E[p][i][2]),color=Color[E[p][i][0]],marker = conv)
 

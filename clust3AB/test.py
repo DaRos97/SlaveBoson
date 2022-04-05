@@ -9,7 +9,7 @@ import csv
 import sys
 ####### inputs
 J1 = 1
-J2, J3 = (0.0,-0.0)
+J2, J3 = (0.0,0.0)
 print("J2,J3=",J2,J3)
 cutoff = inp.cutoff
 #######
@@ -20,7 +20,7 @@ for ans in ansatze:
     print("Using ansatz: ",ans)
     Args = (J1,J2,J3,ans)
     Tti = t()
-    Pi = inp.initialPoint[ans]
+    Pi = (0.5,0.2,0.1,0.1,0.05)
     print("Initial guess: ",Pi)
     DataDic = {}
     HessDic = {}
