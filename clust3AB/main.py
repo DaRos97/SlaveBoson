@@ -17,7 +17,6 @@ ansatze = cf.CheckCsv(csvfile)
 Ti = t()
 Pinitial = cf.checkInitial(J2,J3,ansatze)
 Bnds = cf.findBounds(J2,J3,ansatze)
-ansatze = ['cb1']
 for ans in ansatze:
     print("Using ansatz: ",ans)
     header = inp.header[ans]
@@ -26,8 +25,6 @@ for ans in ansatze:
     Pi = Pinitial[ans]
     DataDic = {}
     HessDic = {}
-    print(Pi)
-    print(Bnds[ans])
     result = minimize(lambda x:cf.Sigma(x,Args),
        Pi,
        method = inp.method,
@@ -52,14 +49,7 @@ for ans in ansatze:
         DataDic[header[ind]] = data[ind]
     for ind2 in range(len(newP)):
         DataDic[header[6+ind2]] = newP[ind2]
-    with open(csvfile,'a') as f:
-        writer = csv.DictWriter(f, fieldnames = header)
-        writer.writeheader()
-        writer.writerow(DataDic)
-    with open(csvfile,'a') as f:
-        writer = csv.DictWriter(f, fieldnames = header[6:])
-        writer.writeheader()
-        writer.writerow(HessDic)
+    cf.saveValues(DataDic,HessDic,csvfile)
     print(DataDic)
     print(HessDic)
     print("Time of ans",ans,": ",(t()-Tti)/60,'\n')              ################
