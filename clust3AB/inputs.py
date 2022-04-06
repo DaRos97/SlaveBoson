@@ -7,9 +7,9 @@ DM1 = 2*np.pi/3
 DM3 = np.pi/3
 ####
 grid_pts = 7    ############
-text_ans = ['3x3','q0','cb1']
-dirname = '/home/users/r/rossid/git/Data/'    ###########
-#dirname = '../Data/'                                       ###########
+text_ans = ['3x3','q0','cb1','cb2']
+#dirname = '/home/users/r/rossid/git/Data/'    ###########
+dirname = '../Data/'                                       ###########
 refDirname = dirname+'Data_7/'
 dataDir = 'Data_'+str(grid_pts)+'/'
 #derivative
@@ -44,7 +44,8 @@ for i in range(grid_pts):
 #csv
 header = {'3x3':    ['ans','J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B3'],  #3x3
           'q0':     ['ans','J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3'],  #q0
-          'cb1':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiA1']}  #cuboc1
+          'cb1':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiA1'],  #cuboc1
+          'cb2':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiB1']}  #cuboc2
 
 
 print("Method used: ",method)

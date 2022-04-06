@@ -15,8 +15,8 @@ g1 = (-1/2,-np.sqrt(3)/2);  kg1 = np.exp(1j*np.tensordot(g1,inp.Mkg,axes=1));   
 g2 = (-1/2,np.sqrt(3)/2);   kg2 = np.exp(1j*np.tensordot(g2,inp.Mkg,axes=1));   kg2_ = np.conjugate(kg2);
 g3 = (1,0);                 kg3 = np.exp(1j*np.tensordot(g3,inp.Mkg,axes=1));   kg3_ = np.conjugate(kg3);
 #### DM
-t1 = np.exp(1j*DM1);    t1_ = np.conjugate(t1)
-t3 = np.exp(1j*DM3);    t3_ = np.conjugate(t3)
+t1 = np.exp(1j*inp.DM1);    t1_ = np.conjugate(t1)
+t3 = np.exp(1j*inp.DM3);    t3_ = np.conjugate(t3)
 #### all ansatze
 def Nk(P,L,args):
     J1,J2,J3,ans = args
@@ -54,6 +54,16 @@ def Nk(P,L,args):
         phiA1p = P[-1]
         phiA2, phiA2p, phiA3 = (phiA1p/2,phiA1p/2,phiA1p/2)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
+        p1 = 1
+    elif ans == 'cb2':      #A1,A2,A3,B1,B2,phiA1p,phiB2
+        A2 = P[1*j2]*j2
+        A3 = P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2)
+        B1 = P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3)
+        B2 = P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3)
+        B3 = 0
+        phiB1 = P[-1]
+        phiA1p, phiA2, phiA2p, phiA3 = (0, 0, 0, 0)        #all can be either 0 or pi except phiA1p
+        phiB1p, phiB2, phiB2p, phiB3 = (-phiB1, 0, 0, 0)
         p1 = 1
     ################
     N = np.zeros((2*m,2*m,grid_pts,grid_pts), dtype=complex)

@@ -71,7 +71,14 @@ def totEl(P,args):
     elif ans == 'q0':
         Pp = (P[0],P[1]*j2,0.,P[2*j2]*j2+P[1]*(1-j2),P[3*j2]*j2,P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'cb1':
-        Pp = (P[0],
+        Pp = (  P[0],
+                P[1*j2]*j2,
+                P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2),
+                P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3),
+                P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3),
+                0)
+    elif ans == 'cb2':
+        Pp = (  P[0],
                 P[1*j2]*j2,
                 P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2),
                 P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3),
@@ -174,19 +181,21 @@ def checkInitial(J2,J3,ansatze):
         P[ans] = []
         P[ans] = [0.51]             #A1
         if j2:
-            if ans == 'q0':
+            if ans == 'q0' or ans == 'cb2':
                 P[ans].append(0.2)      #A2
             elif ans == 'cb1':
                 P[ans].append(-0.2)      #A2
-        if j3 and (ans =='3x3' or ans == 'cb1'):
+        if j3 and (ans =='3x3' or ans == 'cb1' or ans == 'cb2'):
             P[ans].append(0.18)      #A3
         P[ans].append(0.176)         #B1
         if j2:
             P[ans].append(0.1)      #B2
-        if j3 and ans != 'cb1':
+        if j3 and ans != 'cb1' and ans != 'cb2':
             P[ans].append(0.1)      #B3
         if ans == 'cb1':
             P[ans].append(1.95)      #phiA1
+        if ans == 'cb2':
+            P[ans].append(np.pi)      #phiA1
     #remove eventual 0 values
     nP = {}
     for ans in P.keys():
@@ -203,17 +212,21 @@ def findBounds(J2,J3,ansatze):
     for ans in ansatze:
         for ans in ansatze:
             P[ans] = ((0,1),)             #A1
-            if j2 and (ans == 'q0' or ans == 'cb1'):
+            if j2 and (ans == 'q0' or ans == 'cb2'):
+                P[ans] = P[ans] + ((0,1),)      #A2
+            if j2 and ans == 'cb1':
                 P[ans] = P[ans] + ((-1,0),)      #A2
-            if j3 and (ans =='3x3' or ans == 'cb1'):
+            if j3 and (ans =='3x3' or ans == 'cb1' or ans == 'cb2'):
                 P[ans] = P[ans] + ((0,1),)      #A3
             P[ans] = P[ans] + ((0,0.5),)      #B1
             if j2:
                 P[ans] = P[ans] + ((0,0.5),)      #B2
-            if j3 and ans != 'cb1':
+            if j3 and ans != 'cb1' and ans != 'cb2':
                 P[ans] = P[ans] + ((0,0.5),)      #B3
             if ans == 'cb1':
                 P[ans] = P[ans] + ((-np.pi,np.pi),)      #phiA1
+            if ans == 'cb2':
+                P[ans] = P[ans] + ((0,2*np.pi),)      #phiB1
     return P
 
 #From the list of parameters obtained after the minimization constructs an array containing them and eventually 
@@ -233,6 +246,12 @@ def arrangeP(P,ans,J2,J3):
         newP.append(P[3*j2]*j2)
         newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'cb1':
+        newP.append(P[1*j2]*j2)
+        newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
+        newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
+        newP.append(P[-1])
+    elif ans == 'cb2':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))

@@ -17,6 +17,9 @@ ansatze = cf.CheckCsv(csvfile)
 Ti = t()
 Pinitial = cf.checkInitial(J2,J3,ansatze)
 Bnds = cf.findBounds(J2,J3,ansatze)
+ansatze = ['cb2']
+print(Pinitial)
+print(Bnds)
 for ans in ansatze:
     print("Using ansatz: ",ans)
     header = inp.header[ans]
