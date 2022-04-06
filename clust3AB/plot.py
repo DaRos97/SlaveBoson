@@ -5,7 +5,7 @@ import os
 import sys
 
 N = int(sys.argv[1])
-dirname = '../Data/Data_'+sys.argv[1]+'/'
+dirname = '../Data/Data_'+sys.argv[1]+'N/'
 minE = []
 E = []
 for file in os.listdir(dirname):
@@ -15,8 +15,7 @@ for file in os.listdir(dirname):
     tempE = []
     tE = []
     if N != 3:
-        print(file)
-        #continue
+        print(file," has only ",N," ansatze.")
     for i in range(N):
         tE.append([])
         data = lines[i*4+1].split(',')

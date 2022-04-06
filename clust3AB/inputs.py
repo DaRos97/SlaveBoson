@@ -7,8 +7,8 @@ grid_pts = 7    ############
 text_ans = ['3x3','q0','cb1']
 dirname = '/home/users/r/rossid/git/Data/'    ###########
 #dirname = '../Data/'                                       ###########
-refDirname = dirname+'Data_5/'
-dataDir = 'Data_'+str(grid_pts)+'N/'
+refDirname = dirname+'Data_7/'
+dataDir = 'Data_'+str(grid_pts)+'/'
 #derivative
 method = 'Powell'
 der_range = [1e-8 for i in range(8)]

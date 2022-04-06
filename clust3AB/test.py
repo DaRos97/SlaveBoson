@@ -10,7 +10,7 @@ import sys
 import os
 
 
-dataDir = '../data/Data_7/'
+dataDir = '../Data/Data_13/'
 
 for file in os.listdir(dataDir):
     with open(dataDir+file, 'r') as f:

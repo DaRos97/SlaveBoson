@@ -159,39 +159,41 @@ def checkInitial(J2,J3,ansatze):
             with open(inp.refDirname+file, 'r') as f:
                 lines = f.readlines()
             N = (len(lines)-1)//4 + 1
-            for i in range(N):
-                data = lines[i*4+1].split(',')
-                if float(data[4]) < 1e-8:              #if sigma small enough
-                    P[data[0]] = data[6:]
-                    for j in range(len(P[data[0]])):    #cast to float
-                        P[data[0]][j] = float(P[data[0]][j])
+            for Ans in ansatze:
+                for i in range(N):
+                    data = lines[i*4+1].split(',')
+                    if data[0] == Ans and float(data[4]) < 1e-8:              #if sigma small enough
+                        P[data[0]] = data[6:]
+                        for j in range(len(P[data[0]])):    #cast to float
+                            P[data[0]][j] = float(P[data[0]][j])
     j2 = np.abs(J2) > inp.cutoff_pts    #bool for j2 not 0
     j3 = np.abs(J3) > inp.cutoff_pts
-    if len(P) == 0:
-        for ans in ansatze:
-            P[ans] = [0.51]             #A1
-            if j2:
-                if ans == 'q0':
-                    P[ans].append(0.2)      #A2
-                elif ans == 'cb1':
-                    P[ans].append(-0.2)      #A2
-            if j3 and (ans =='3x3' or ans == 'cb1'):
-                P[ans].append(0.18)      #A3
-            P[ans].append(0.176)         #B1
-            if j2:
-                P[ans].append(0.1)      #B2
-            if j3 and ans != 'cb1':
-                P[ans].append(0.1)      #B3
-            if ans == 'cb1':
-                P[ans].append(1.95)      #phiA1
-    else:
-        nP = {}
-        for ans in P.keys():
-            nP[ans] = []
-            for i in np.nonzero(P[ans])[0]:
-                nP[ans].append(P[ans][i])
-        P = nP
-    return P
+    for ans in inp.text_ans:
+        if ans in list(P.keys()):
+            continue
+        P[ans] = []
+        P[ans] = [0.51]             #A1
+        if j2:
+            if ans == 'q0':
+                P[ans].append(0.2)      #A2
+            elif ans == 'cb1':
+                P[ans].append(-0.2)      #A2
+        if j3 and (ans =='3x3' or ans == 'cb1'):
+            P[ans].append(0.18)      #A3
+        P[ans].append(0.176)         #B1
+        if j2:
+            P[ans].append(0.1)      #B2
+        if j3 and ans != 'cb1':
+            P[ans].append(0.1)      #B3
+        if ans == 'cb1':
+            P[ans].append(1.95)      #phiA1
+    #remove eventual 0 values
+    nP = {}
+    for ans in P.keys():
+        nP[ans] = []
+        for i in np.nonzero(P[ans])[0]:
+            nP[ans].append(P[ans][i])
+    return nP
 
 #Constructs the bounds of the specific ansatz depending on the number and type of parameters involved in the minimization
 def findBounds(J2,J3,ansatze):
