@@ -170,8 +170,11 @@ def checkInitial(J2,J3,ansatze):
     if len(P) == 0:
         for ans in ansatze:
             P[ans] = [0.51]             #A1
-            if j2 and (ans == 'q0' or ans == 'cb1'):
-                P[ans].append(-0.2)      #A2
+            if j2:
+                if ans == 'q0':
+                    P[ans].append(0.2)      #A2
+                elif ans == 'cb1':
+                    P[ans].append(-0.2)      #A2
             if j3 and (ans =='3x3' or ans == 'cb1'):
                 P[ans].append(0.18)      #A3
             P[ans].append(0.176)         #B1
@@ -197,16 +200,16 @@ def findBounds(J2,J3,ansatze):
     j3 = np.abs(J3) > inp.cutoff_pts
     for ans in ansatze:
         for ans in ansatze:
-            P[ans] = ((-1,1),)             #A1
+            P[ans] = ((0,1),)             #A1
             if j2 and (ans == 'q0' or ans == 'cb1'):
-                P[ans] = P[ans] + ((-1,1),)      #A2
+                P[ans] = P[ans] + ((-1,0),)      #A2
             if j3 and (ans =='3x3' or ans == 'cb1'):
-                P[ans] = P[ans] + ((-1,1),)      #A3
-            P[ans] = P[ans] + ((-0.5,0.5),)      #B1
+                P[ans] = P[ans] + ((0,1),)      #A3
+            P[ans] = P[ans] + ((0,0.5),)      #B1
             if j2:
-                P[ans] = P[ans] + ((-0.5,0.5),)      #B2
+                P[ans] = P[ans] + ((0,0.5),)      #B2
             if j3 and ans != 'cb1':
-                P[ans] = P[ans] + ((-0.5,0.5),)      #B3
+                P[ans] = P[ans] + ((0,0.5),)      #B3
             if ans == 'cb1':
                 P[ans] = P[ans] + ((-np.pi,np.pi),)      #phiA1
     return P
