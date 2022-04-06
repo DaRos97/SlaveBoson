@@ -12,7 +12,7 @@ dataDir = 'Data_'+str(grid_pts)+'/'
 #derivative
 method = 'Powell'
 der_range = [1e-8 for i in range(8)]
-Jpts = 11
+Jpts = 21
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
 prec_L = 1e-10       #precision required in L maximization

@@ -5,7 +5,7 @@ import os
 import sys
 
 N = int(sys.argv[1])
-dirname = '../Data/Data_'+sys.argv[1]+'N/'
+dirname = '../Data/Data_'+sys.argv[1]+'Nn/'
 minE = []
 E = []
 for file in os.listdir(dirname):

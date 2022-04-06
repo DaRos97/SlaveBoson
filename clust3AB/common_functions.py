@@ -162,7 +162,7 @@ def checkInitial(J2,J3,ansatze):
             for Ans in ansatze:
                 for i in range(N):
                     data = lines[i*4+1].split(',')
-                    if data[0] == Ans and float(data[4]) < 1e-8:              #if sigma small enough
+                    if data[0] == Ans :#and float(data[4]) < 1e-8:              #if sigma small enough
                         P[data[0]] = data[6:]
                         for j in range(len(P[data[0]])):    #cast to float
                             P[data[0]][j] = float(P[data[0]][j])
@@ -243,8 +243,11 @@ def arrangeP(P,ans,J2,J3):
 #Save the dictionaries in the file given, rewriting the already existing data if precision is better
 def saveValues(Data,Hess,csvfile):
     N_ = 0
-    with open(csvfile,'r') as f:
-        init = f.readlines()
+    if Path(csvfile).is_file():
+        with open(csvfile,'r') as f:
+            init = f.readlines()
+    else:
+        init = []
     ans = Data['ans']
     N = (len(init)-1)//4+1
     ac = False
