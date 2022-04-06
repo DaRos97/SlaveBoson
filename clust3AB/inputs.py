@@ -3,6 +3,9 @@ import numpy as np
 m = 6
 S = 0.5
 ####
+DM1 = 2*np.pi/3
+DM3 = np.pi/3
+####
 grid_pts = 7    ############
 text_ans = ['3x3','q0','cb1']
 dirname = '/home/users/r/rossid/git/Data/'    ###########
