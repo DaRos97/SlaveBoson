@@ -147,7 +147,6 @@ def CheckCsv(csvf):
 #we can check that the energy is a max in As and min in Bs (for J>0).
 def checkHessian(P,args):
     res = []
-    print("Initiating Hessiani, with P=",P)
     for i in range(len(P)):
         pp = np.array(P)
         Der = []
@@ -168,14 +167,13 @@ def checkHessian(P,args):
         dderivative = dde/ddx
         f = interp1d(ptsPP,dderivative)
         res.append(f(P[i]))
-        print("For param ",P[i]," hessian is ",f(P[i]))
     return np.array(res)
 
 #Extracts the initial point for the minimization from a file in a reference directory specified in inputs.py
 #If the file matching the j2,j3 point is not found initialize the initial point with default parameters
 def checkInitial(J2,J3,ansatze):
     P = {}
-    if Path(inp.refDirname).is_file():
+    if Path(inp.refDirname).is_dir():
         for file in os.listdir(inp.refDirname):     #find file in dir
             j2 = float(file[7:-5].split('_')[0])/10000
             j3 = float(file[7:-5].split('_')[1])/10000
@@ -186,7 +184,7 @@ def checkInitial(J2,J3,ansatze):
                 for Ans in ansatze:
                     for i in range(N):
                         data = lines[i*4+1].split(',')
-                        if data[0] == Ans :#and float(data[4]) < 1e-8:              #if sigma small enough
+                        if data[0] == Ans and float(data[5]) > 0.51:   #correct ansatz and non completely wrong solution
                             P[data[0]] = data[6:]
                             for j in range(len(P[data[0]])):    #cast to float
                                 P[data[0]][j] = float(P[data[0]][j])
@@ -196,12 +194,12 @@ def checkInitial(J2,J3,ansatze):
         if ans in list(P.keys()):
             continue
         P[ans] = []
-        P[ans] = [0.51]             #A1
+        P[ans] = [0.5]             #A1
         if j2 and ans in inp.list_A2:
             P[ans].append(0.17)      #A2
         if j3 and ans in inp.list_A3:
             P[ans].append(0.18)      #A3
-        P[ans].append(0.176)         #B1
+        P[ans].append(0.16)         #B1
         if j2:
             P[ans].append(0.1)      #B2
         if j3 and ans in inp.list_B3:
@@ -225,14 +223,14 @@ def findBounds(J2,J3,ansatze):
     j3 = np.abs(J3) > inp.cutoff_pts
     for ans in ansatze:
         for ans in ansatze:
-            P[ans] = ((0,1),)             #A1
+            P[ans] = ((0.1,1),)             #A1
             if j2 and ans in inp.list_A2:
-                P[ans] = P[ans] + ((0,1),)      #A2
+                P[ans] = P[ans] + ((-1,1),)      #A2
             if j3 and ans in inp.list_A3:
                 P[ans] = P[ans] + ((-1,1),)      #A3
-            P[ans] = P[ans] + ((0,0.5),)      #B1
+            P[ans] = P[ans] + ((0.,0.5),)      #B1
             if j2:
-                P[ans] = P[ans] + ((0,0.5),)      #B2
+                P[ans] = P[ans] + ((-0.5,0.5),)      #B2
             if j3 and ans in inp.list_B3:
                 P[ans] = P[ans] + ((-0.5,0.5),)      #B3
             if ans == 'cb1':
@@ -296,7 +294,7 @@ def saveValues(Data,Hess,csvfile):
     for i in range(N):
         if init[i*4+1].split(',')[0] == ans:
             ac = True
-            if float(init[i*4+1].split(',')[4]) > Data['Sigma']:
+            if float(init[i*4+1].split(',')[4]) > Data['Sigma'] and float(Data['L']) > 0.51:
                 N_ = i+1
     ###
     header = inp.header[ans]

@@ -14,6 +14,7 @@ print('(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.dirname+inp.dataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 ansatze = cf.CheckCsv(csvfile)
+ansatze = ['3x3']
 Ti = t()
 Pinitial = cf.checkInitial(J2,J3,ansatze)
 Bnds = cf.findBounds(J2,J3,ansatze)
@@ -25,14 +26,15 @@ for ans in ansatze:
     Pi = Pinitial[ans]
     DataDic = {}
     HessDic = {}
+    print(Pi)
     result = minimize(lambda x:cf.Sigma(x,Args),
        Pi,
        method = inp.method,
        bounds = Bnds[ans],
        options = {
 #           'maxiter':100*len(Pi),
+#           'adaptive':True,
            'ftol':inp.cutoff}
-#           'adaptive':True}
        )
     Pf = tuple(result.x)
     E,L = cf.totE(Pf,Args)
@@ -52,6 +54,6 @@ for ans in ansatze:
     cf.saveValues(DataDic,HessDic,csvfile)
     print(DataDic)
     print(HessDic)
-    print("Time of ans",ans,": ",(t()-Tti)/60,'\n')              ################
+    print("Time of ans",ans,": ",'{:5.2f}'.format((t()-Tti)/60),' minutes\n')              ################
 
-print("Total time: ",(t()-Ti)/60)                           ################
+print("Total time: ",'{:5.2f}'.format((t()-Ti)/60),' minutes.')                           ################

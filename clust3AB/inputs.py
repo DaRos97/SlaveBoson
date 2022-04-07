@@ -3,20 +3,20 @@ import numpy as np
 m = 6
 S = 0.5
 ####
-DM1 = 0#2*np.pi/3
-DM3 = DM1/2#np.pi/3
-tDM = 'DM' if DM1 != 0 else ''
+DM1 = np.pi/3
+DM3 = 0.#DM1/2#np.pi/3
+tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
 grid_pts = 5
 text_ans = ['3x3','q0','0-pi','cb1','cb2']#,'octa']
 #dirname = '/home/users/r/rossid/git/Data/'
 dirname = '../Data/test/'
-refDirname = dirname+'Data_7/'
 dataDir = 'Data_'+str(grid_pts)+tDM+'/'
+refDirname = dirname+dataDir#dirname+'Data_7/'          ########ATTENZIONE
 #derivative
 method = 'Powell'
 der_range = [1e-8 for i in range(8)]
-Jpts = 11
+Jpts = 21
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
 prec_L = 1e-10       #precision required in L maximization
