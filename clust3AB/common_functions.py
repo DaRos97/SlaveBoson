@@ -70,6 +70,13 @@ def totEl(P,args):
         Pp = (P[0],0.,P[1]*j3,P[2*j3]*j3+P[1]*(1-j3),P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2,P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'q0':
         Pp = (P[0],P[1]*j2,0.,P[2*j2]*j2+P[1]*(1-j2),P[3*j2]*j2,P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
+    elif ans == '0-pi':
+        Pp = (  P[0],
+                P[1*j2]*j2,
+                P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2),
+                P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3),
+                P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3),
+                0)
     elif ans == 'cb1':
         Pp = (  P[0],
                 P[1*j2]*j2,
@@ -84,6 +91,13 @@ def totEl(P,args):
                 P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3),
                 P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3),
                 0)
+    elif ans == 'octa':
+        Pp = (  P[0],
+                P[1*j2]*j2,
+                0,
+                P[2*j2]*j2 + P[1*(1-j2)]*(1-j2),
+                P[3*j2]*j2,
+                P[4*j2*j2]*j2*j3 + P[2*j3*(1-j2)]*j3*(1-j2))
     for i in range(3):
         res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
     res -= L*(2*inp.S+1)
@@ -133,6 +147,7 @@ def CheckCsv(csvf):
 #we can check that the energy is a max in As and min in Bs (for J>0).
 def checkHessian(P,args):
     res = []
+    print("Initiating Hessiani, with P=",P)
     for i in range(len(P)):
         pp = np.array(P)
         Der = []
@@ -153,26 +168,28 @@ def checkHessian(P,args):
         dderivative = dde/ddx
         f = interp1d(ptsPP,dderivative)
         res.append(f(P[i]))
+        print("For param ",P[i]," hessian is ",f(P[i]))
     return np.array(res)
 
 #Extracts the initial point for the minimization from a file in a reference directory specified in inputs.py
 #If the file matching the j2,j3 point is not found initialize the initial point with default parameters
 def checkInitial(J2,J3,ansatze):
     P = {}
-    for file in os.listdir(inp.refDirname):     #find file in dir
-        j2 = float(file[7:-5].split('_')[0])/10000
-        j3 = float(file[7:-5].split('_')[1])/10000
-        if j2 == J2 and j3 == J3:               #once found read it
-            with open(inp.refDirname+file, 'r') as f:
-                lines = f.readlines()
-            N = (len(lines)-1)//4 + 1
-            for Ans in ansatze:
-                for i in range(N):
-                    data = lines[i*4+1].split(',')
-                    if data[0] == Ans :#and float(data[4]) < 1e-8:              #if sigma small enough
-                        P[data[0]] = data[6:]
-                        for j in range(len(P[data[0]])):    #cast to float
-                            P[data[0]][j] = float(P[data[0]][j])
+    if Path(inp.refDirname).is_file():
+        for file in os.listdir(inp.refDirname):     #find file in dir
+            j2 = float(file[7:-5].split('_')[0])/10000
+            j3 = float(file[7:-5].split('_')[1])/10000
+            if j2 == J2 and j3 == J3:               #once found read it
+                with open(inp.refDirname+file, 'r') as f:
+                    lines = f.readlines()
+                N = (len(lines)-1)//4 + 1
+                for Ans in ansatze:
+                    for i in range(N):
+                        data = lines[i*4+1].split(',')
+                        if data[0] == Ans :#and float(data[4]) < 1e-8:              #if sigma small enough
+                            P[data[0]] = data[6:]
+                            for j in range(len(P[data[0]])):    #cast to float
+                                P[data[0]][j] = float(P[data[0]][j])
     j2 = np.abs(J2) > inp.cutoff_pts    #bool for j2 not 0
     j3 = np.abs(J3) > inp.cutoff_pts
     for ans in inp.text_ans:
@@ -180,21 +197,18 @@ def checkInitial(J2,J3,ansatze):
             continue
         P[ans] = []
         P[ans] = [0.51]             #A1
-        if j2:
-            if ans == 'q0' or ans == 'cb2':
-                P[ans].append(0.2)      #A2
-            elif ans == 'cb1':
-                P[ans].append(-0.2)      #A2
-        if j3 and (ans =='3x3' or ans == 'cb1' or ans == 'cb2'):
+        if j2 and ans in inp.list_A2:
+            P[ans].append(0.17)      #A2
+        if j3 and ans in inp.list_A3:
             P[ans].append(0.18)      #A3
         P[ans].append(0.176)         #B1
         if j2:
             P[ans].append(0.1)      #B2
-        if j3 and ans != 'cb1' and ans != 'cb2':
+        if j3 and ans in inp.list_B3:
             P[ans].append(0.1)      #B3
         if ans == 'cb1':
             P[ans].append(1.95)      #phiA1
-        if ans == 'cb2':
+        if ans == 'cb2' or ans == 'octa':
             P[ans].append(np.pi)      #phiA1
     #remove eventual 0 values
     nP = {}
@@ -212,20 +226,18 @@ def findBounds(J2,J3,ansatze):
     for ans in ansatze:
         for ans in ansatze:
             P[ans] = ((0,1),)             #A1
-            if j2 and (ans == 'q0' or ans == 'cb2'):
+            if j2 and ans in inp.list_A2:
                 P[ans] = P[ans] + ((0,1),)      #A2
-            if j2 and ans == 'cb1':
-                P[ans] = P[ans] + ((-1,0),)      #A2
-            if j3 and (ans =='3x3' or ans == 'cb1' or ans == 'cb2'):
-                P[ans] = P[ans] + ((0,1),)      #A3
+            if j3 and ans in inp.list_A3:
+                P[ans] = P[ans] + ((-1,1),)      #A3
             P[ans] = P[ans] + ((0,0.5),)      #B1
             if j2:
                 P[ans] = P[ans] + ((0,0.5),)      #B2
-            if j3 and ans != 'cb1' and ans != 'cb2':
-                P[ans] = P[ans] + ((0,0.5),)      #B3
+            if j3 and ans in inp.list_B3:
+                P[ans] = P[ans] + ((-0.5,0.5),)      #B3
             if ans == 'cb1':
                 P[ans] = P[ans] + ((-np.pi,np.pi),)      #phiA1
-            if ans == 'cb2':
+            if ans == 'cb2' or ans == 'octa':
                 P[ans] = P[ans] + ((0,2*np.pi),)      #phiB1
     return P
 
@@ -245,6 +257,11 @@ def arrangeP(P,ans,J2,J3):
         newP.append(P[2*j2]*j2+P[1]*(1-j2))
         newP.append(P[3*j2]*j2)
         newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
+    elif ans == '0-pi':
+        newP.append(P[1*j2]*j2)
+        newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
+        newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
     elif ans == 'cb1':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
@@ -256,6 +273,12 @@ def arrangeP(P,ans,J2,J3):
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
         newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
+        newP.append(P[-1])
+    elif ans == 'octa':
+        newP.append(P[1*j2]*j2)
+        newP.append(P[2*j2]*j2 + P[1*(1-j2)]*(1-j2))
+        newP.append(P[3*j2]*j2)
+        newP.append(P[4*j3*j2]*j2*j3 + P[2*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[-1])
     return tuple(newP)
 
@@ -300,3 +323,5 @@ def saveValues(Data,Hess,csvfile):
             writer = csv.DictWriter(f, fieldnames = header[6:])
             writer.writeheader()
             writer.writerow(Hess)
+
+

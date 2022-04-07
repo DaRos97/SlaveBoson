@@ -5,7 +5,7 @@ import os
 import sys
 
 N = int(sys.argv[1])
-dirname = '../Data/Data_'+sys.argv[1]+'Nn/'
+dirname = '../Data/PD_03/Data_'+sys.argv[1]+'DM/'
 minE = []
 E = []
 for file in os.listdir(dirname):
@@ -42,8 +42,11 @@ for i in range(3):
     plt.title(E[0][i][0])
     for p in range(pts):
         conv='^'
-        if float(E[p][i][4]) < 1e-8:
-            conv = 'o'
-        plt.scatter(float(E[p][i][1]),float(E[p][i][2]),color=Color[E[p][i][0]],marker = conv)
+        try:
+            if float(E[p][i][4]) < 1e-8:
+                conv = 'o'
+            plt.scatter(float(E[p][i][1]),float(E[p][i][2]),color=Color[E[p][i][0]],marker = conv)
+        except:
+            continue
 
 plt.show()

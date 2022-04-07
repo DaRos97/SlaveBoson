@@ -45,6 +45,15 @@ def Nk(P,L,args):
         phiA1p, phiA2, phiA2p, phiA3 = (0, np.pi, np.pi, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
         p1 = 0
+    elif ans == '0-pi':      #A1,A2,A3,B1,B2,phiA1p,phiB2
+        A2 = P[1*j2]*j2
+        A3 = P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2)
+        B1 = P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3)
+        B2 = P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3)
+        B3 = 0
+        phiA1p, phiA2, phiA2p, phiA3 = (0, np.pi, np.pi, np.pi)
+        phiB1, phiB1p, phiB2, phiB2p, phiB3 = ( np.pi, np.pi, np.pi, np.pi, 0)
+        p1 = 1
     elif ans == 'cb1':      #A1,A2,A3,B1,B2,phiA1p,phiB2
         A2 = P[1*j2]*j2
         A3 = P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2)
@@ -52,7 +61,7 @@ def Nk(P,L,args):
         B2 = P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3)
         B3 = 0
         phiA1p = P[-1]
-        phiA2, phiA2p, phiA3 = (phiA1p/2,phiA1p/2,phiA1p/2)
+        phiA2, phiA2p, phiA3 = (-phiA1p/2,-phiA1p/2,phiA1p/2)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
         p1 = 1
     elif ans == 'cb2':      #A1,A2,A3,B1,B2,phiA1p,phiB2
@@ -62,8 +71,18 @@ def Nk(P,L,args):
         B2 = P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3)
         B3 = 0
         phiB1 = P[-1]
-        phiA1p, phiA2, phiA2p, phiA3 = (0, 0, 0, 0)        #all can be either 0 or pi except phiA1p
-        phiB1p, phiB2, phiB2p, phiB3 = (-phiB1, 0, 0, 0)
+        phiA1p, phiA2, phiA2p, phiA3 = (0, np.pi, -np.pi, np.pi)        #all can be either 0 or pi except phiA1p
+        phiB1p, phiB2, phiB2p, phiB3 = (-phiB1, np.pi, np.pi, 0)
+        p1 = 1
+    elif ans == 'octa':      #A1,A2,A3,B1,B2,phiA1p,phiB2
+        A2 = P[1*j2]*j2
+        A3 = 0
+        B1 = P[2*j2]*j2 + P[1*(1-j2)]*(1-j2)
+        B2 = P[3*j2]*j2
+        B3 = P[4*j2*j3]*j2*j3 + P[2*j3*(1-j2)]*j3*(1-j2)
+        phiB1 = P[-1]
+        phiA1p, phiA2, phiA2p, phiA3 = (np.pi, -np.pi/2, np.pi/2, 0)        #all can be either 0 or pi except phiA1p
+        phiB1p, phiB2, phiB2p, phiB3 = (phiB1, 0, 0, -np.pi/2)
         p1 = 1
     ################
     N = np.zeros((2*m,2*m,grid_pts,grid_pts), dtype=complex)

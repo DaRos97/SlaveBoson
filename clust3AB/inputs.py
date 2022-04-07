@@ -3,19 +3,20 @@ import numpy as np
 m = 6
 S = 0.5
 ####
-DM1 = 2*np.pi/3
-DM3 = np.pi/3
+DM1 = 0#2*np.pi/3
+DM3 = DM1/2#np.pi/3
+tDM = 'DM' if DM1 != 0 else ''
 ####
-grid_pts = 7    ############
-text_ans = ['3x3','q0','cb1','cb2']
-#dirname = '/home/users/r/rossid/git/Data/'    ###########
-dirname = '../Data/'                                       ###########
+grid_pts = 5
+text_ans = ['3x3','q0','0-pi','cb1','cb2']#,'octa']
+#dirname = '/home/users/r/rossid/git/Data/'
+dirname = '../Data/test/'
 refDirname = dirname+'Data_7/'
-dataDir = 'Data_'+str(grid_pts)+'/'
+dataDir = 'Data_'+str(grid_pts)+tDM+'/'
 #derivative
 method = 'Powell'
 der_range = [1e-8 for i in range(8)]
-Jpts = 21
+Jpts = 11
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
 prec_L = 1e-10       #precision required in L maximization
@@ -23,8 +24,8 @@ cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considere
 #phase diagram
 J1 = 1
 z = (4,4,2)
-Ji = -0.03
-Jf = 0.03
+Ji = -0.3
+Jf = 0.3
 J = []
 for i in range(Jpts):
     for j in range(Jpts):
@@ -44,9 +45,13 @@ for i in range(grid_pts):
 #csv
 header = {'3x3':    ['ans','J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B3'],  #3x3
           'q0':     ['ans','J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3'],  #q0
+          '0-pi':   ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2'],  #0-pi
           'cb1':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiA1'],  #cuboc1
-          'cb2':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiB1']}  #cuboc2
-
+          'cb2':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiB1'],  #cuboc2
+          'octa':   ['ans','J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3','phiB1']}  #octa
+list_A2 = ['q0','0-pi','octa','cb1','cb2']
+list_A3 = ['3x3','0-pi','cb1','cb2']
+list_B3 = ['3x3','q0','octa']
 
 print("Method used: ",method)
 print("Minimization precision:",cutoff)
