@@ -19,21 +19,21 @@ t1 = np.exp(-1j*inp.DM1);    t1_ = np.conjugate(t1)
 t3 = np.exp(-1j*inp.DM3);    t3_ = np.conjugate(t3)
 #### all ansatze
 def Nk(P,L,args):
-    Jj1,Jj2,Jj3,ans = args
-    J1 = Jj1/2.
-    J2 = Jj2/2.
-    J3 = Jj3/2.
-    j2 = np.sign(int(np.abs(J2)*1e8))
+    J1,J2,J3,ans = args
+    J1 /= 2.
+    J2 /= 2.
+    J3 /= 2.
+    j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or not --> problem with VERY small J2,J3
     j3 = np.sign(int(np.abs(J3)*1e8))
     A1 = P[0]
     #params
     if ans == '3x3':
-        A2 = 0
+        A2 = 0;     phiA2 = 0;    phiA2p = 0;
         A3 = j3*P[1]
         B1 = P[2*j3]*j3 + P[1]*(1-j3)
         B2 = P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2
         B3 = P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2)
-        phiA1p, phiA2, phiA2p, phiA3 = (np.pi, 0, 0, 0)
+        phiA1p, phiA3 = (np.pi, 0)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, np.pi)
         p1 = 0
     elif ans == 'q0':
@@ -110,10 +110,10 @@ def Nk(P,L,args):
     N[3,5] = J1*b1p  *ke2_              + J2*b2pi_*kf2_
     N[4,5] = J1*(b1_ *ke3_  + b1pi_*ke3)
 
-    N[0,0] = J3*b3i_ *kg3_ *t3
-    N[3,3] = J3*b3_  *kg3_ *t3
-    N[1,4] = J3*(b3_ *kg2_ *t3  + b3  *kg2 *t3_)
-    N[2,5] = J3*(b3  *kg1  *t3_ + b3i_*kg1_*t3)
+    N[0,0] = J3*b3i_ *kg3_
+    N[3,3] = J3*b3_  *kg3_
+    N[1,4] = J3*(b3_ *kg2_ + b3  *kg2 *t3_)
+    N[2,5] = J3*(b3  *kg1  + b3i_*kg1_*t3)
     ####other half square
     N[m+0,m+1] = J1*b1p  *ke1           + J2*b2_  *kf1_
     N[m+0,m+2] = J1*b1p_ *ke2_          + J2*b2p  *kf2_
@@ -128,10 +128,10 @@ def Nk(P,L,args):
     N[m+3,m+5] = J1*b1p_ *ke2_          + J2*b2pi *kf2_
     N[m+4,m+5] = J1*(b1  *ke3_ + b1pi*ke3)
 
-    N[m+0,m+0] = J3*b3i *kg3_ *t3_
-    N[m+3,m+3] = J3*b3  *kg3_ *t3_
-    N[m+1,m+4] = J3*(b3 *kg2_ *t3_  + b3_ *kg2 *t3)
-    N[m+2,m+5] = J3*(b3_*kg1  *t3   + b3i *kg1_*t3_)
+    N[m+0,m+0] = J3*b3i *kg3_
+    N[m+3,m+3] = J3*b3  *kg3_
+    N[m+1,m+4] = J3*(b3 *kg2_ + b3_ *kg2 *t3)
+    N[m+2,m+5] = J3*(b3_*kg1  + b3i *kg1_*t3_)
     ######################################## A
     a1 = A1
     a1p = A1*np.exp(1j*phiA1p)
@@ -186,4 +186,16 @@ def Nk(P,L,args):
         N[i,i] += L
     return N
 
-
+#        |*          |*          |
+#        |  *    B   |  *   A    |
+#        |    *      |    *      |
+#        |      *    |      *    |
+#        |  c.c.  *  |  -A*   *  |
+#        |          *|          *|
+#  N  =  |-----------|-----------|  +  diag(L)
+#        |*          |*          |
+#        |  *   c.c. |  *  B*(-k)|
+#        |    *      |    *      |
+#        |      *    | c.c. *    |
+#        | c.c.   *  |        *  |
+#        |          *|          *|

@@ -8,7 +8,7 @@ from colorama import Fore
 from pathlib import Path
 import csv
 from pandas import read_csv
-from time import time as t
+import time
 import os
 
 #Some parameters from inputs.py
@@ -23,56 +23,69 @@ J = np.zeros((2*m,2*m))
 for i in range(m):
     J[i,i] = -1
     J[i+m,i+m] = 1
-#### Computes the part of the energy given by the Bogoliubov eigen-modes
+####
 def sumEigs(P,L,args):
-    N = an.Nk(P,L,args) #compute Hermitian matrix
+    N = an.Nk(P,L,args)
     res = np.zeros((m,grid_pts,grid_pts))
     for i in range(grid_pts):
         for j in range(grid_pts):
             Nk = N[:,:,i,j]
             try:
-                K = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
-            except LA.LinAlgError:      #matrix not pos def for that specific kx,ky
-                return inp.shame_value      #if that's the case even for a single k in the grid, return a defined value
-            temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
-            res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:m])    #only diagonalization
+                K = LA.cholesky(Nk)
+            except LA.LinAlgError:
+                return inp.shame_value
+            except:
+                print("Unexpected error in Cholesky decomposition.")
+                exit()
+            temp = np.dot(np.dot(K,J),np.conjugate(K.T))
+            res[:,i,j] = np.tensordot(J,LA.eigvalsh(temp),1)[:m]    #only diagonalization
     r2 = 0
     for i in range(m):
-        func = interp2d(inp.kg[0],inp.kg[1],res[i],kind='cubic')    #Interpolate the 2D surface
-        temp = func(inp.Kp[0],inp.Kp[1])                            #sum over more points to increase the precision
+        func = interp2d(inp.kg[0],inp.kg[1],res[i],kind='cubic')
+        temp = func(inp.Kp[0],inp.Kp[1])
         r2 += temp.ravel().sum()
-#        if i == 0 and np.amin(temp) < 0:
-#            k = np.argmin(temp)
-#            ky = inp.Kp[1][k//101]
-#            kx = inp.Kp[0][k-(k//101)*101]
-#            print("neg min for P = ",P," is ",np.amin(temp)," at K = ",kx/np.pi,ky/np.pi)
     r2 /= (m*kp**2)
     return r2
 
-#### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L
+####
 def totE(P,args):
-    res = minimize_scalar(lambda l: -totEl(P,l,args)[0],  #maximize energy wrt L with fixed P
+    res = minimize_scalar(lambda l: -totEl(tuple(P)+(l,),args)[0],
             method = inp.L_method,
             bounds = inp.L_bounds,
             options={'xatol':inp.prec_L}
             )
     L = res.x
     minE = -res.fun
-    temp = totEl(P,L,args)[1]
+    temp = totEl(tuple(P)+(L,),args)[1]
     return minE, L, temp
-
-#### Computes the Energy given the paramters P and the Lagrange multiplier L
-def totEl(P,L,args):
+####
+def totEl(P,args):
+    L = P[-1]
+    P = tuple(P[:-1])
     J1,J2,J3,ans = args
     J = (J1,J2,J3)
-    j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or 1 --> problem for VERY small J2,J3 points
+    j2 = np.sign(int(np.abs(J2)*1e8))
     j3 = np.sign(int(np.abs(J3)*1e8))
     res = 0
     if ans == '3x3':
         Pp = (P[0],0.,P[1]*j3,P[2*j3]*j3+P[1]*(1-j3),P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2,P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'q0':
         Pp = (P[0],P[1]*j2,0.,P[2*j2]*j2+P[1]*(1-j2),P[3*j2]*j2,P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
-    elif ans == '0-pi' or ans == 'cb1' or ans == 'cb2':
+    elif ans == '0-pi':
+        Pp = (  P[0],
+                P[1*j2]*j2,
+                P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2),
+                P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3),
+                P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3),
+                0)
+    elif ans == 'cb1':
+        Pp = (  P[0],
+                P[1*j2]*j2,
+                P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2),
+                P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3),
+                P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3),
+                0)
+    elif ans == 'cb2':
         Pp = (  P[0],
                 P[1*j2]*j2,
                 P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2),
@@ -92,16 +105,15 @@ def totEl(P,L,args):
     temp = sumEigs(P,L,args)
     res += temp
     return res, temp
-#### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
+####
 def Sigma(P,args):
-    test = totE(P,args)         #check initial point
-    if test[2] == inp.shame_value:
-        #print(Fore.RED+"rejecting for shame_value",P,Fore.RESET)
-        inp.shame2 += inp.increase_shame
-        return inp.shame2
-    if np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
-        #print(Fore.GREEN+"rejecting for wrong multiplier",P,Fore.RESET)
-        inp.shame2 += inp.increase_shame
+    print("Initial P: ",P)
+    t = time.time()
+    test = totE(P,args)
+    if test[2] == 0:
+        print(Fore.RED+"rejecting ", P,Fore.RESET)
+        inp.shmae2 += 0.1
+        print(inp.shame2)
         return inp.shame2
     J1,J2,J3,ans = args
     res = 0
@@ -111,21 +123,40 @@ def Sigma(P,args):
         dP = inp.der_range[i]
         pp[i] = P[i] + dP
         tempE = totE(pp,args)
-        if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:  #try in the other direction
-            pp[i] = P[i] - dP
-            tempE = totE(pp,args)
-            if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:
-                #print(Fore.GREEN+"rejecting ", pp,Fore.RESET)
-                inp.shame2 += inp.increase_shame
-                return inp.shame2
+        if tempE[2] == 0:
+            print(Fore.RED+"rejecting ", P,Fore.RESET)
+            return inp.shame2
         temp.append(((tempE[0]-test[0])/dP)**2)
     res = np.array(temp).sum()
-    #print(Fore.YELLOW+"res for P = ",P," is ",res,'\n'+Fore.RESET)
+    print("res: ",res)
+    return res
+
+#################################################################
+#checks if the file exists and if it does, reads which ansatze have been computed and returns the remaining ones
+#from the list of ansatze in inputs.py
+def CheckCsv(csvf):
+    my_file = Path(csvf)
+    ans = []
+    if my_file.is_file():
+        with open(my_file,'r') as f:
+            lines = f.readlines()
+            N = (len(lines)-1)//4 +1
+            for i in range(N):
+                if float(lines[i*4+1].split(',')[4]) < 1e-8:
+                    ans.append(lines[i*4+1].split(',')[0])
+    res = []
+    for a in inp.text_ans:
+        t = 1
+        for b in ans:
+            if a == b:
+                t *= 0
+        if t:
+            res.append(a)
     return res
 
 #Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
 #we can check that the energy is a max in As and min in Bs (for J>0).
-def Hessian(P,args):
+def checkHessian(P,args):
     res = []
     for i in range(len(P)):
         pp = np.array(P)
@@ -149,44 +180,22 @@ def Hessian(P,args):
         res.append(f(P[i]))
     return np.array(res)
 
-
-#################################################################
-#checks if the file exists and if it does, reads which ansatze have been computed and returns the remaining ones
-#from the list of ansatze in inputs.py
-def CheckCsv(csvf):
-    my_file = Path(csvf)
-    ans = []
-    if my_file.is_file():
-        with open(my_file,'r') as f:
-            lines = f.readlines()
-        N = (len(lines)-1)//4 +1        #4 lines per ansatz
-        for i in range(N):
-            data = lines[i*4+1].split(',')
-            if float(data[4]) < 1e-8 and float(data[5]) > inp.L_bounds[0] + 1e-3:    #if Sigma accurate enough and Lambda not equal to the lower bound
-                ans.append(lines[i*4+1].split(',')[0])
-    res = []
-    for a in inp.list_ans:
-        if a not in ans:
-            res.append(a)
-    return res
-
 #Extracts the initial point for the minimization from a file in a reference directory specified in inputs.py
-#If the file matching the j2,j3 point is not found initialize the initial point with default parameters defined in inputs.py
-def FindInitialPoint(J2,J3,ansatze):
-    P = {}  #parameters
-    if Path(inp.ReferenceDir).is_dir():
-        for file in os.listdir(inp.ReferenceDir):     #find file in dir
-            j2 = float(file[7:-5].split('_')[0])/10000  #specific for the name of the file
+#If the file matching the j2,j3 point is not found initialize the initial point with default parameters
+def checkInitial(J2,J3,ansatze):
+    P = {}
+    if Path(inp.refDirname).is_dir():
+        for file in os.listdir(inp.refDirname):     #find file in dir
+            j2 = float(file[7:-5].split('_')[0])/10000
             j3 = float(file[7:-5].split('_')[1])/10000
-            if np.abs(j2-J2) < inp.cutoff_pts and np.abs(j3 - J3) < inp.cutoff_pts:         #once found read it
-                with open(inp.ReferenceDir+file, 'r') as f:
+            if j2 == J2 and j3 == J3:               #once found read it
+                with open(inp.refDirname+file, 'r') as f:
                     lines = f.readlines()
                 N = (len(lines)-1)//4 + 1
                 for Ans in ansatze:
                     for i in range(N):
                         data = lines[i*4+1].split(',')
-                        if data[0] == Ans:              #correct ansatz
-                            print("taking initial point from reference file")
+                        if data[0] == Ans and float(data[5]) > 0.51:   #correct ansatz and non completely wrong solution
                             P[data[0]] = data[6:]
                             for j in range(len(P[data[0]])):    #cast to float
                                 P[data[0]][j] = float(P[data[0]][j])
@@ -199,7 +208,6 @@ def FindInitialPoint(J2,J3,ansatze):
         for i in np.nonzero(P[ans])[0]:
             nP[ans].append(P[ans][i])
     P = nP
-    #check eventual missing ansatze from the reference fileand initialize with default values
     for ans in ansatze:
         if ans in list(P.keys()):
             continue
@@ -221,30 +229,31 @@ def FindInitialPoint(J2,J3,ansatze):
     return P
 
 #Constructs the bounds of the specific ansatz depending on the number and type of parameters involved in the minimization
-def FindBounds(J2,J3,ansatze):
-    B = {}
+def findBounds(J2,J3,ansatze):
+    P = {}
     j2 = np.abs(J2) > inp.cutoff_pts
     j3 = np.abs(J3) > inp.cutoff_pts
     for ans in ansatze:
-        B[ans] = (inp.bounds['A1'],)             #A1
-        if j2 and ans in inp.list_A2:
-            B[ans] = B[ans] + (inp.bounds['A2'],)      #A2
-        if j3 and ans in inp.list_A3:
-            B[ans] = B[ans] + (inp.bounds['A3'],)      #A3
-        B[ans] = B[ans] + (inp.bounds['B1'],)      #B1
-        if j2:
-            B[ans] = B[ans] + (inp.bounds['B2'],)      #B2
-        if j3 and ans in inp.list_B3:
-            B[ans] = B[ans] + (inp.bounds['B3'],)      #B3
-        if ans == 'cb1':
-            B[ans] = B[ans] + ((-np.pi,np.pi),)      #phiA1
-        if ans == 'cb2' or ans == 'octa':
-            B[ans] = B[ans] + ((0,2*np.pi),)      #phiB1
-    return B
+        for ans in ansatze:
+            P[ans] = (inp.bounds['A1'],)             #A1
+            if j2 and ans in inp.list_A2:
+                P[ans] = P[ans] + (inp.bounds['A2'],)      #A2
+            if j3 and ans in inp.list_A3:
+                P[ans] = P[ans] + (inp.bounds['A3'],)      #A3
+            P[ans] = P[ans] + (inp.bounds['B1'],)      #B1
+            if j2:
+                P[ans] = P[ans] + (inp.bounds['B2'],)      #B2
+            if j3 and ans in inp.list_B3:
+                P[ans] = P[ans] + (inp.bounds['B3'],)      #B3
+            if ans == 'cb1':
+                P[ans] = P[ans] + ((-np.pi,np.pi),)      #phiA1
+            if ans == 'cb2' or ans == 'octa':
+                P[ans] = P[ans] + ((0,2*np.pi),)      #phiB1
+    return P
 
 #From the list of parameters obtained after the minimization constructs an array containing them and eventually 
 #some 0 parameters which may be omitted because j2 or j3 are equal to 0.
-def arangeP(P,ans,J2,J3):
+def arrangeP(P,ans,J2,J3):
     j2 = np.sign(int(np.abs(J2)*1e8))
     j3 = np.sign(int(np.abs(J3)*1e8))
     newP = [P[0]]
@@ -263,7 +272,13 @@ def arangeP(P,ans,J2,J3):
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
         newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
-    elif ans == 'cb1' or ans == 'cb2':
+    elif ans == 'cb1':
+        newP.append(P[1*j2]*j2)
+        newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
+        newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
+        newP.append(P[-1])
+    elif ans == 'cb2':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
@@ -278,16 +293,16 @@ def arangeP(P,ans,J2,J3):
     return tuple(newP)
 
 #Save the dictionaries in the file given, rewriting the already existing data if precision is better
-def SaveToCsv(Data,Hess,csvfile):
+def saveValues(Data,Hess,csvfile):
     N_ = 0
     if Path(csvfile).is_file():
         with open(csvfile,'r') as f:
             init = f.readlines()
     else:
         init = []
-    ans = Data['ans']       #computed ansatz
+    ans = Data['ans']
     N = (len(init)-1)//4+1
-    ac = False      #ac i.e. already-computed
+    ac = False
     for i in range(N):
         if init[i*4+1].split(',')[0] == ans:
             ac = True
@@ -319,6 +334,7 @@ def SaveToCsv(Data,Hess,csvfile):
             writer = csv.DictWriter(f, fieldnames = header)
             writer.writeheader()
             writer.writerow(Data)
+        with open(csvfile,'a') as f:
             writer = csv.DictWriter(f, fieldnames = header[6:])
             writer.writeheader()
             writer.writerow(Hess)

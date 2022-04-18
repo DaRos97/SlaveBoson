@@ -4,6 +4,7 @@ import common_functions as cf
 from time import time as t
 from colorama import Fore
 from scipy.optimize import minimize
+from scipy.optimize import differential_evolution as d_e
 from pandas import read_csv
 import csv
 import sys
@@ -12,37 +13,39 @@ J1 = inp.J1
 J2, J3 = inp.J[int(sys.argv[1])]
 print('(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
-csvfile = inp.dirname+inp.dataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
+csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 ansatze = cf.CheckCsv(csvfile)
 ansatze = ['3x3']
 Ti = t()
-Pinitial = cf.checkInitial(J2,J3,ansatze)
-Bnds = cf.findBounds(J2,J3,ansatze)
+Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
+Bnds = cf.FindBounds(J2,J3,ansatze)
 for ans in ansatze:
+    Tti = t()
     print("Using ansatz: ",ans)
     header = inp.header[ans]
-    Args = (J1,J2,J3,ans)
-    Tti = t()
     Pi = Pinitial[ans]
+    bnds = Bnds[ans]
+    Args = (J1,J2,J3,ans)
     DataDic = {}
     HessDic = {}
-    print(Pi)
-    result = minimize(lambda x:cf.Sigma(x,Args),
-       Pi,
-       method = inp.method,
-       bounds = Bnds[ans],
-       options = {
-#           'maxiter':100*len(Pi),
-#           'adaptive':True,
-           'ftol':inp.cutoff}
-       )
+    print("Initial point and bounds: \n",Pi,'\n',bnds,'\n')
+    result = d_e(lambda x: cf.Sigma(x,Args),
+            x0 = Pi,
+            bounds = bnds,
+            disp = True,
+            tol = inp.cutoff,
+            atol = inp.cutoff,
+            maxiter = inp.MaxIter*len(Pi),
+            workers = 1
+            )
+    print(result.success,result.message)
     Pf = tuple(result.x)
-    E,L = cf.totE(Pf,Args)
+    E,L = cf.totE(Pf,Args)[:2]
     S = result.fun
     #Add 0 values
-    newP = cf.arrangeP(Pf,ans,J2,J3)
+    newP = cf.arangeP(Pf,ans,J2,J3)
     ########Check of Hessian values
-    hessian = cf.arrangeP(cf.checkHessian(Pf,Args),ans,J2,J3)
+    hessian = cf.arangeP(cf.Hessian(Pf,Args),ans,J2,J3)
     for i in range(len(hessian)):
         HessDic[header[6+i]] = hessian[i]
     #save values
@@ -51,7 +54,7 @@ for ans in ansatze:
         DataDic[header[ind]] = data[ind]
     for ind2 in range(len(newP)):
         DataDic[header[6+ind2]] = newP[ind2]
-    cf.saveValues(DataDic,HessDic,csvfile)
+    cf.SaveToCsv(DataDic,HessDic,csvfile)
     print(DataDic)
     print(HessDic)
     print("Time of ans",ans,": ",'{:5.2f}'.format((t()-Tti)/60),' minutes\n')              ################
