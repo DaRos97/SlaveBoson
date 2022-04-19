@@ -87,11 +87,11 @@ def totEl(P,L,args):
     temp = sumEigs(P,L,args)
     res += temp
     return res, temp
+
 #### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
 def Sigma(P,args):
     test = totE(P,args)         #check initial point
     if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
-        #print(Fore.RED+"rejecting for shame_value",P,Fore.RESET)
         return inp.shame2
     J1,J2,J3,ans = args
     res = 0
@@ -105,11 +105,11 @@ def Sigma(P,args):
             pp[i] = P[i] - dP
             tempE = totE(pp,args)
             if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:
-                #print(Fore.GREEN+"rejecting ", pp,Fore.RESET)
                 return inp.shame2
         temp.append(((tempE[0]-test[0])/dP)**2)
     res = np.array(temp).sum()
-    #print(Fore.YELLOW+"res for P = ",P," is ",res,'\n'+Fore.RESET)
+    #print(P,temp)
+    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
     return res
 
 #Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
@@ -175,7 +175,6 @@ def FindInitialPoint(J2,J3,ansatze):
                     for i in range(N):
                         data = lines[i*4+1].split(',')
                         if data[0] == Ans:              #correct ansatz
-                            print("taking initial point from reference file")
                             P[data[0]] = data[6:]
                             for j in range(len(P[data[0]])):    #cast to float
                                 P[data[0]][j] = float(P[data[0]][j])
@@ -280,12 +279,8 @@ def SaveToCsv(Data,Hess,csvfile):
     for i in range(N):
         if init[i*4+1].split(',')[0] == ans:
             ac = True
-            print("point already computed before")
             if float(init[i*4+1].split(',')[4]) > Data['Sigma'] and float(Data['L']) > 0.51:
                 N_ = i+1
-                print("Saving result to file, cause this is better")
-            else:
-                print("not a better result")
     ###
     header = inp.header[ans]
     if N_:
@@ -303,7 +298,6 @@ def SaveToCsv(Data,Hess,csvfile):
             for l in range(4*N_,len(init)):
                 f.write(init[l])
     elif not ac:
-        print("new point -> saving")
         with open(csvfile,'a') as f:
             writer = csv.DictWriter(f, fieldnames = header)
             writer.writeheader()

@@ -2,8 +2,6 @@ import numpy as np
 import inputs as inp
 import common_functions as cf
 from time import time as t
-from colorama import Fore
-from scipy.optimize import minimize, brute
 from scipy.optimize import differential_evolution as d_e
 from pandas import read_csv
 import csv
@@ -14,8 +12,8 @@ J2, J3 = inp.J[int(sys.argv[1])]
 print('(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
-ansatze = cf.CheckCsv(csvfile)
-ansatze = ['3x3']
+#ansatze = cf.CheckCsv(csvfile)
+ansatze = ['q0']
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
 Bnds = cf.FindBounds(J2,J3,ansatze)
@@ -29,31 +27,20 @@ for ans in ansatze:
     DataDic = {}
     HessDic = {}
     print("Initial point and bounds: \n",Pi,'\n',bnds,'\n')
-#    result = brute(lambda x: cf.Sigma(x,Args),
-#            ranges = bnds,
-#            full_output = True,
-#            finish = d_e,
-#            disp = True,
-#            workers = 1
-#            )
-#    Pf = result[0]
-#    S = result[1]
     result = d_e(lambda x: cf.Sigma(x,Args),
             x0 = Pi,
             bounds = bnds,
             disp = True,
             tol = inp.cutoff,
             atol = inp.cutoff,
-            maxiter = inp.MaxIter*len(Pi),
-            workers = 1
+            workers = 1     #parallelization --> see if necessary
             )
-    print(result.success,result.message)
     Pf = tuple(result.x)
     S = result.fun
     E,L = cf.totE(Pf,Args)[:2]
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
-    ########Check of Hessian values
+    ########Compute Hessian values
     hessian = cf.arangeP(cf.Hessian(Pf,Args),ans,J2,J3)
     for i in range(len(hessian)):
         HessDic[header[6+i]] = hessian[i]
