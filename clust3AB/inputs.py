@@ -16,7 +16,6 @@ DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + DirName
 #derivative
 der_range = [1e-6 for i in range(8)]
-der_phase = 1e-5
 Jpts = 21
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
