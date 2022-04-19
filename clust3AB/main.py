@@ -13,6 +13,7 @@ print('(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 ansatze = cf.CheckCsv(csvfile)
+#ansatze = ['cb1']
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
 Bnds = cf.FindBounds(J2,J3,ansatze)
@@ -29,7 +30,7 @@ for ans in ansatze:
     result = d_e(lambda x: cf.Sigma(x,Args),
             x0 = Pi,
             bounds = bnds,
-            disp = True,
+ #           disp = True,
             tol = inp.cutoff,
             atol = inp.cutoff,
             workers = 1     #parallelization --> see if necessary

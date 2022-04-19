@@ -8,7 +8,7 @@ DM1 = 0#np.pi/3
 DM3 = 0#DM1/2#np.pi/3
 tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 5
+grid_pts = 13
 list_ans = ['3x3','q0','cb1']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Data_SB/'
 #DirName = '../Data/test/'
@@ -16,6 +16,7 @@ DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + DirName
 #derivative
 der_range = [1e-6 for i in range(8)]
+der_phase = 1e-5
 Jpts = 21
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
@@ -44,8 +45,8 @@ for i in range(grid_pts):
     Mkg[1,:,i] = kg[1]
 #initial point
 Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.21, 'B2': 0.36, 'B3': 0.0},
-        'q0':{'A1':0.5, 'A2':0.4, 'B1':0.2, 'B2': 0.2, 'B3': 0.2},
-        'cb1':{'A1':0.5, 'A2':0.4, 'A3':0.3, 'B1':0.2, 'B2': 0.2, 'phiA1':-1.95},
+        'q0':{'A1':0.51, 'A2':0.4, 'B1':0.2, 'B2': 0.2, 'B3': 0.2},
+        'cb1':{'A1':0.51, 'A2':0.4, 'A3':0.3, 'B1':0.17, 'B2': 0.2, 'phiA1':1.95},
         '0-pi':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.2, 'B2': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
@@ -56,7 +57,7 @@ bounds = {  'A1':(0,1),
             'B1':(0,0.5),
             'B2':(0,0.5),
             'B3':(0,0.5)}
-L_bounds = (0.3,5)
+L_bounds = (0.3,2)
 shame_value = -1
 shame2 = 5
 #csv
