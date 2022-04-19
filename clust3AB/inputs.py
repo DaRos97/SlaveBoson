@@ -10,8 +10,8 @@ tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
 grid_pts = 5
 list_ans = ['3x3','q0','cb1']#,'0-pi','cb2']#,'octa']
-#DirName = '/home/users/r/rossid/git/Data/'
-DirName = '../Data/test/'
+DirName = '/home/users/r/rossid/Data_SB/'
+#DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + DirName
 #derivative
