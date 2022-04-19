@@ -8,7 +8,7 @@ DM1 = 0#np.pi/3
 DM3 = 0#DM1/2#np.pi/3
 tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 13
+grid_pts = 9
 list_ans = ['3x3','q0','cb1']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Data_SB/'
 #DirName = '../Data/test/'
@@ -19,6 +19,7 @@ der_range = [1e-6 for i in range(8)]
 Jpts = 21
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
+MaxIter = 100
 prec_L = 1e-10       #precision required in L maximization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
 L_method = 'bounded'

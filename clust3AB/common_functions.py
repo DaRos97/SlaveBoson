@@ -90,6 +90,7 @@ def totEl(P,L,args):
 
 #### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
 def Sigma(P,args):
+    #ti = t()
     test = totE(P,args)         #check initial point
     if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
         return inp.shame2
@@ -109,7 +110,8 @@ def Sigma(P,args):
         temp.append(((tempE[0]-test[0])/dP)**2)
     res = np.array(temp).sum()
     #print(P,temp)
-    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
+    #print("time: ",t()-ti)
+    print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
     return res
 
 #Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
