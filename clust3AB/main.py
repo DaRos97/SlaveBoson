@@ -29,28 +29,28 @@ for ans in ansatze:
     DataDic = {}
     HessDic = {}
     print("Initial point and bounds: \n",Pi,'\n',bnds,'\n')
-    result = brute(lambda x: cf.Sigma(x,Args),
-            ranges = bnds,
-            full_output = True,
+#    result = brute(lambda x: cf.Sigma(x,Args),
+#            ranges = bnds,
+#            full_output = True,
 #            finish = d_e,
-            disp = True,
-            workers = 1
-            )
-    Pf = result[0]
-    S = result[1]
-#    result = d_e(lambda x: cf.Sigma(x,Args),
-#            x0 = Pi,
-#            bounds = bnds,
 #            disp = True,
-#            tol = inp.cutoff,
-#            atol = inp.cutoff,
-#            maxiter = inp.MaxIter*len(Pi),
 #            workers = 1
 #            )
-#    print(result.success,result.message)
-#    Pf = tuple(result.x)
+#    Pf = result[0]
+#    S = result[1]
+    result = d_e(lambda x: cf.Sigma(x,Args),
+            x0 = Pi,
+            bounds = bnds,
+            disp = True,
+            tol = inp.cutoff,
+            atol = inp.cutoff,
+            maxiter = inp.MaxIter*len(Pi),
+            workers = 1
+            )
+    print(result.success,result.message)
+    Pf = tuple(result.x)
+    S = result.fun
     E,L = cf.totE(Pf,Args)[:2]
-#    S = result.fun
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
     ########Check of Hessian values

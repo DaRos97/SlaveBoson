@@ -41,11 +41,6 @@ def sumEigs(P,L,args):
         func = interp2d(inp.kg[0],inp.kg[1],res[i],kind='cubic')    #Interpolate the 2D surface
         temp = func(inp.Kp[0],inp.Kp[1])                            #sum over more points to increase the precision
         r2 += temp.ravel().sum()
-#        if i == 0 and np.amin(temp) < 0:
-#            k = np.argmin(temp)
-#            ky = inp.Kp[1][k//101]
-#            kx = inp.Kp[0][k-(k//101)*101]
-#            print("neg min for P = ",P," is ",np.amin(temp)," at K = ",kx/np.pi,ky/np.pi)
     r2 /= (m*kp**2)
     return r2
 
@@ -95,13 +90,8 @@ def totEl(P,L,args):
 #### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
 def Sigma(P,args):
     test = totE(P,args)         #check initial point
-    if test[2] == inp.shame_value:
+    if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
         #print(Fore.RED+"rejecting for shame_value",P,Fore.RESET)
-        inp.shame2 += inp.increase_shame
-        return inp.shame2
-    if np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
-        #print(Fore.GREEN+"rejecting for wrong multiplier",P,Fore.RESET)
-        inp.shame2 += inp.increase_shame
         return inp.shame2
     J1,J2,J3,ans = args
     res = 0
@@ -116,7 +106,6 @@ def Sigma(P,args):
             tempE = totE(pp,args)
             if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:
                 #print(Fore.GREEN+"rejecting ", pp,Fore.RESET)
-                inp.shame2 += inp.increase_shame
                 return inp.shame2
         temp.append(((tempE[0]-test[0])/dP)**2)
     res = np.array(temp).sum()
