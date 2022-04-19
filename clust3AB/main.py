@@ -32,7 +32,7 @@ for ans in ansatze:
     result = brute(lambda x: cf.Sigma(x,Args),
             ranges = bnds,
             full_output = True,
-            finish = d_e,
+#            finish = d_e,
             disp = True,
             workers = 1
             )
