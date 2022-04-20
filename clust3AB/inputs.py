@@ -4,14 +4,14 @@ from colorama import Fore
 m = 6
 S = 0.5
 ####
-DM1 = 4/3*np.pi
-DM3 = 2/3*np.pi
+DM1 = 0#4/3*np.pi
+DM3 = 0#2/3*np.pi
 tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 5
+grid_pts = 11
 list_ans = ['3x3','q0','cb1']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Data_SB/DM_test/'
-#DirName = '../Data/test/'
+#DirName = '/home/users/r/rossid/Data_SB/DM_test/'
+DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+'/'
 ReferenceDir = 'none'#DirName + DirName
 #derivative
@@ -19,7 +19,7 @@ der_range = [1e-6 for i in range(8)]
 Jpts = 21
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
-MaxIter = 100
+MaxIter = 500
 prec_L = 1e-10       #precision required in L maximization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
 L_method = 'bounded'
@@ -51,12 +51,12 @@ Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.21, 'B2': 0.36, 'B3': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
 #bounds
-bounds = {  'A1':(0,1),
-            'A2':(0,1),
-            'A3':(0,1),
+bounds = {  'A1':(-1,1),
+            'A2':(-1,1),
+            'A3':(-1,1),
             'B1':(-0.5,0.5),
-            'B2':(0,0.5),
-            'B3':(0,0.5)}
+            'B2':(-0.5,0.5),
+            'B3':(-0.5,0.5)}
 L_bounds = (0.1,5)
 shame_value = -1
 shame2 = 5
