@@ -14,11 +14,11 @@ f3 = (0,np.sqrt(3)/2);      kf3 = np.exp(1j*np.tensordot(f3,inp.Mkg,axes=1));   
 g1 = (-1/2,-np.sqrt(3)/2);  kg1 = np.exp(1j*np.tensordot(g1,inp.Mkg,axes=1));   kg1_ = np.conjugate(kg1);
 g2 = (-1/2,np.sqrt(3)/2);   kg2 = np.exp(1j*np.tensordot(g2,inp.Mkg,axes=1));   kg2_ = np.conjugate(kg2);
 g3 = (1,0);                 kg3 = np.exp(1j*np.tensordot(g3,inp.Mkg,axes=1));   kg3_ = np.conjugate(kg3);
+#### DM
+t1 = np.exp(-1j*inp.DM1/2);    t1_ = np.conjugate(t1)
+t3 = np.exp(-1j*inp.DM3/2);    t3_ = np.conjugate(t3)
 #### all ansatze
 def Nk(P,L,args):
-    #### DM
-    t1 = np.exp(-1j*inp.DM1/2);    t1_ = np.conjugate(t1)
-    t3 = np.exp(-1j*inp.DM3/2);    t3_ = np.conjugate(t3)
     J1,J2,J3,ans = args
     J1 /= 2.
     J2 /= 2.

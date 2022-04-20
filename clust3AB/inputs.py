@@ -4,16 +4,16 @@ from colorama import Fore
 m = 6
 S = 0.5
 ####
-DM1 = 0#4/3*np.pi
-DM3 = 0#2/3*np.pi
-tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
+DM1 = 4/3*np.pi
+DM3 = 2/3*np.pi
+tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 11
-list_ans = ['3x3','q0','cb1']#,'0-pi','cb2']#,'octa']
-#DirName = '/home/users/r/rossid/Data_SB/DM_test/'
-DirName = '../Data/test/'
-DataDir = DirName + 'Data_'+str(grid_pts)+'/'
-ReferenceDir = 'none'#DirName + DirName
+grid_pts = 13
+list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Data_SB/'
+#DirName = '../Data/test/'
+DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
+ReferenceDir = 'none'#DirName + 'Data_11/'
 #derivative
 der_range = [1e-6 for i in range(8)]
 Jpts = 21
@@ -44,8 +44,8 @@ for i in range(grid_pts):
     Mkg[0,i,:] = kg[0]
     Mkg[1,:,i] = kg[1]
 #initial point
-Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.21, 'B2': 0.36, 'B3': 0.0},
-        'q0':{'A1':0.51, 'A2':0.4, 'B1':0.2, 'B2': 0.2, 'B3': 0.2},
+Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.17, 'B2': 0.36, 'B3': 0.0},
+        'q0':{'A1':0.51, 'A2':0.4, 'B1':0.17, 'B2': 0.2, 'B3': 0.2},
         'cb1':{'A1':0.51, 'A2':0.4, 'A3':0.3, 'B1':0.17, 'B2': 0.2, 'phiA1':1.95},
         '0-pi':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.2, 'B2': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
