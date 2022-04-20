@@ -8,7 +8,7 @@ data = np.ndarray((N,3))
 y1 = []
 y2 = []
 for j in range(N):
-    filename = inp.DataDir+'testDM_phi='+str("{:4.4f}".format(inp.range_phi[j])).replace('.','')+'.npy'
+    filename = '../../testData/Data_5_1/'+'testDM_phi='+str("{:4.4f}".format(inp.range_phi[j])).replace('.','')+'.npy'
     data[j] = np.load(filename)
     y1.append(data[j,1])
     y2.append(data[j,2])
