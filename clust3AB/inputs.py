@@ -4,14 +4,14 @@ from colorama import Fore
 m = 6
 S = 0.5
 ####
-DM1 = 4/3*np.pi
-DM3 = 2/3*np.pi
+DM1 = 0#4/3*np.pi
+DM3 = 0#2/3*np.pi
 tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
 grid_pts = 13
-list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Data_SB/'
-#DirName = '../Data/test/'
+list_ans = ['cb12','3x3','q0']#,'0-pi','cb2']#,'octa']
+#DirName = '/home/users/r/rossid/Data_SB/'
+DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + 'Data_11/'
 #derivative
@@ -47,6 +47,7 @@ for i in range(grid_pts):
 Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.17, 'B2': 0.36, 'B3': 0.0},
         'q0':{'A1':0.51, 'A2':0.4, 'B1':0.17, 'B2': 0.2, 'B3': 0.2},
         'cb1':{'A1':0.51, 'A2':0.4, 'A3':0.3, 'B1':0.17, 'B2': 0.2, 'phiA1':1.95},
+        'cb12':{'A1':0.51, 'A2':0.4, 'A3':0.3, 'B1':0.17, 'B2': 0.2, 'phiA1':1.95, 'phiB2': 3.14},
         '0-pi':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.2, 'B2': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
@@ -64,11 +65,12 @@ shame2 = 5
 header = {'3x3':    ['ans','J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B3'],  #3x3
           'q0':     ['ans','J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3'],  #q0
           'cb1':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiA1'],  #cuboc1
+          'cb12':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiA1','phiB2'],  #cuboc1
           '0-pi':   ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2'],  #0-pi
           'cb2':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiB1'],  #cuboc2
           'octa':   ['ans','J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3','phiB1']}  #octa
-list_A2 = ['q0','0-pi','octa','cb1','cb2']
-list_A3 = ['3x3','0-pi','cb1','cb2']
+list_A2 = ['q0','0-pi','octa','cb1','cb2','cb12']
+list_A3 = ['3x3','0-pi','cb1','cb2','cb12']
 list_B3 = ['3x3','q0','octa']
 
 print("Minimization precision (both tol and atol):",cutoff)
