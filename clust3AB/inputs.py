@@ -8,7 +8,7 @@ DM1 = 0#np.pi/3
 DM3 = 0#DM1/2#np.pi/3
 tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 9
+grid_pts = 11
 list_ans = ['3x3','q0','cb1']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Data_SB/'
 #DirName = '../Data/test/'
