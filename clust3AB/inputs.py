@@ -10,9 +10,9 @@ tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
 grid_pts = 5
 list_ans = ['3x3','q0','cb1']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Data_SB/'
+DirName = '/home/users/r/rossid/Data_SB/DM_test/'
 #DirName = '../Data/test/'
-DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
+DataDir = DirName + 'Data_'+str(grid_pts)+'/'
 ReferenceDir = 'none'#DirName + DirName
 #derivative
 der_range = [1e-6 for i in range(8)]

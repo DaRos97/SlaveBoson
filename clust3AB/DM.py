@@ -11,7 +11,7 @@ J1 = inp.J1
 J2, J3 = (0,0)
 phi = inp.range_phi[int(sys.argv[1])]
 #######
-filename = inp.DataDir+'testDM_phi='+str("{:4.4f}".format(phi)).replace('.','')+'.csv'
+filename = inp.DataDir+'testDM_phi='+str("{:4.4f}".format(phi)).replace('.','')+'.npy'
 ansatze = ['3x3','q0']
 Ti = t()
 Pinitial = {'3x3':(0.51,0.17), 'q0':(0.51,0.17)}
