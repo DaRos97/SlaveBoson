@@ -4,11 +4,11 @@ from colorama import Fore
 m = 6
 S = 0.5
 ####
-DM1 = 0#np.pi/3
-DM3 = 0#DM1/2#np.pi/3
+DM1 = 4/3*np.pi
+DM3 = 2/3*np.pi
 tDM = 'DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 11
+grid_pts = 5
 list_ans = ['3x3','q0','cb1']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Data_SB/'
 #DirName = '../Data/test/'
@@ -54,10 +54,10 @@ Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.21, 'B2': 0.36, 'B3': 0.0},
 bounds = {  'A1':(0,1),
             'A2':(0,1),
             'A3':(0,1),
-            'B1':(0,0.5),
+            'B1':(-0.5,0.5),
             'B2':(0,0.5),
             'B3':(0,0.5)}
-L_bounds = (0.3,2)
+L_bounds = (0.1,5)
 shame_value = -1
 shame2 = 5
 #csv
@@ -76,3 +76,8 @@ print("Grid / Summation pts:",grid_pts,'/',sum_pts)
 print("Derivative distance:",der_range[0])
 print("Lagrange multiplier maximization precision:",prec_L)
 print("Dzyaloshinskii-Moriya angles:",DM1,"  ",DM3)
+
+
+###############################test DM
+pts_phiDM = 51
+range_phi = np.linspace(0,2*np.pi,pts_phiDM)

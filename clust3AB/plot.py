@@ -5,16 +5,18 @@ import os
 import sys
 
 N = int(sys.argv[1])
-dirname = '../Data/PD_03/Data_'+sys.argv[1]+'n/'
+dirname = '../Data/Data_'+sys.argv[1]+'/'
 minE = []
 E = []
 for file in os.listdir(dirname):
     with open(dirname+file, 'r') as f:
         lines = f.readlines()
     N = (len(lines)-1)//4 + 1
+    if N == 3:
+        N = 2
     tempE = []
     tE = []
-    if N < 3:
+    if N !=  2:
         print(file," has only ",N," ansatze.")
     for i in range(N):
         tE.append([])
@@ -39,6 +41,7 @@ for p in range(pts):
         conv = 'o'
     plt.scatter(float(minE[p][1]),float(minE[p][2]),color=Color[minE[p][0]],marker = conv)
 plt.show()
+exit()
 plt.figure(figsize=(16,16))
 for i in range(5):
     plt.subplot(2,3,i+1)

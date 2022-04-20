@@ -111,7 +111,7 @@ def Sigma(P,args):
     res = np.array(temp).sum()
     #print(P,temp)
     #print("time: ",t()-ti)
-    print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
+    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
     return res
 
 #Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
