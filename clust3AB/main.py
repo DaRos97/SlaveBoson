@@ -6,9 +6,11 @@ from scipy.optimize import differential_evolution as d_e
 from pandas import read_csv
 import csv
 import sys
+import os
 ####### inputs
 J1 = inp.J1
-J2, J3 = inp.J[int(sys.argv[1])]
+test_list = [52,74,118,72,51,48]
+J2, J3 = inp.J[test_list[int(sys.argv[1])]]
 print('(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
@@ -18,6 +20,7 @@ Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
 Bnds = cf.FindBounds(J2,J3,ansatze)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
+print("There are ",os.cpu_count()," CPUs available")
 for ans in ansatze:
     Tti = t()
     print("Using ansatz: ",ans)
@@ -25,12 +28,13 @@ for ans in ansatze:
     Pi = Pinitial[ans]
     bnds = Bnds[ans]
     der_range = DerRange[ans]
-    Args = (J1,J2,J3,ans,der_range)
+    Args1 = (J1,J2,J3,ans,der_range)
+    Args = (J1,J2,J3,ans)
     DataDic = {}
     HessDic = {}
     print("Initial point and bounds: \n",Pi,'\n',bnds,'\n',der_range,'\n')
     result = d_e(cf.Sigma,
-            args = Args,
+            args = Args1,
             x0 = Pi,
             bounds = bnds,
             popsize = 15,

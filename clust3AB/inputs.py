@@ -11,7 +11,7 @@ tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 grid_pts = 11
 mp_cpu = -1
 list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Data_SB/test/'
+DirName = '/home/users/r/rossid/Test/'
 #DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + 'Data_11/'
