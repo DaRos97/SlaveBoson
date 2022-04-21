@@ -10,8 +10,7 @@ import os
 print("There are ",os.cpu_count()," CPUs available")
 ####### inputs
 J1 = inp.J1
-test_list = [52,51,48]#,74,118,72,51,48]
-J2, J3 = inp.J[test_list[int(sys.argv[1])]]
+J2, J3 = inp.J[int(sys.argv[1])]
 print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'

@@ -8,11 +8,11 @@ DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 9
+grid_pts = 13
 mp_cpu = -1
 list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
-#DirName = '/home/users/r/rossid/Test/noDM/'
-DirName = '../Data/test/pdDM/'
+DirName = '/home/users/r/rossid/Test/noDM/'
+#DirName = '../Data/test/pdDM/'
 DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + 'Data_11/'
 #derivative
@@ -54,12 +54,12 @@ Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.17, 'B2': 0.36, 'B3': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
 #bounds
-bounds = {  'A1':(-1,1),
-            'A2':(-1,1),
-            'A3':(-1,1),
-            'B1':(-0.5,0.5),
-            'B2':(-0.5,0.5),
-            'B3':(-0.5,0.5)}
+bounds = {  'A1':(0,1),
+            'A2':(0,1),
+            'A3':(0,1),
+            'B1':(0,0.5),
+            'B2':(0,0.5),
+            'B3':(0,0.5)}
 L_bounds = (0.1,5)
 shame_value = -1
 shame2 = 5
