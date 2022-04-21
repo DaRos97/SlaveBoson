@@ -7,11 +7,12 @@ from pandas import read_csv
 import csv
 import sys
 import os
+print("There are ",os.cpu_count()," CPUs available")
 ####### inputs
 J1 = inp.J1
 test_list = [52,74,118,72,51,48]
 J2, J3 = inp.J[test_list[int(sys.argv[1])]]
-print('(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
+print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 #ansatze = cf.CheckCsv(csvfile)
@@ -20,7 +21,6 @@ Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
 Bnds = cf.FindBounds(J2,J3,ansatze)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
-print("There are ",os.cpu_count()," CPUs available")
 for ans in ansatze:
     Tti = t()
     print("Using ansatz: ",ans)
@@ -33,7 +33,8 @@ for ans in ansatze:
     DataDic = {}
     HessDic = {}
     print("Initial point and bounds: \n",Pi,'\n',bnds,'\n',der_range,'\n')
-    result = d_e(cf.Sigma,
+    if False:
+        result = d_e(cf.Sigma,
             args = Args1,
             x0 = Pi,
             bounds = bnds,
@@ -45,13 +46,16 @@ for ans in ansatze:
             updating='deferred' if inp.mp_cpu == -1 else 'immediate',
             workers = inp.mp_cpu     #parallelization
             )
-    Pf = tuple(result.x)
-    S = result.fun
-    E,L = cf.totE(Pf,Args)[:2]
+        Pf = tuple(result.x)
+        S = result.fun
+        E,L = cf.totE(Pf,Args)[:2]
+    Pf = (0.51,0.17)
+    S = 0.001
+    E,L = (-0.45,0.71)
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
     ########Compute Hessian values
-    hessian = cf.arangeP(cf.Hessian(Pf,Args),ans,J2,J3)
+    hessian = cf.arangeP(cf.Hessian(Pf,Args1),ans,J2,J3)
     for i in range(len(hessian)):
         HessDic[header[6+i]] = hessian[i]
     #save values

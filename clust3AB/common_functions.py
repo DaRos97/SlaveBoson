@@ -14,7 +14,6 @@ import os
 #Some parameters from inputs.py
 m = inp.m
 kp = inp.sum_pts
-S = inp.S
 J1 = inp.J1
 #grid points
 grid_pts = inp.grid_pts
@@ -128,13 +127,15 @@ def totEl(P,L,args):
 
 #Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
 #we can check that the energy is a max in As and min in Bs (for J>0).
-def Hessian(P,args):
+def Hessian(P,Args):
     res = []
+    der_range = Args[-1]
+    args = Args[:-1]
     for i in range(len(P)):
         pp = np.array(P)
         Der = []
         der = []
-        ptsP = np.linspace(P[i]-inp.der_range[i],P[i]+inp.der_range[i],3)
+        ptsP = np.linspace(P[i]-der_range[i],P[i]+der_range[i],3)
         for j in range(3):
             pp[i] = ptsP[j]
             der.append(totE(pp,args)[0])        #uses at each energy evaluation the best lambda

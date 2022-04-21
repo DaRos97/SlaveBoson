@@ -8,7 +8,7 @@ DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 11
+grid_pts = 5
 mp_cpu = -1
 list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Test/'
@@ -82,4 +82,13 @@ print("Derivative distance (par / phi):",der_par,'/',der_phi)
 print("Lagrange multiplier maximization precision:",prec_L)
 print("Dzyaloshinskii-Moriya angles:",DM1,"  ",DM3)
 
-
+####################################
+DM_PD = []
+Si = 0.01
+Sf = 0.5
+DM1i = 0
+DM1f = 0.5
+PDpts = 11
+for i in range(Jpts):
+    for j in range(Jpts):
+        DM_PD.append((Si+(Sf-Si)/(PDpts-1)*i,DM1i+(DM1f-DM1i)/(PDpts-1)*j))
