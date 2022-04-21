@@ -23,6 +23,44 @@ J = np.zeros((2*m,2*m))
 for i in range(m):
     J[i,i] = -1
     J[i+m,i+m] = 1
+
+#### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
+def Sigma(P,*Args):
+    #ti = t()
+    J1,J2,J3,ans,der_range = Args
+    args = (J1,J2,J3,ans)
+    test = totE(P,args)         #check initial point
+    if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
+        return inp.shame2
+    res = 0
+    temp = []
+    for i in range(len(P)):
+        pp = np.array(P)
+        dP = der_range[i]
+        pp[i] = P[i] + dP
+        tempE = totE(pp,args)
+        der = (tempE[0]-test[0])/dP
+        if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:  #try in the other direction
+            return inp.shame2
+            pp[i] = P[i] - dP
+            tempE = totE(pp,args)
+            if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:
+                return inp.shame2
+        temp.append(der**2)
+        if ans == 'cb1' and i == len(P) - 1:
+            pp2 = np.array(P)
+            pp2[i] = P[i] - dP
+            tempE2 = totE(pp2,args)
+            der2 = (test[0]-tempE2[0])/dP
+            hess = (der-der2)/dP
+            if hess < 0:
+                res += inp.shame2
+    res += np.array(temp).sum()
+    #print(P,temp)
+    #print("time: ",t()-ti)
+    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
+    return res
+
 #### Computes the part of the energy given by the Bogoliubov eigen-modes
 def sumEigs(P,L,args):
     N = an.Nk(P,L,args) #compute Hermitian matrix
@@ -87,32 +125,6 @@ def totEl(P,L,args):
     temp = sumEigs(P,L,args)
     res += temp
     return res, temp
-
-#### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
-def Sigma(P,args):
-    #ti = t()
-    test = totE(P,args)         #check initial point
-    if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
-        return inp.shame2
-    J1,J2,J3,ans = args
-    res = 0
-    temp = []
-    for i in range(len(P)):
-        pp = np.array(P)
-        dP = inp.der_range[i]
-        pp[i] = P[i] + dP
-        tempE = totE(pp,args)
-        if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:  #try in the other direction
-            pp[i] = P[i] - dP
-            tempE = totE(pp,args)
-            if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:
-                return inp.shame2
-        temp.append(((tempE[0]-test[0])/dP)**2)
-    res = np.array(temp).sum()
-    #print(P,temp)
-    #print("time: ",t()-ti)
-    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
-    return res
 
 #Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
 #we can check that the energy is a max in As and min in Bs (for J>0).
@@ -238,6 +250,27 @@ def FindBounds(J2,J3,ansatze):
                 B[ans] = B[ans] + ((0,2*np.pi),)
     return B
 
+#Compute the derivative ranges for the various parameters of the minimization
+def ComputeDerRanges(J2,J3,ansatze):
+    R = {}
+    j2 = np.abs(J2) > inp.cutoff_pts
+    j3 = np.abs(J3) > inp.cutoff_pts
+    for ans in ansatze:
+        Npar = 2
+        if j2:
+            Npar +=1
+            if ans in inp.list_A2:
+                Npar +=1
+        if j3 and ans in inp.list_A3:
+            Npar +=1
+        if j3 and ans in inp.list_B3:
+            Npar +=1
+        R[ans] = [inp.der_par for i in range(Npar)]
+        if ans in inp.list_chiral:
+            R[ans].append(inp.der_phi)
+            if ans == 'cb12' and j2:
+                R[ans].append(inp.der_phi)
+    return R
 #From the list of parameters obtained after the minimization constructs an array containing them and eventually 
 #some 0 parameters which may be omitted because j2 or j3 are equal to 0.
 def arangeP(P,ans,J2,J3):
