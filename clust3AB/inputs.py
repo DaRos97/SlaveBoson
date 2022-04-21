@@ -8,11 +8,11 @@ DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 11
+grid_pts = 9
 mp_cpu = -1
 list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Test/noDM/'
-#DirName = '../Data/test/'
+#DirName = '/home/users/r/rossid/Test/noDM/'
+DirName = '../Data/test/pdDM/'
 DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + 'Data_11/'
 #derivative
