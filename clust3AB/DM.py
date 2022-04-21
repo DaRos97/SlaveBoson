@@ -11,8 +11,8 @@ print("There are ",os.cpu_count()," CPUs available")
 ####### inputs
 J1 = inp.J1
 J2, J3 = (0,0)
-S,DM = inp.DM_PD[int(sys.argv[1])]
-DataDir = '../Data/test/dm_5/'
+list_PD = [10,22,66,69,26]
+S,DM = inp.DM_PD[list_PD[int(sys.argv[1])]]
 #######
 filename = inp.DataDir+'testDM_S-DM='+str("{:4.4f}".format(DM)).replace('.','')+'-'+str("{:4.4f}".format(DM)).replace('.','')+'.csv'
 ansatze = ['3x3','q0','cb1']

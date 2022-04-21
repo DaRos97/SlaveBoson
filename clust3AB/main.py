@@ -10,7 +10,7 @@ import os
 print("There are ",os.cpu_count()," CPUs available")
 ####### inputs
 J1 = inp.J1
-test_list = [52,74,118,72,51,48]
+test_list = [52,51,48]#,74,118,72,51,48]
 J2, J3 = inp.J[test_list[int(sys.argv[1])]]
 print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
@@ -33,25 +33,21 @@ for ans in ansatze:
     DataDic = {}
     HessDic = {}
     print("Initial point and bounds: \n",Pi,'\n',bnds,'\n',der_range,'\n')
-    if False:
-        result = d_e(cf.Sigma,
-            args = Args1,
-            x0 = Pi,
-            bounds = bnds,
-            popsize = 15,
-            maxiter = inp.MaxIter,
-            disp = True,
-            tol = inp.cutoff,
-            atol = inp.cutoff,
-            updating='deferred' if inp.mp_cpu == -1 else 'immediate',
-            workers = inp.mp_cpu     #parallelization
-            )
-        Pf = tuple(result.x)
-        S = result.fun
-        E,L = cf.totE(Pf,Args)[:2]
-    Pf = (0.51,0.17)
-    S = 0.001
-    E,L = (-0.45,0.71)
+    result = d_e(cf.Sigma,
+        args = Args1,
+        x0 = Pi,
+        bounds = bnds,
+        popsize = 15,
+        maxiter = inp.MaxIter,
+        disp = True,
+        tol = inp.cutoff,
+        atol = inp.cutoff,
+        updating='deferred' if inp.mp_cpu == -1 else 'immediate',
+        workers = inp.mp_cpu     #parallelization
+        )
+    Pf = tuple(result.x)
+    S = result.fun
+    E,L = cf.totE(Pf,Args)[:2]
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
     ########Compute Hessian values

@@ -8,10 +8,10 @@ DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 5
+grid_pts = 11
 mp_cpu = -1
 list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Test/'
+DirName = '/home/users/r/rossid/Test/noDM/'
 #DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + 'Data_11/'
@@ -84,10 +84,10 @@ print("Dzyaloshinskii-Moriya angles:",DM1,"  ",DM3)
 
 ####################################
 DM_PD = []
-Si = 0.01
+Si = 0.0
 Sf = 0.5
 DM1i = 0
-DM1f = 0.5
+DM1f = 1
 PDpts = 11
 for i in range(Jpts):
     for j in range(Jpts):
