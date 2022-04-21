@@ -8,10 +8,10 @@ DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 13
-list_ans = ['cb12','3x3','q0']#,'0-pi','cb2']#,'octa']
-#DirName = '/home/users/r/rossid/Data_SB/'
-DirName = '../Data/test/'
+grid_pts = 7
+list_ans = ['cb12']#,'3x3','q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Data_SB/'
+#DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
 ReferenceDir = 'none'#DirName + 'Data_11/'
 #derivative

@@ -70,8 +70,8 @@ def Nk(P,L,args):
         B1 = P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3)
         B2 = P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3)
         B3 = 0
-        phiB2 = P[5*j3*j2]*j3*j2 + P[4*j2*(1-j3)]*j2*(1-j3)
-        phiA1p = P[-1]
+        phiA1p = P[5*j3*j2]*j3*j2 + P[4*j2*(1-j3)]*j2*(1-j3) + P[3*j3*(1-j2)]*j3*(1-j2) + P[-1]*(1-j2)*(1-j3)
+        phiB2 = P[-1]*j2
         phiA2, phiA2p, phiA3 = (-phiA1p/2,-phiA1p/2,phiA1p/2)
         phiB1, phiB1p, phiB2p, phiB3 = (np.pi, np.pi, -phiB2, 0)
         p1 = 1

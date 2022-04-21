@@ -111,7 +111,7 @@ def Sigma(P,args):
     res = np.array(temp).sum()
     #print(P,temp)
     #print("time: ",t()-ti)
-    print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
+    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
     return res
 
 #Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
@@ -208,7 +208,8 @@ def FindInitialPoint(J2,J3,ansatze):
             P[ans].append(inp.Pi[ans]['phiA1'])      #phiA1
         if ans == 'cb12':
             P[ans].append(inp.Pi[ans]['phiA1'])      #phiA1
-            P[ans].append(inp.Pi[ans]['phiB2'])      #phiA1
+            if j2:
+                P[ans].append(inp.Pi[ans]['phiB2'])      #phiA1
         if ans == 'cb2' or ans == 'octa':
             P[ans].append(inp.Pi[ans]['phiB1'])      #phiA1
     return P
@@ -232,7 +233,9 @@ def FindBounds(J2,J3,ansatze):
         if ans == 'cb1' or ans == 'cb2' or ans == 'octa':
             B[ans] = B[ans] + ((0,2*np.pi),)      #phiB1
         if ans == 'cb12':
-            B[ans] = B[ans] + ((0,2*np.pi),(0,2*np.pi),)      #phiB1
+            B[ans] = B[ans] + ((0,2*np.pi),)      #phiB1
+            if j2:
+                B[ans] = B[ans] + ((0,2*np.pi),)
     return B
 
 #From the list of parameters obtained after the minimization constructs an array containing them and eventually 
@@ -267,8 +270,8 @@ def arangeP(P,ans,J2,J3):
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
         newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
-        newP.append(P[5*j3*j2]*j3*j2 + P[4*j2*(1-j3)]*j2*(1-j3))
-        newP.append(P[-1])
+        newP.append(P[5*j3*j2]*j3*j2 + P[4*j2*(1-j3)]*j2*(1-j3) + P[3*j3*(1-j2)]*j3*(1-j2) + P[-1]*(1-j2)*(1-j3))
+        newP.append(P[-1]*j2)
     elif ans == 'octa':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j2]*j2 + P[1*(1-j2)]*(1-j2))
