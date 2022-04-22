@@ -6,7 +6,7 @@ import sys
 Color=('k','orange','r','b','g','m','c')
 txt = ('ferr along z','q=0','3x3','octahedral','cuboc1','cuboc2', 'ferr in-plane')
 def energy(J1,J2,J3,J3p,t1,t3):
-    k = 4*J1*(np.cos(t1)-1) + 2*J3*(np.cos(t3)-1)
+    k = 4#4*J1*(np.cos(t1)-1) + 2*J3*(np.cos(t3)-1)
     psi = 0 if k>0 else np.pi/2
     #
     ferr =  4*J1*(np.cos(psi)**2 + np.cos(t1)*np.sin(psi)**2) + 4*J2 + 2*J3p*(np.cos(psi)**2 + np.cos(t3)*np.sin(psi)**2) + 4*J3

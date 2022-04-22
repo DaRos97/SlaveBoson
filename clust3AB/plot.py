@@ -34,6 +34,19 @@ Color = {'3x3': 'b',
          'cb2': 'k'}
 #check on convergence
 plt.figure(figsize=(16,16))
+#plt.subplot(2,3,2)
+for p in range(pts):
+    conv = '^'
+    if float(minE[p][4]) < 1e-8:# and float(minE[p][6]) > 0.5:
+        conv = 'o'
+    elif float(E[minE[p][0]][p][6]) < 0.5:
+        conv = '*'
+    plt.scatter(float(minE[p][1]),float(minE[p][2]),color=Color[minE[p][0]],marker = conv)
+plt.hlines(0,inp.J2i,inp.J2f,'g',linestyles = 'dashed')
+plt.vlines(0,inp.J3i,inp.J3f,'g',linestyles = 'dashed')
+
+plt.show()
+exit()
 for ind,i in enumerate(['3x3', 'q0', 'cb1']):
     plt.subplot(2,3,ind+4)
     plt.title(i)
@@ -48,17 +61,5 @@ for ind,i in enumerate(['3x3', 'q0', 'cb1']):
         except:
             continue
 #real fig
-plt.subplot(2,3,2)
-for p in range(pts):
-    conv = '^'
-    if float(minE[p][4]) < 1e-8:# and float(minE[p][6]) > 0.5:
-        conv = 'o'
-    elif float(E[minE[p][0]][p][6]) < 0.5:
-        conv = '*'
-    plt.scatter(float(minE[p][1]),float(minE[p][2]),color=Color[minE[p][0]],marker = conv)
-plt.hlines(0,inp.J2i,inp.J2f,'g',linestyles = 'dashed')
-plt.vlines(0,inp.J3i,inp.J3f,'g',linestyles = 'dashed')
-
-plt.show()
 
 plt.show()
