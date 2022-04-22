@@ -1,4 +1,4 @@
-mport numpy as np
+import numpy as np
 import inputs as inp
 import common_functions as cf
 from time import time as t
@@ -31,19 +31,20 @@ for ans in ansatze:
     Args = (J1,J2,J3,ans)
     DataDic = {}
     HessDic = {}
-    print("Initial point and bounds: \n",Pi,'\n',bnds,'\n',der_range,'\n')
+    print("Initial point and bounds: \n",Pi,'\n',bnds,'\n')
     result = d_e(cf.Sigma,
         args = Args1,
         x0 = Pi,
         bounds = bnds,
         popsize = 15,
         maxiter = inp.MaxIter,
-        disp = True,
+        disp = False,
         tol = inp.cutoff,
         atol = inp.cutoff,
         updating='deferred' if inp.mp_cpu == -1 else 'immediate',
         workers = inp.mp_cpu     #parallelization
         )
+    print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter,'\n')
     Pf = tuple(result.x)
     S = result.fun
     E,L = cf.totE(Pf,Args)[:2]
