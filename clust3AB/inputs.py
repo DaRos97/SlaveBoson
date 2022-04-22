@@ -8,7 +8,7 @@ DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
 ####
-grid_pts = 13
+grid_pts = 21
 mp_cpu = -1
 list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Test/noDM/'
@@ -54,10 +54,10 @@ Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.17, 'B2': 0.36, 'B3': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
 #bounds
-bounds = {  'A1':(0,1),
+bounds = {  'A1':(0.5,0.6),
             'A2':(0,1),
             'A3':(0,1),
-            'B1':(0,0.5),
+            'B1':(0.16,0.2),
             'B2':(0,0.5),
             'B3':(0,0.5)}
 L_bounds = (0.1,5)

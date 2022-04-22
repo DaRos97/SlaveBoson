@@ -1,4 +1,4 @@
-import numpy as np
+mport numpy as np
 import inputs as inp
 import common_functions as cf
 from time import time as t

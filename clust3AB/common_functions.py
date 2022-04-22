@@ -244,7 +244,7 @@ def FindBounds(J2,J3,ansatze):
         if j3 and ans in inp.list_B3:
             B[ans] = B[ans] + (inp.bounds['B3'],)      #B3
         if ans == 'cb1' or ans == 'cb2' or ans == 'octa':
-            B[ans] = B[ans] + ((0,2*np.pi),)      #phiB1
+            B[ans] = B[ans] + ((1,3),)      #phiB1
         if ans == 'cb12':
             B[ans] = B[ans] + ((0,2*np.pi),)      #phiB1
             if j2:
