@@ -7,7 +7,6 @@ from pandas import read_csv
 import csv
 import sys
 import os
-print("There are ",os.cpu_count()," CPUs available")
 ####### inputs
 J1 = inp.J1
 J2, J3 = inp.J[int(sys.argv[1])]
@@ -41,7 +40,7 @@ for ans in ansatze:
         disp = False,
         tol = inp.cutoff,
         atol = inp.cutoff,
-        updating='deferred' if inp.mp_cpu == -1 else 'immediate',
+        updating='deferred' if inp.mp_cpu != 1 else 'immediate',
         workers = inp.mp_cpu     #parallelization
         )
     print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter,'\n')

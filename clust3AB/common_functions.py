@@ -166,7 +166,7 @@ def CheckCsv(csvf):
         N = (len(lines)-1)//4 +1        #4 lines per ansatz
         for i in range(N):
             data = lines[i*4+1].split(',')
-            if float(data[4]) < 1e-8 and float(data[5]) > inp.L_bounds[0] + 1e-3:    #if Sigma accurate enough and Lambda not equal to the lower bound
+            if float(data[4]) < inp.cutoff and np.abs(float(data[6])) > 0.5:    #if Sigma accurate enough and Lambda not equal to the lower bound
                 ans.append(lines[i*4+1].split(',')[0])
     res = []
     for a in inp.list_ans:
@@ -243,12 +243,8 @@ def FindBounds(J2,J3,ansatze):
             B[ans] = B[ans] + (inp.bounds['B2'],)      #B2
         if j3 and ans in inp.list_B3:
             B[ans] = B[ans] + (inp.bounds['B3'],)      #B3
-        if ans == 'cb1' or ans == 'cb2' or ans == 'octa':
-            B[ans] = B[ans] + ((1,3),)      #phiB1
-        if ans == 'cb12':
-            B[ans] = B[ans] + ((0,2*np.pi),)      #phiB1
-            if j2:
-                B[ans] = B[ans] + ((0,2*np.pi),)
+        if ans == 'cb1':# or ans == 'cb2' or ans == 'octa':
+            B[ans] = B[ans] + (inp.bounds['phiA1'],)      #phiB1
     return B
 
 #Compute the derivative ranges for the various parameters of the minimization
