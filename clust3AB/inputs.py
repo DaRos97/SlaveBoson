@@ -4,17 +4,16 @@ from colorama import Fore
 m = 6
 S = 0.5
 ####
-DM1 = 4/3*np.pi
-DM3 = 2/3*np.pi
-tDM = '_DM' if (DM1 != 0 or DM3 != 0) else ''
+DM1 = 0#4/3*np.pi
+DM3 = 0#2/3*np.pi
 ####
 grid_pts = 21
-mp_cpu = 4
-list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Test/yesDMsmall/'
+mp_cpu = 8
+list_ans = ['cb1']#,'q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Test/noDMbig/'
 #DirName = '../Data/test/'
-DataDir = DirName + 'Data_'+str(grid_pts)+tDM+'/'
-ReferenceDir = 'none'#DirName + 'Data_11/'
+DataDir = DirName + 'Data_'+str(grid_pts)+'/'
+ReferenceDir = 'none'#DirName + 'Data_17/'
 #derivative
 der_par = 1e-6
 der_phi = 1e-4
@@ -28,9 +27,9 @@ L_method = 'bounded'
 J1 = 1
 z = (4,4,2)
 #small
-J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
+#J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
 #big
-#J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 21
+J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 21
 J = []
 for i in range(Jpts):
     for j in range(Jpts):
@@ -54,14 +53,14 @@ Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.17, 'B2': 0.36, 'B3': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
 #bounds
-bounds = {  'A1':(0.5,0.6),
+bounds = {  'A1':(-1,1),
             'A2':(-1,1),
             'A3':(-1,1),
-            'B1':(0.16,0.2),
+            'B1':(-0.5,0.5),
             'B2':(-0.5,0.5),
             'B3':(-0.5,0.5),
-            'phiA1':(1.8,2.1)}
-L_bounds = (0.1,5)
+            'phiA1':(0,2*np.pi)}
+L_bounds = (0.1,10)
 shame_value = -1
 shame2 = 5
 #csv
