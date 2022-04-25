@@ -22,6 +22,40 @@ J = np.zeros((2*m,2*m))
 for i in range(m):
     J[i,i] = -1
     J[i+m,i+m] = 1
+# Check also Hessians on the way --> more time
+def Sigma2(P,*Args):
+    #ti = t()
+    J1,J2,J3,ans,der_range = Args
+    j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
+    j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
+    args = (J1,J2,J3,ans)
+    test = totE(P,args)         #check initial point
+    if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
+        return inp.shame2
+    res = 0
+    temp = []
+    for i in range(len(P)): #for each parameter
+        pp = np.array(P)
+        dP = der_range[i]
+        pp[i] = P[i] + dP
+        tempE = totE(pp,args)   #compute derivative
+        der = (tempE[0]-test[0])/dP
+        #compute Hessian to see if it is of correct sign
+        pp2 = np.array(P)
+        pp2[i] = P[i] - dP
+        tempE2 = totE(pp2,args)
+        der2 = (test[0]-tempE2[0])/dP
+        hess = int(np.sign((der-der2)))    #order is important!!
+        sign = inp.HS[ans][j2][j3][i]
+        if sign == hess:
+            temp.append(der**2)     #add it to the sum
+        else:
+            return inp.shame3
+    res += np.array(temp).sum()
+    #print(P,temp)
+    #print("time: ",t()-ti)
+    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
+    return res
 
 #### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
 def Sigma(P,*Args):
@@ -57,7 +91,7 @@ def Sigma(P,*Args):
     res += np.array(temp).sum()
     #print(P,temp)
     #print("time: ",t()-ti)
-    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
+    print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
     return res
 
 #### Computes the part of the energy given by the Bogoliubov eigen-modes
