@@ -358,7 +358,7 @@ def SaveToCsv(Data,Hess,csvfile):
     for i in range(N):
         if init[i*4+1].split(',')[0] == ans:
             ac = True
-            if float(init[i*4+1].split(',')[4]) > Data['Sigma'] and float(Data['L']) > 0.51:
+            if (float(init[i*4+1].split(',')[4]) > Data['Sigma'] and float(Data['L']) > 0.51) or (float(init[i*4+1].split(',')[6]) < 0.5 and Data['A1'] > 0.5):
                 N_ = i+1
     ###
     header = inp.header[ans]

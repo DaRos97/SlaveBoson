@@ -57,12 +57,12 @@ for p in range(pts):
     if np.abs(float(minE[p][6])) < 0.5:
         conv = '*'
     cn = 0
-    for n in range(len(H[minE[p][0]][p])):
-        hess = int(np.sign(float(H[minE[p][0]][p][n])))
-        if hess != 0:
-            if hess != inp.HS[minE[p][0]][j2][j3][cn]:
-                conv = '^'
-            cn += 1
+#    for n in range(len(H[minE[p][0]][p])):
+#        hess = int(np.sign(float(H[minE[p][0]][p][n])))
+#        if hess != 0:
+#            if hess != inp.HS[minE[p][0]][j2][j3][cn]:
+#                conv = '^'
+#            cn += 1
     plt.scatter(float(minE[p][1]),float(minE[p][2]),color=Color[minE[p][0]],marker = conv)
 plt.hlines(0,inp.J2i,inp.J2f,'g',linestyles = 'dashed')
 plt.vlines(0,inp.J3i,inp.J3f,'g',linestyles = 'dashed')
@@ -82,12 +82,12 @@ for ind,i in enumerate(['3x3', 'q0', 'cb1']):
             if np.abs(float(E[i][p][6])) < 0.5:
                 conv = '*'
             cn = 0
-            for n in range(len(E[i][p][6:])):
-                hess = int(np.sign(float(H[i][p][n])))
-                if hess != 0:
-                    if hess != inp.HS[i][j2][j3][cn]:
-                        conv = '^'
-                    cn += 1
+ #           for n in range(len(E[i][p][6:])):
+ #               hess = int(np.sign(float(H[i][p][n])))
+ #               if hess != 0:
+ #                   if hess != inp.HS[i][j2][j3][cn]:
+ #                       conv = '^'
+ #                   cn += 1
             plt.scatter(J2,J3,color=Color[E[i][p][0]],marker = conv)
         except:
             print(J2,J3,i)
