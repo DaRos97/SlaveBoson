@@ -4,14 +4,14 @@ from colorama import Fore
 m = 6
 S = 0.5
 ####
-DM1 = 0#4/3*np.pi
-DM3 = 0#2/3*np.pi
+DM1 = 4/3*np.pi
+DM3 = 2/3*np.pi
 ####
-grid_pts = 5
-mp_cpu = 4
-list_ans = ['3x3']#,'q0']#,'0-pi','cb2']#,'octa']
-#DirName = '/home/users/r/rossid/Test/noDMbig/'
-DirName = '../Data/test/'
+grid_pts = 21
+mp_cpu = 16
+list_ans = ['q0']#,'q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Test/yesDMsmall/'
+#DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+'/'
 ReferenceDir = 'none'#DirName + 'Data_17/'
 #derivative
@@ -92,6 +92,7 @@ print("Grid / Summation pts:",grid_pts,'/',sum_pts)
 print("Derivative distance (par / phi):",der_par,'/',der_phi)
 print("Lagrange multiplier maximization precision:",prec_L)
 print("Dzyaloshinskii-Moriya angles:",DM1,"  ",DM3)
+print("Number of CPUs used: ",mp_cpu)
 
 ####################################
 DM_PD = []

@@ -91,7 +91,7 @@ def Sigma(P,*Args):
     res += np.array(temp).sum()
     #print(P,temp)
     #print("time: ",t()-ti)
-    print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
+    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
     return res
 
 #### Computes the part of the energy given by the Bogoliubov eigen-modes
@@ -358,7 +358,7 @@ def SaveToCsv(Data,Hess,csvfile):
     for i in range(N):
         if init[i*4+1].split(',')[0] == ans:
             ac = True
-            if (float(init[i*4+1].split(',')[4]) > Data['Sigma'] and float(Data['L']) > 0.51) or (float(init[i*4+1].split(',')[6]) < 0.5 and Data['A1'] > 0.5):
+            if (float(init[i*4+1].split(',')[4]) > Data['Sigma'] and float(Data['L']) > 0.51) or (np.abs(float(init[i*4+1].split(',')[6])) < 0.5 and np.abs(Data['A1']) > 0.5):
                 N_ = i+1
     ###
     header = inp.header[ans]

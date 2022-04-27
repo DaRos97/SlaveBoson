@@ -31,7 +31,7 @@ for ans in ansatze:
     DataDic = {}
     HessDic = {}
     print("Initial point and bounds: \n",Pi,'\n',bnds,'\n')
-    result = d_e(cf.Sigma,
+    result = d_e(cf.Sigma2,
         args = Args1,
         x0 = Pi,
         bounds = bnds,
@@ -59,9 +59,9 @@ for ans in ansatze:
         DataDic[header[ind]] = data[ind]
     for ind2 in range(len(newP)):
         DataDic[header[6+ind2]] = newP[ind2]
-    cf.SaveToCsv(DataDic,HessDic,csvfile)
     print(DataDic)
     print(HessDic)
     print("Time of ans",ans,": ",'{:5.2f}'.format((t()-Tti)/60),' minutes\n')              ################
+    cf.SaveToCsv(DataDic,HessDic,csvfile)
 
 print("Total time: ",'{:5.2f}'.format((t()-Ti)/60),' minutes.')                           ################

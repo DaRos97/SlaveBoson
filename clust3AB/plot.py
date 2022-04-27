@@ -6,8 +6,8 @@ import sys
 
 N = int(sys.argv[1])
 #dirname = '../Data/noDMbig/Data_'+sys.argv[1]+'N/'
-dirname = '../Data/noDMsmall/Data_'+sys.argv[1]+'/'
-#dirname = '../Data/yesDMsmall/Data_'+sys.argv[1]+'/'
+#dirname = '../Data/noDMsmall/Data_'+sys.argv[1]+'/'
+dirname = '../Data/yesDMsmall/Data_'+sys.argv[1]+'/'
 minE = []
 E = {'3x3':[],
      'q0' :[],
