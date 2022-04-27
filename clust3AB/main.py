@@ -9,6 +9,8 @@ import sys
 import os
 ####### inputs
 J1 = inp.J1
+#li = [111,113,115,117,119,120]
+#J2, J3 = inp.J[li[int(sys.argv[1])]]
 J2, J3 = inp.J[int(sys.argv[1])]
 print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
