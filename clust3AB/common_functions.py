@@ -11,111 +11,82 @@ from pandas import read_csv
 from time import time as t
 import os
 
-#Some parameters from inputs.py
-m = inp.m
-kp = inp.sum_pts
-J1 = inp.J1
-#grid points
-grid_pts = inp.grid_pts
 ####
-J = np.zeros((2*m,2*m))
-for i in range(m):
+J = np.zeros((2*inp.m,2*inp.m))
+for i in range(inp.m):
     J[i,i] = -1
-    J[i+m,i+m] = 1
-# Check also Hessians on the way --> more time
-def Sigma2(P,*Args):
+    J[i+inp.m,i+inp.m] = 1
+# Check also Hessians on the way --> more time. Calls only the totE func
+def Sigma(P,*Args):
     #ti = t()
-    J1,J2,J3,ans,der_range = Args
+#    print("\nP = ",P)
+    J1,J2,J3,ans,der_range,mi = Args
     j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
     j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
     args = (J1,J2,J3,ans)
-    test = totE(P,args)         #check initial point
-    if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
+    init = totE(P,args)         #check initial point
+    if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3: #if not pos def H or converging to L_min
+#        print("initial P not good")
         return inp.shame2
+#    print("initial Params are good")
     res = 0
     temp = []
+    final_Hess = []
     for i in range(len(P)): #for each parameter
         pp = np.array(P)
         dP = der_range[i]
         pp[i] = P[i] + dP
-        tempE = totE(pp,args)   #compute derivative
-        der = (tempE[0]-test[0])/dP
+        init_plus = totE(pp,args)   #compute derivative
+        der1 = (init_plus[0]-init[0])/dP
         #compute Hessian to see if it is of correct sign
-        pp2 = np.array(P)
-        pp2[i] = P[i] - dP
-        tempE2 = totE(pp2,args)
-        der2 = (test[0]-tempE2[0])/dP
-        hess = int(np.sign((der-der2)))    #order is important!!
+        pp[i] = P[i] + 2*dP
+        init_2plus = totE(pp,args)
+        der2 = (init_2plus[0]-init_plus[0])/dP
+        final_Hess.append((der2-der1)/dP)
+        hess = int(np.sign(final_Hess[-1]))    #order is important!!
         sign = inp.HS[ans][j2][j3][i]
         if sign == hess:
-            temp.append(der**2)     #add it to the sum
+            temp.append(der1**2)     #add it to the sum
         else:
+#            print("Wrong Hess")
             return inp.shame3
     res += np.array(temp).sum()
     #print(P,temp)
     #print("time: ",t()-ti)
     #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
-    return res
-
-#### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
-def Sigma(P,*Args):
-    #ti = t()
-    J1,J2,J3,ans,der_range = Args
-    args = (J1,J2,J3,ans)
-    test = totE(P,args)         #check initial point
-    if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
-        return inp.shame2
-    res = 0
-    temp = []
-    for i in range(len(P)):
-        pp = np.array(P)
-        dP = der_range[i]
-        pp[i] = P[i] + dP
-        tempE = totE(pp,args)
-        der = (tempE[0]-test[0])/dP
-        if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:  #try in the other direction
-            return inp.shame2
-            pp[i] = P[i] - dP
-            tempE = totE(pp,args)
-            if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:
-                return inp.shame2
-        temp.append(der**2)
-        if ans == 'cb1' and i == len(P) - 1:
-            pp2 = np.array(P)
-            pp2[i] = P[i] - dP
-            tempE2 = totE(pp2,args)
-            der2 = (test[0]-tempE2[0])/dP
-            hess = (der-der2)/dP
-            if hess < 0:
-                res += inp.shame2
-    res += np.array(temp).sum()
-    #print(P,temp)
-    #print("time: ",t()-ti)
-    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
-    return res
+    final_E = init[0]
+    final_L = init[1]
+    final_gap = init[2][1]
+#    print("Exiting Sigma with S = ",res," \nL = ",final_L," \ngap = ",final_gap," \nE = ",final_E)
+    if mi:
+        return res
+    else:
+        return res, final_Hess, final_E, final_L, final_gap
 
 #### Computes the part of the energy given by the Bogoliubov eigen-modes
 def sumEigs(P,L,args):
     N = an.Nk(P,L,args) #compute Hermitian matrix
-    res = np.zeros((m,grid_pts,grid_pts))
-    for i in range(grid_pts):
-        for j in range(grid_pts):
+    res = np.zeros((inp.m,inp.grid_pts,inp.grid_pts))
+    for i in range(inp.grid_pts):
+        for j in range(inp.grid_pts):
             Nk = N[:,:,i,j]
             try:
                 K = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
             except LA.LinAlgError:      #matrix not pos def for that specific kx,ky
-                return inp.shame_value      #if that's the case even for a single k in the grid, return a defined value
+                return inp.shame1, 10      #if that's the case even for a single k in the grid, return a defined value
             temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
-            res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:m])    #only diagonalization
+            res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:inp.m])    #only diagonalization
     r2 = 0
-    for i in range(m):
-        func = interp2d(inp.kg[0],inp.kg[1],res[i],kind='cubic')    #Interpolate the 2D surface
+    for i in range(inp.m):
+        func = interp2d(inp.kg[0],inp.kg[1],res[i],kind='quintic')    #Interpolate the 2D surface
         temp = func(inp.Kp[0],inp.Kp[1])                            #sum over more points to increase the precision
+        if i == 0:
+            gap = np.amin(temp.ravel())
         r2 += temp.ravel().sum()
-    r2 /= (m*kp**2)
-    return r2
+    r2 /= (inp.m*inp.sum_pts**2)
+    return r2, gap
 
-#### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L
+#### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
 def totE(P,args):
     res = minimize_scalar(lambda l: -totEl(P,l,args)[0],  #maximize energy wrt L with fixed P
             method = inp.L_method,
@@ -138,7 +109,7 @@ def totEl(P,L,args):
         Pp = (P[0],0.,P[1]*j3,P[2*j3]*j3+P[1]*(1-j3),P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2,P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
     elif ans == 'q0':
         Pp = (P[0],P[1]*j2,0.,P[2*j2]*j2+P[1]*(1-j2),P[3*j2]*j2,P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
-    elif ans == '0-pi' or ans == 'cb1' or ans == 'cb2' or ans == 'cb12':
+    elif ans == '0-pi' or ans == 'cb1' or ans == 'cb2':
         Pp = (  P[0],
                 P[1*j2]*j2,
                 P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2),
@@ -155,9 +126,9 @@ def totEl(P,L,args):
     for i in range(3):
         res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
     res -= L*(2*inp.S+1)
-    temp = sumEigs(P,L,args)
-    res += temp
-    return res, temp
+    eigEn = sumEigs(P,L,args)
+    res += eigEn[0]
+    return res, eigEn
 
 #Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
 #we can check that the energy is a max in As and min in Bs (for J>0).
@@ -356,9 +327,10 @@ def SaveToCsv(Data,Hess,csvfile):
     N = (len(init)-1)//4+1
     ac = False      #ac i.e. already-computed
     for i in range(N):
-        if init[i*4+1].split(',')[0] == ans:
+        D = init[i*4+1].split(',')
+        if D[0] == ans:
             ac = True
-            if (float(init[i*4+1].split(',')[4]) > Data['Sigma'] and float(Data['L']) > 0.51) or (np.abs(float(init[i*4+1].split(',')[6])) < 0.5 and np.abs(Data['A1']) > 0.5):
+            if (float(D[4]) > Data['Sigma'] and float(Data['L']) > inp.L_bounds[0]+1e-3) or (np.abs(float(D[7])) < 0.5 and np.abs(Data['A1']) > 0.5):
                 N_ = i+1
     ###
     header = inp.header[ans]
@@ -370,7 +342,7 @@ def SaveToCsv(Data,Hess,csvfile):
             writer = csv.DictWriter(f, fieldnames = header)
             writer.writeheader()
             writer.writerow(Data)
-            writer = csv.DictWriter(f, fieldnames = header[6:])
+            writer = csv.DictWriter(f, fieldnames = header[7:])
             writer.writeheader()
             writer.writerow(Hess)
         with open(csvfile,'a') as f:
@@ -381,8 +353,45 @@ def SaveToCsv(Data,Hess,csvfile):
             writer = csv.DictWriter(f, fieldnames = header)
             writer.writeheader()
             writer.writerow(Data)
-            writer = csv.DictWriter(f, fieldnames = header[6:])
+            writer = csv.DictWriter(f, fieldnames = header[7:])
             writer.writeheader()
             writer.writerow(Hess)
 
+#### OLD SIGMA
+#### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
+def SigmaOld(P,*Args):
+    #ti = t()
+    J1,J2,J3,ans,der_range = Args
+    args = (J1,J2,J3,ans)
+    test = totE(P,args)         #check initial point
+    if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
+        return inp.shame2
+    res = 0
+    temp = []
+    for i in range(len(P)):
+        pp = np.array(P)
+        dP = der_range[i]
+        pp[i] = P[i] + dP
+        tempE = totE(pp,args)
+        der = (tempE[0]-test[0])/dP
+        if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:  #try in the other direction
+            return inp.shame2
+            pp[i] = P[i] - dP
+            tempE = totE(pp,args)
+            if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:
+                return inp.shame2
+        temp.append(der**2)
+        if ans == 'cb1' and i == len(P) - 1:
+            pp2 = np.array(P)
+            pp2[i] = P[i] - dP
+            tempE2 = totE(pp2,args)
+            der2 = (test[0]-tempE2[0])/dP
+            hess = (der-der2)/dP
+            if hess < 0:
+                res += inp.shame2
+    res += np.array(temp).sum()
+    #print(P,temp)
+    #print("time: ",t()-ti)
+    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
+    return res
 

@@ -7,8 +7,8 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-grid_pts = 51
-mp_cpu = 16
+grid_pts = 21
+mp_cpu = 8
 list_ans = ['3x3']#,'q0']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Test/noDMbig/'
 #DirName = '../Data/test/'
@@ -27,9 +27,9 @@ L_method = 'bounded'
 J1 = 1
 z = (4,4,2)
 #small
-J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
+#J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
 #big
-#J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 21
+J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 21
 J = []
 for i in range(Jpts):
     for j in range(Jpts):
@@ -46,9 +46,9 @@ for i in range(grid_pts):
     Mkg[0,i,:] = kg[0]
     Mkg[1,:,i] = kg[1]
 #initial point
-Pi = {  '3x3':{'A1':0.51, 'A3':0.1, 'B1':0.17, 'B2': 0.36, 'B3': 0.0},
-        'q0':{'A1':0.51, 'A2':0.1, 'B1':0.13, 'B2': 0.17, 'B3': 0.13},
-        'cb1':{'A1':0.51, 'A2':0.4, 'A3':0.3, 'B1':0.17, 'B2': 0.2, 'phiA1':1.95},
+Pi = {  '3x3':{'A1':0.51706, 'A3':0.1, 'B1':0.17790, 'B2': 0.36, 'B3': 0.0},
+        'q0':{'A1':0.51624, 'A2':0.1, 'B1':0.18036, 'B2': 0.17, 'B3': 0.13},
+        'cb1':{'A1':0.51660, 'A2':0.4, 'A3':0.3, 'B1':0.17616, 'B2': 0.2, 'phiA1':1.9525},
         '0-pi':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.2, 'B2': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
@@ -61,16 +61,16 @@ bounds = {  'A1':(-1,1),
             'B3':(-0.5,0.5),
             'phiA1':(0,2*np.pi)}
 L_bounds = (0.1,10)
-shame_value = -1
+shame1 = -1
 shame2 = 5
 shame3 = 2
 #csv
-header = {'3x3':    ['ans','J2','J3','Energy','Sigma','L','A1','A3','B1','B2','B3'],  #3x3
-          'q0':     ['ans','J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3'],  #q0
-          'cb1':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiA1'],  #cuboc1
-          '0-pi':   ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2'],  #0-pi
-          'cb2':    ['ans','J2','J3','Energy','Sigma','L','A1','A2','A3','B1','B2','phiB1'],  #cuboc2
-          'octa':   ['ans','J2','J3','Energy','Sigma','L','A1','A2','B1','B2','B3','phiB1']}  #octa
+header = {'3x3':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1','B2','B3'],  #3x3
+          'q0':     ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','B1','B2','B3'],  #q0
+          'cb1':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiA1'],  #cuboc1
+          '0-pi':   ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','A3','B1','B2'],  #0-pi
+          'cb2':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiB1'],  #cuboc2
+          'octa':   ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1']}  #octa
 list_A2 = ['q0','0-pi','octa','cb1','cb2']
 list_A3 = ['3x3','0-pi','cb1','cb2']
 list_B3 = ['3x3','q0','octa']
@@ -94,13 +94,3 @@ print("Lagrange multiplier maximization precision:",prec_L)
 print("Dzyaloshinskii-Moriya angles:",DM1,"  ",DM3)
 print("Number of CPUs used: ",mp_cpu)
 
-####################################
-DM_PD = []
-Si = 0.0
-Sf = 0.5
-DM1i = 0
-DM1f = 1
-PDpts = 11
-for i in range(Jpts):
-    for j in range(Jpts):
-        DM_PD.append((Si+(Sf-Si)/(PDpts-1)*i,DM1i+(DM1f-DM1i)/(PDpts-1)*j))

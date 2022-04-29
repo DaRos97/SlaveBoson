@@ -3,18 +3,13 @@ import inputs as inp
 import common_functions as cf
 from time import time as t
 from scipy.optimize import differential_evolution as d_e
-from pandas import read_csv
-import csv
 import sys
-import os
 ####### inputs
-J1 = inp.J1
-#li = [111,113,115,117,119,120]
-#J2, J3 = inp.J[li[int(sys.argv[1])]]
 J2, J3 = inp.J[int(sys.argv[1])]
 print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
+print("File name for saving: ",csvfile)
 #ansatze = cf.CheckCsv(csvfile)
 ansatze = inp.list_ans
 Ti = t()
@@ -28,12 +23,11 @@ for ans in ansatze:
     Pi = Pinitial[ans]
     bnds = Bnds[ans]
     der_range = DerRange[ans]
-    Args1 = (J1,J2,J3,ans,der_range)
-    Args = (J1,J2,J3,ans)
+    Args1 = (inp.J1,J2,J3,ans,der_range,True)
     DataDic = {}
     HessDic = {}
-    print("Initial point and bounds: \n",Pi,'\n',bnds,'\n')
-    result = d_e(cf.Sigma2,
+    print("Initial point and bounds: \n",Pi,'\n',bnds)
+    result = d_e(cf.Sigma,
         args = Args1,
         x0 = Pi,
         bounds = bnds,
@@ -47,20 +41,20 @@ for ans in ansatze:
         )
     print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter,'\n')
     Pf = tuple(result.x)
-    S = result.fun
-    E,L = cf.totE(Pf,Args)[:2]
+    Args2 = (J1,J2,J3,ans,der_range,False)
+    S, HessVals, E, L, gap = cf.Sigma(Pf,*Args2)
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
-    ########Compute Hessian values
-    hessian = cf.arangeP(cf.Hessian(Pf,Args1),ans,J2,J3)
-    for i in range(len(hessian)):
-        HessDic[header[6+i]] = hessian[i]
-    #save values
-    data = [ans,J2,J3,E,S,L]
+    data = [ans,J2,J3,E,S,gap,L]
     for ind in range(len(data)):
         DataDic[header[ind]] = data[ind]
     for ind2 in range(len(newP)):
-        DataDic[header[6+ind2]] = newP[ind2]
+        DataDic[header[7+ind2]] = newP[ind2]
+    ########Compute Hessian values
+    hessian = cf.arangeP(HessVals,ans,J2,J3)
+    for i in range(len(hessian)):
+        HessDic[header[7+i]] = hessian[i]
+    #save values
     print(DataDic)
     print(HessDic)
     print("Time of ans",ans,": ",'{:5.2f}'.format((t()-Tti)/60),' minutes\n')              ################
