@@ -4,11 +4,18 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
+Color = {'3x3': ['b','orange','g'],
+         'q0':  ['r','y','k'],
+         '0-pi': 'y',
+         'cb1':  ['m','purple','gray'],
+         'cb2': 'k'}
 N = int(sys.argv[1])
 #dirname = '../Data/noDMbig/Data_'+sys.argv[1]+'N/'
-#dirname = '../Data/noDMsmall/Data_'+sys.argv[1]+'/'
-dirname = '../Data/yesDMsmall/Data_'+sys.argv[1]+'/'
+dirname = '../Data/noDMsmall/copy/'#Data_'+sys.argv[1]+'/'
+#dirname = '../Data/yesDMsmall/copy/'#Data_'+sys.argv[1]+'/'
+#dirname = '../Data/yesDMsmall/Data_'+sys.argv[1]+'N/'
 minE = []
+ct = 1e-2
 E = {'3x3':[],
      'q0' :[],
      'cb1':[]
@@ -38,11 +45,6 @@ for filename in os.listdir(dirname):
     minE.append(lines[minInd*4+1].split(','))
 
 pts = len(os.listdir(dirname))
-Color = {'3x3': 'b',
-         'q0':   'r',
-         '0-pi': 'y',
-         'cb1':  'm',
-         'cb2': 'k'}
 #check on convergence
 plt.figure(figsize=(16,16))
 plt.subplot(2,3,2)
@@ -63,7 +65,13 @@ for p in range(pts):
 #            if hess != inp.HS[minE[p][0]][j2][j3][cn]:
 #                conv = '^'
 #            cn += 1
-    plt.scatter(float(minE[p][1]),float(minE[p][2]),color=Color[minE[p][0]],marker = conv)
+    if float(minE[p][-1]) < ct:
+        col = Color[minE[p][0]][0]
+    elif float(minE[p][-1]) > ct:
+        col = Color[minE[p][0]][1]
+    if float(minE[p][-1]) > 99:
+        col = Color[minE[p][0]][2]
+    plt.scatter(float(minE[p][1]),float(minE[p][2]),color=col,marker = conv)
 plt.hlines(0,inp.J2i,inp.J2f,'g',linestyles = 'dashed')
 plt.vlines(0,inp.J3i,inp.J3f,'g',linestyles = 'dashed')
 
@@ -81,14 +89,20 @@ for ind,i in enumerate(['3x3', 'q0', 'cb1']):
                 conv = 'o'
             if np.abs(float(E[i][p][6])) < 0.5:
                 conv = '*'
-            cn = 0
+#            cn = 0
  #           for n in range(len(E[i][p][6:])):
  #               hess = int(np.sign(float(H[i][p][n])))
  #               if hess != 0:
  #                   if hess != inp.HS[i][j2][j3][cn]:
  #                       conv = '^'
  #                   cn += 1
-            plt.scatter(J2,J3,color=Color[E[i][p][0]],marker = conv)
+            if float(E[i][p][-1]) < ct:
+                col = Color[E[i][p][0]][0]
+            elif float(E[i][p][-1]) > ct:
+                col = Color[E[i][p][0]][1]
+            if float(E[i][p][-1]) > 99:
+                col = Color[E[i][p][0]][2]
+            plt.scatter(J2,J3,color=col,marker = conv)
         except:
             print(J2,J3,i)
             print(j2,j3)

@@ -7,7 +7,7 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-grid_pts = 21
+grid_pts = 51
 mp_cpu = 16
 list_ans = ['3x3']#,'q0']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Test/noDMbig/'
@@ -27,9 +27,9 @@ L_method = 'bounded'
 J1 = 1
 z = (4,4,2)
 #small
-#J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
+J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
 #big
-J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 21
+#J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 21
 J = []
 for i in range(Jpts):
     for j in range(Jpts):
