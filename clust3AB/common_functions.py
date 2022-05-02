@@ -39,6 +39,9 @@ def Sigma(P,*Args):
         init_plus = totE(pp,args)   #compute derivative
         der1 = (init_plus[0]-init[0])/dP
         #compute Hessian to see if it is of correct sign
+#        if ans == 'cb1' and i == len(P)-1:
+#            temp.append(der1**2)
+#            continue
         pp[i] = P[i] + 2*dP
         init_2plus = totE(pp,args)
         der2 = (init_2plus[0]-init_plus[0])/dP

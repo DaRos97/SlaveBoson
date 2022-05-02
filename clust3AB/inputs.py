@@ -7,10 +7,10 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-grid_pts = 7
+grid_pts = 21
 mp_cpu = 16
-list_ans = ['3x3','q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Test/ref/'
+list_ans = ['q0']#,'q0']#,'cb1']#,'q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Test/noDMbig/'
 #DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+'/'
 ReferenceDir = 'none'#DirName + 'Data_17/'
@@ -19,7 +19,7 @@ der_par = 1e-6
 der_phi = 1e-4
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
-MaxIter = 500
+MaxIter = 200
 prec_L = 1e-10       #precision required in L maximization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
 L_method = 'bounded'
@@ -46,20 +46,20 @@ for i in range(grid_pts):
     Mkg[0,i,:] = kg[0]
     Mkg[1,:,i] = kg[1]
 #initial point
-Pi = {  '3x3':{'A1':0.51706, 'A3':0.1, 'B1':0.17790, 'B2': 0.36, 'B3': 0.0},
+Pi = {  '3x3':{'A1':0.51706, 'A3':0.1, 'B1':0.17790, 'B2': 0.36, 'B3': 0.1},
         'q0':{'A1':0.51624, 'A2':0.1, 'B1':0.18036, 'B2': 0.17, 'B3': 0.13},
-        'cb1':{'A1':0.51660, 'A2':0.4, 'A3':0.3, 'B1':0.17616, 'B2': 0.2, 'phiA1':1.9525},
+        'cb1':{'A1':0.51660, 'A2':0.1, 'A3':0.1, 'B1':0.17616, 'B2': 0.1, 'phiA1':1.9525},
         '0-pi':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.2, 'B2': 0.0},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
 #bounds
-bounds = {  'A1':(-1,1),
-            'A2':(-1,1),
-            'A3':(-1,1),
-            'B1':(-0.5,0.5),
-            'B2':(-0.5,0.5),
-            'B3':(-0.5,0.5),
-            'phiA1':(0,2*np.pi)}
+bounds = {  'A1':(0.4,0.6),
+            'A2':(0,0.5),
+            'A3':(0,0.5),
+            'B1':(0.05,0.3),
+            'B2':(0.1,0.5),
+            'B3':(0,0.5),
+            'phiA1':(1.8,2.1)}
 L_bounds = (0.1,10)
 shame1 = -1
 shame2 = 5
