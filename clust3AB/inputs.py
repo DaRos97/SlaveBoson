@@ -7,10 +7,10 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-grid_pts = 21
-mp_cpu = 8
-list_ans = ['3x3']#,'q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Test/noDMbig/'
+grid_pts = 7
+mp_cpu = 16
+list_ans = ['3x3','q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Test/ref/'
 #DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(grid_pts)+'/'
 ReferenceDir = 'none'#DirName + 'Data_17/'
@@ -29,7 +29,7 @@ z = (4,4,2)
 #small
 #J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
 #big
-J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 21
+J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 9
 J = []
 for i in range(Jpts):
     for j in range(Jpts):

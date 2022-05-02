@@ -33,15 +33,15 @@ for ans in ansatze:
         bounds = bnds,
         popsize = 15,
         maxiter = inp.MaxIter,
-        disp = False,
-        tol = inp.cutoff,
-        atol = inp.cutoff,
+        disp = True,
+        tol = 1e-5,#inp.cutoff,
+        atol = 1e-5,#inp.cutoff,
         updating='deferred' if inp.mp_cpu != 1 else 'immediate',
         workers = inp.mp_cpu     #parallelization
         )
     print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter,'\n')
     Pf = tuple(result.x)
-    Args2 = (J1,J2,J3,ans,der_range,False)
+    Args2 = (inp.J1,J2,J3,ans,der_range,False)
     S, HessVals, E, L, gap = cf.Sigma(Pf,*Args2)
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
