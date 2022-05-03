@@ -7,12 +7,12 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-grid_pts = 21
+grid_pts = 24
 mp_cpu = 16
-list_ans = ['q0']#,'q0']#,'cb1']#,'q0']#,'0-pi','cb2']#,'octa']
+list_ans = ['cb1']#,'q0']#,'cb1']#,'q0']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Test/noDMbig/'
 #DirName = '../Data/test/'
-DataDir = DirName + 'Data_'+str(grid_pts)+'/'
+DataDir = DirName + 'Data_21/'#'Data_'+str(grid_pts)+'/'
 ReferenceDir = 'none'#DirName + 'Data_17/'
 #derivative
 der_par = 1e-6
@@ -54,12 +54,12 @@ Pi = {  '3x3':{'A1':0.51706, 'A3':0.1, 'B1':0.17790, 'B2': 0.36, 'B3': 0.1},
         }
 #bounds
 bounds = {  'A1':(0.4,0.6),
-            'A2':(0,0.5),
-            'A3':(0,0.5),
-            'B1':(0.05,0.3),
-            'B2':(0.1,0.5),
+            'A2':(0,0.6),
+            'A3':(0,0.6),
+            'B1':(0,0.5),
+            'B2':(0,0.5),
             'B3':(0,0.5),
-            'phiA1':(1.8,2.1)}
+            'phiA1':(1.5,2.5)}
 L_bounds = (0.1,10)
 shame1 = -1
 shame2 = 5
