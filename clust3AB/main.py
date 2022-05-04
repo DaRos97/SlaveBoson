@@ -35,9 +35,9 @@ for ans in ansatze:
         bounds = bnds,
         popsize = 15,
         maxiter = inp.MaxIter*len(Pi),
-        disp = True,
-        tol = 1e-7,#inp.cutoff,
-        atol = 1e-7,#inp.cutoff,
+        disp = False,
+        tol = inp.cutoff,
+        atol = inp.cutoff,
         updating='deferred' if inp.mp_cpu != 1 else 'immediate',
         workers = inp.mp_cpu     #parallelization
         )

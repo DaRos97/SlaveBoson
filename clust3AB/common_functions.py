@@ -174,7 +174,7 @@ def CheckCsv(csvf):
         N = (len(lines)-1)//4 +1        #4 lines per ansatz
         for i in range(N):
             data = lines[i*4+1].split(',')
-            if float(data[4]) < inp.cutoff and np.abs(float(data[6])) > 0.5:    #if Sigma accurate enough and Lambda not equal to the lower bound
+            if float(data[4]) < inp.cutoff:# and np.abs(float(data[6])) > 0.5:    #if Sigma accurate enough and Lambda not equal to the lower bound
                 ans.append(lines[i*4+1].split(',')[0])
     res = []
     for a in inp.list_ans:
@@ -198,7 +198,7 @@ def FindInitialPoint(J2,J3,ansatze):
                     for i in range(N):
                         data = lines[i*4+1].split(',')
                         if data[0] == Ans:              #correct ansatz
-                            P[data[0]] = data[6:]
+                            P[data[0]] = data[7:]
                             for j in range(len(P[data[0]])):    #cast to float
                                 P[data[0]][j] = float(P[data[0]][j])
     j2 = np.abs(J2) > inp.cutoff_pts    #bool for j2 not 0
