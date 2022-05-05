@@ -10,12 +10,13 @@ Color = {'3x3': ['b','orange'],
          'cb1':  ['m','purple'],
          'cb2': 'k'}
 N = int(sys.argv[1])
-dirname = '../Data/noDMbig/Data_'+sys.argv[1]+'_9/'
+#dirname = '../Data/noDMbig/Data_'+sys.argv[1]+'_9/'
+dirname = '../Data/yesDMbig/Data_'+sys.argv[1]+'/'
 #dirname = '../Data/noDMsmall/copy/'#Data_'+sys.argv[1]+'/'
 #dirname = '../Data/yesDMsmall/copy/'#Data_'+sys.argv[1]+'/'
 #dirname = '../Data/yesDMsmall/Data_'+sys.argv[1]+'N/'
 minE = []
-ct = 1e-2
+ct = 0
 E = {'3x3':[],
      'q0' :[],
      'cb1':[]
