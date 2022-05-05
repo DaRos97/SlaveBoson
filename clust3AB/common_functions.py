@@ -236,7 +236,7 @@ def FindInitialPoint(J2,J3,ansatze):
     return P
 
 #Constructs the bounds of the specific ansatz depending on the number and type of parameters involved in the minimization
-def FindBounds(J2,J3,ansatze):
+def FindBounds2(J2,J3,ansatze):
     B = {}
     j2 = np.abs(J2) > inp.cutoff_pts
     j3 = np.abs(J3) > inp.cutoff_pts
@@ -253,6 +253,14 @@ def FindBounds(J2,J3,ansatze):
             B[ans] = B[ans] + (inp.bounds['B3'],)      #B3
         if ans == 'cb1':# or ans == 'cb2' or ans == 'octa':
             B[ans] = B[ans] + (inp.bounds['phiA1'],)      #phiB1
+    return B
+def FindBounds(Pi,ansatze):
+    B = {}
+    for ans in ansatze:
+        B[ans] = []
+        for P in Pi[ans]:
+            B[ans].append((P-0.01,P+0.01))
+        B[ans] = tuple(B[ans])
     return B
 
 #Compute the derivative ranges for the various parameters of the minimization

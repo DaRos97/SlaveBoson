@@ -16,7 +16,8 @@ print("File name for saving: ",csvfile)
 ansatze = inp.list_ans
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
-Bnds = cf.FindBounds(J2,J3,ansatze)
+Bnds = cf.FindBounds(Pinitial,ansatze)
+#Bnds = cf.FindBounds2(J2,J3,ansatze)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
 for ans in ansatze:
     Tti = t()

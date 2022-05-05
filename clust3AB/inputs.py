@@ -7,16 +7,16 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-grid_pts = 24
+grid_pts = 20
 mp_cpu = 16
 list_ans = ['3x3','q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Test/noDMbig/'
 #DirName = '../Data/test/'
-DataDir = DirName + 'Data_24/'#'Data_'+str(grid_pts)+'/'
+DataDir = DirName + 'Data_'+str(grid_pts)+'/'
 ReferenceDir = DirName + 'Data_12/'
 #derivative
 der_par = 1e-6
-der_phi = 1e-4
+der_phi = 1e-2
 sum_pts = 101
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
 MaxIter = 200
@@ -29,7 +29,7 @@ z = (4,4,2)
 #small
 #J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
 #big
-J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 17
+J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 7
 J = []
 for i in range(Jpts):
     for j in range(Jpts):
@@ -59,7 +59,7 @@ bounds = {  'A1':(0.4,0.6),
             'B1':(0,0.5),
             'B2':(0,0.5),
             'B3':(0,0.5),
-            'phiA1':(1.5,2.5)}
+            'phiA1':(1,3)}
 L_bounds = (0.1,10)
 shame1 = -1
 shame2 = 5
