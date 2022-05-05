@@ -7,12 +7,12 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-grid_pts = 12
+grid_pts = 24
 mp_cpu = 16
 list_ans = ['3x3','q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
 DirName = '/home/users/r/rossid/Test/noDMbig/'
 #DirName = '../Data/test/'
-DataDir = DirName + 'Data_12/'#'Data_'+str(grid_pts)+'/'
+DataDir = DirName + 'Data_24/'#'Data_'+str(grid_pts)+'/'
 ReferenceDir = DirName + 'Data_12/'
 #derivative
 der_par = 1e-6
