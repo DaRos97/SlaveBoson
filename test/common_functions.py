@@ -55,7 +55,7 @@ def Sigma(P,*Args):
     final_L = init[1]
     final_gap = init[2][1]
     if mi:
-        return res
+        return res# if res > inp.cutoff else 0
     else:
         return res, final_Hess, final_E, final_L, final_gap
 
@@ -229,7 +229,7 @@ def FindBounds(Pi,ansatze):
     for ans in ansatze:
         B[ans] = []
         for P in Pi[ans]:
-            B[ans].append((P-0.01,P+0.01))
+            B[ans].append((P-0.1,P+0.1))
         B[ans] = tuple(B[ans])
     return B
 

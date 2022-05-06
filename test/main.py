@@ -16,8 +16,8 @@ print("File name for saving: ",csvfile)
 ansatze = inp.list_ans
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
-#Bnds = cf.FindBounds(Pinitial,ansatze)
-Bnds = cf.FindBounds2(J2,J3,ansatze)
+Bnds = cf.FindBounds(Pinitial,ansatze)
+#Bnds = cf.FindBounds2(J2,J3,ansatze)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
 for ans in ansatze:
     Tti = t()
@@ -37,8 +37,8 @@ for ans in ansatze:
         popsize = inp.mp_cpu*4,
         maxiter = inp.MaxIter*len(Pi),
         disp = True,
-        tol = 1e-7,#inp.cutoff,
-        atol = 1e-7,#inp.cutoff,
+        tol = 1e-5,#inp.cutoff,
+        atol = 1e-5,#inp.cutoff,
         updating='deferred' if inp.mp_cpu != 1 else 'immediate',
         workers = inp.mp_cpu     #parallelization
         )
