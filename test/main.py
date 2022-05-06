@@ -37,8 +37,8 @@ for ans in ansatze:
         popsize = inp.mp_cpu*4,
         maxiter = inp.MaxIter*len(Pi),
         disp = True,
-        tol = 1e-6,#inp.cutoff,
-        atol = 1e-6,#inp.cutoff,
+        tol = 1e-7,#inp.cutoff,
+        atol = 1e-7,#inp.cutoff,
         updating='deferred' if inp.mp_cpu != 1 else 'immediate',
         workers = inp.mp_cpu     #parallelization
         )

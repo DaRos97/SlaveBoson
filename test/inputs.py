@@ -7,17 +7,17 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-grid_pts = 12
+grid_pts = 18
 mp_cpu = 4
 list_ans = ['3x3']#,'q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
 #DirName = '/home/users/r/rossid/Test/noDMbig/'
 DirName = '../Data/test/'
 DataDir = DirName# + 'Data_'+str(grid_pts)+'/'
-ReferenceDir = 'none'#DirName + 'Data_12/'
+ReferenceDir = '../Data/noDMbig/Data_12/'#DirName + 'Data_12/'
 #derivative
 der_par = 1e-6
 der_phi = 1e-2
-sum_pts = 101
+sum_pts = 1200
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
 MaxIter = 200
 prec_L = 1e-10       #precision required in L maximization

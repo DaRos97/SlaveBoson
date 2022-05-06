@@ -3,11 +3,9 @@ import ansatze as an
 import numpy as np
 from scipy import linalg as LA
 from scipy.optimize import minimize_scalar
-from scipy.interpolate import interp2d, interp1d
-from colorama import Fore
+from scipy.interpolate import RectBivariateSpline
 from pathlib import Path
 import csv
-from pandas import read_csv
 from time import time as t
 import os
 
@@ -24,7 +22,7 @@ def Sigma(P,*Args):
     J1,J2,J3,ans,der_range,mi = Args
     j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
     j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
-    args = (J1,J2,J3,ans)
+    args = (J1,J2,J3,ans,mi)
     init = totE(P,args)         #check initial point        #1
     if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
         return inp.shame2
@@ -63,7 +61,9 @@ def Sigma(P,*Args):
 
 #### Computes the part of the energy given by the Bogoliubov eigen-modes
 def sumEigs(P,L,args):
-    N = an.Nk(P,L,args) #compute Hermitian matrix
+    J1,J2,J3,ans,mi = args
+    Args = (J1,J2,J3,ans)
+    N = an.Nk(P,L,Args) #compute Hermitian matrix
     res = np.zeros((inp.m,inp.grid_pts,inp.grid_pts))
     for i in range(inp.grid_pts):
         for j in range(inp.grid_pts):
@@ -76,12 +76,15 @@ def sumEigs(P,L,args):
             res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:inp.m])    #only diagonalization
     r2 = 0
     for i in range(inp.m):
-        func = interp2d(inp.kg[0],inp.kg[1],res[i],kind='quintic')    #Interpolate the 2D surface
-        temp = func(inp.Kp[0],inp.Kp[1])                            #sum over more points to increase the precision
-        if i == 0:
-            gap = np.amin(temp.ravel())
-        r2 += temp.ravel().sum()
-    r2 /= (inp.m*inp.sum_pts**2)
+        interp = RectBivariateSpline(inp.kg[1],inp.kg[0],res[i])      #Interpolate the 2D surface
+        r2 += interp.integral(0,inp.maxK2,0,inp.maxK1)/(inp.maxK1*inp.maxK2)
+    if mi:
+        gap = 10
+    else:
+        func = RectBivariateSpline(inp.kg[1],inp.kg[0],res[0])
+        temp = func(inp.Kp[1],inp.Kp[0])
+        gap = np.amin(temp.ravel())
+    r2 /= inp.m
     return r2, gap
 
 #### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
@@ -98,7 +101,7 @@ def totE(P,args):
 
 #### Computes the Energy given the paramters P and the Lagrange multiplier L
 def totEl(P,L,args):
-    J1,J2,J3,ans = args
+    J1,J2,J3,ans,mi = args
     J = (J1,J2,J3)
     j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or 1 --> problem for VERY small J2,J3 points
     j3 = np.sign(int(np.abs(J3)*1e8))
@@ -127,35 +130,6 @@ def totEl(P,L,args):
     eigEn = sumEigs(P,L,args)
     res += eigEn[0]
     return res, eigEn
-
-#Computes the Hessian values of the energy, i.e. the second derivatives wrt the variational paramters. In this way
-#we can check that the energy is a max in As and min in Bs (for J>0).
-def Hessian(P,Args):
-    res = []
-    der_range = Args[-1]
-    args = Args[:-1]
-    for i in range(len(P)):
-        pp = np.array(P)
-        Der = []
-        der = []
-        ptsP = np.linspace(P[i]-der_range[i],P[i]+der_range[i],3)
-        for j in range(3):
-            pp[i] = ptsP[j]
-            der.append(totE(pp,args)[0])        #uses at each energy evaluation the best lambda
-        for l in range(2):
-            de = np.gradient(der[l:l+2])
-            dx = np.gradient(ptsP[l:l+2])
-            derivative = de/dx
-            f = interp1d(ptsP[l:l+2],derivative)
-            Der.append(f((ptsP[l]+ptsP[l+1])/2))
-        ptsPP = [(ptsP[l]+ptsP[l+1])/2 for l in range(2)]
-        dde = np.gradient(Der)
-        ddx = np.gradient(ptsPP)
-        dderivative = dde/ddx
-        f = interp1d(ptsPP,dderivative)
-        res.append(f(P[i]))
-    return np.array(res)
-
 
 #################################################################
 #checks if the file exists and if it does, reads which ansatze have been computed and returns the remaining ones
@@ -249,6 +223,7 @@ def FindBounds2(J2,J3,ansatze):
         if ans == 'cb1':# or ans == 'cb2' or ans == 'octa':
             B[ans] = B[ans] + (inp.bounds['phiA1'],)      #phiB1
     return B
+
 def FindBounds(Pi,ansatze):
     B = {}
     for ans in ansatze:
@@ -362,42 +337,4 @@ def SaveToCsv(Data,Hess,csvfile):
             writer = csv.DictWriter(f, fieldnames = header[7:])
             writer.writeheader()
             writer.writerow(Hess)
-
-#### OLD SIGMA
-#### Sum of the square of the derivatives of the energy wrt the mean field parameters (not Lambda)
-def SigmaOld(P,*Args):
-    #ti = t()
-    J1,J2,J3,ans,der_range = Args
-    args = (J1,J2,J3,ans)
-    test = totE(P,args)         #check initial point
-    if test[2] == inp.shame_value or np.abs(test[1]-inp.L_bounds[0]) < 1e-3:
-        return inp.shame2
-    res = 0
-    temp = []
-    for i in range(len(P)):
-        pp = np.array(P)
-        dP = der_range[i]
-        pp[i] = P[i] + dP
-        tempE = totE(pp,args)
-        der = (tempE[0]-test[0])/dP
-        if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:  #try in the other direction
-            return inp.shame2
-            pp[i] = P[i] - dP
-            tempE = totE(pp,args)
-            if tempE[2] == inp.shame_value or np.abs(tempE[1]-inp.L_bounds[0]) < 1e-3:
-                return inp.shame2
-        temp.append(der**2)
-        if ans == 'cb1' and i == len(P) - 1:
-            pp2 = np.array(P)
-            pp2[i] = P[i] - dP
-            tempE2 = totE(pp2,args)
-            der2 = (test[0]-tempE2[0])/dP
-            hess = (der-der2)/dP
-            if hess < 0:
-                res += inp.shame2
-    res += np.array(temp).sum()
-    #print(P,temp)
-    #print("time: ",t()-ti)
-    #print(Fore.YELLOW+"res for P = ",P," is ",res,' with L = ',test[1],Fore.RESET)
-    return res
 
