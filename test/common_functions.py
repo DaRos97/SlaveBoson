@@ -210,18 +210,18 @@ def FindBounds2(J2,J3,ansatze):
     j2 = np.abs(J2) > inp.cutoff_pts
     j3 = np.abs(J3) > inp.cutoff_pts
     for ans in ansatze:
-        B[ans] = (inp.bounds['A1'],)             #A1
+        B[ans] = (inp.bounds[ans]['A1'],)             #A1
         if j2 and ans in inp.list_A2:
-            B[ans] = B[ans] + (inp.bounds['A2'],)      #A2
+            B[ans] = B[ans] + (inp.bounds[ans]['A2'],)      #A2
         if j3 and ans in inp.list_A3:
-            B[ans] = B[ans] + (inp.bounds['A3'],)      #A3
-        B[ans] = B[ans] + (inp.bounds['B1'],)      #B1
+            B[ans] = B[ans] + (inp.bounds[ans]['A3'],)      #A3
+        B[ans] = B[ans] + (inp.bounds[ans]['B1'],)      #B1
         if j2:
-            B[ans] = B[ans] + (inp.bounds['B2'],)      #B2
+            B[ans] = B[ans] + (inp.bounds[ans]['B2'],)      #B2
         if j3 and ans in inp.list_B3:
-            B[ans] = B[ans] + (inp.bounds['B3'],)      #B3
+            B[ans] = B[ans] + (inp.bounds[ans]['B3'],)      #B3
         if ans == 'cb1':# or ans == 'cb2' or ans == 'octa':
-            B[ans] = B[ans] + (inp.bounds['phiA1'],)      #phiB1
+            B[ans] = B[ans] + (inp.bounds[ans]['phiA1'],)      #phiB1
     return B
 
 def FindBounds(Pi,ansatze):
