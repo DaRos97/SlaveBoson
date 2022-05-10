@@ -5,8 +5,6 @@ from time import time as t
 from scipy.optimize import differential_evolution as d_e
 import sys
 ####### inputs
-#li = [0,8,72,80]
-#J2, J3 = inp.J[li[int(sys.argv[1])]]
 J2, J3 = inp.J[int(sys.argv[1])]
 print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
@@ -16,8 +14,8 @@ print("File name for saving: ",csvfile)
 ansatze = inp.list_ans
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
-Bnds = cf.FindBounds(Pinitial,ansatze)
-#Bnds = cf.FindBounds2(J2,J3,ansatze)
+#Bnds = cf.FindBounds(Pinitial,ansatze)
+Bnds = cf.FindBounds2(J2,J3,ansatze)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
 for ans in ansatze:
     Tti = t()
@@ -34,7 +32,7 @@ for ans in ansatze:
         args = Args1,
         x0 = Pi,
         bounds = bnds,
-        popsize = inp.mp_cpu*4,
+        popsize = 15,
         maxiter = inp.MaxIter*len(Pi),
         disp = True,
         tol = 1e-7,#inp.cutoff,
