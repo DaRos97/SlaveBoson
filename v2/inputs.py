@@ -7,13 +7,13 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-Nx = 24
+Nx = 12
 Ny = 12
-mp_cpu = 4
-list_ans = ['3x3']#,'q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
-#DirName = '/home/users/r/rossid/Test/noDMbig/'
-DirName = '../Data/test/'
-DataDir = DirName# + 'Data_'+str(grid_pts)+'/'
+mp_cpu = 8
+list_ans = ['3x3','q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Data/noDMbig/'
+#DirName = '../Data/test/'
+DataDir = DirName + 'Data_'+str(Nx)+'-'+str(Ny)+'/'
 ReferenceDir = 'none'#DirName + 'Data_18/'
 #derivative
 der_par = 1e-6
@@ -50,11 +50,11 @@ Pi = {  '3x3':{'A1':0.51706, 'A3':0.1, 'B1':0.17790, 'B2': 0.36, 'B3': 0.1},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
 #bounds
-bounds = {  '3x3':{ 'A1':(-1,1),
-                    'A3':(-1,1),
-                    'B1':(-0.5,0.5),
-                    'B2':(-0.5,0.5),
-                    'B3':(-0.5,0.5)},
+bounds = {  '3x3':{ 'A1':(0.4,0.6),
+                    'A3':(0,1),
+                    'B1':(0,0.5),
+                    'B2':(0,0.5),
+                    'B3':(0,0.5)},
             'q0': { 'A1':(0.4,0.6),
                     'A2':(0,0.6),
                     'B1':(0,0.5),
@@ -65,7 +65,7 @@ bounds = {  '3x3':{ 'A1':(-1,1),
                     'A3':(0,0.6),
                     'B1':(0,0.5),
                     'B2':(0,0.5),
-                    'phiA1':(0,0.5)}
+                    'phiA1':(0,2*np.pi)}
          }
 L_bounds = (0.1,10)
 shame1 = -1

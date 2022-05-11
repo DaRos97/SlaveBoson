@@ -9,7 +9,8 @@ import csv
 from time import time as t
 import os
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+#from matplotlib import cm
 
 ####
 J = np.zeros((2*inp.m,2*inp.m))
@@ -79,8 +80,14 @@ def sumEigs(P,L,args):
             res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:inp.m])    #only diagonalization
     r2 = 0
     for i in range(inp.m):
-        r2 += res[i].ravel().sum()/(inp.Nx*inp.Ny)
-    gap = np.amin(res[0].ravel())
+        func = RectBivariateSpline(inp.kxg,inp.kyg,res[i])
+        r2 += func.integral(0,1,0,1)    #r2 += res[i].ravel().sum()/(inp.Nx*inp.Ny)
+    if mi:
+        gap = 10
+    else:
+        func = RectBivariateSpline(inp.kxg,inp.kyg,res[0])
+        temp = func(np.linspace(0,1,1000),np.linspace(0,1,1000))
+        gap = np.amin(temp.ravel())
     r2 /= inp.m
     #plot
     #R = np.zeros((3,inp.Nx,inp.Ny))
@@ -89,9 +96,13 @@ def sumEigs(P,L,args):
     #        R[0,i,j] = np.real(inp.kkg[0,i,j])
     #        R[1,i,j] = np.real(inp.kkg[1,i,j])
     #        R[2,i,j] = res[0,i,j]
-    #fig = plt.figure()
-    #ax = fig.gca(projection='3d')
-    #ax.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
+    ##fig,(ax1,ax2) = plt.subplots(1,2)#,projection='3d')
+    #fig = plt.figure(figsize=(10,5))
+    #ax1 = fig.add_subplot(121, projection='3d')
+    ##ax1 = fig.gca(projection='3d')
+    #ax1.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
+    #ax2 = fig.add_subplot(122, projection='3d')
+    #ax2.plot_surface(inp.kkgp[0],inp.kkgp[1],res[0],cmap=cm.coolwarm)
     #plt.show()
     return r2, gap
 
