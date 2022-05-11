@@ -38,7 +38,7 @@ def Sigma(P,*Args):
         pp[i] = P[i] + dP
         init_plus = totE(pp,args)   #compute derivative     #2
         der1 = (init_plus[0]-init[0])/dP
-        if np.abs(der1) > 1e-3:
+        if np.abs(der1) > inp.der_lim and mi:
             temp.append(der1**2)
         else:
         #compute Hessian to see if it is of correct sign
@@ -300,13 +300,6 @@ def arangeP(P,ans,J2,J3):
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
         newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
         newP.append(P[-1])
-    elif ans == 'cb12':
-        newP.append(P[1*j2]*j2)
-        newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
-        newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
-        newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
-        newP.append(P[5*j3*j2]*j3*j2 + P[4*j2*(1-j3)]*j2*(1-j3) + P[3*j3*(1-j2)]*j3*(1-j2) + P[-1]*(1-j2)*(1-j3))
-        newP.append(P[-1]*j2)
     elif ans == 'octa':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j2]*j2 + P[1*(1-j2)]*(1-j2))
@@ -330,7 +323,7 @@ def SaveToCsv(Data,Hess,csvfile):
         D = init[i*4+1].split(',')
         if D[0] == ans:
             ac = True
-            if (float(D[4]) > Data['Sigma'] and float(Data['L']) > inp.L_bounds[0]+1e-3) or (np.abs(float(D[7])) < 0.5 and np.abs(Data['A1']) > 0.5):
+            if float(D[4]) > Data['Sigma']:
                 N_ = i+1
     ###
     header = inp.header[ans]

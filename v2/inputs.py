@@ -18,6 +18,7 @@ ReferenceDir = 'none'#DirName + 'Data_18/'
 #derivative
 der_par = 1e-6
 der_phi = 1e-2
+der_lim = 1e-2
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
 MaxIter = 200
 prec_L = 1e-10       #precision required in L maximization
