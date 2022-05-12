@@ -11,6 +11,7 @@ Color = {'3x3': ['b','orange'],
          'cb1':  ['m','g'],
          'cb2': 'k'}
 N = str(int(sys.argv[1]))
+#dirname = '../Data/yesDMbig/Data_'+N+'-'+N+'/'
 dirname = '../Data/noDMbig/Data_'+N+'-'+N+'/'
 #dirname = '../Data/yesDMbig/Data_'+sys.argv[1]+'/'
 #dirname = '../Data/noDMbig/Data_'+sys.argv[1]+'/'
@@ -58,6 +59,8 @@ if cn == 0 or cn == 2:
         ax = fig.add_subplot(n,projection='3d')
         ax.plot_surface(X,Y,gaps[ans].T,cmap=cm.coolwarm)
         ax.set_title(ans)
+        ax.set_xlabel("J2")
+        ax.set_ylabel("J3")
     plt.show()
 if cn == 0:
     exit()
