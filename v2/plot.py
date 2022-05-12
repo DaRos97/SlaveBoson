@@ -11,8 +11,8 @@ Color = {'3x3': ['b','orange'],
          'cb1':  ['m','g'],
          'cb2': 'k'}
 N = str(int(sys.argv[1]))
-#dirname = '../Data/yesDMbig/Data_'+N+'-'+N+'/'
-dirname = '../Data/noDMbig/Data_'+N+'-'+N+'/'
+#dirname = '../Data/yesDMbig/Data_'+N+'-'+N+'/'; title = 'With DM interactions'
+dirname = '../Data/noDMbig/Data_'+N+'-'+N+'/'; title = 'Without DM interactions'
 #dirname = '../Data/yesDMbig/Data_'+sys.argv[1]+'/'
 #dirname = '../Data/noDMbig/Data_'+sys.argv[1]+'/'
 #dirname = '../Data/yesDMbig/Data_'+sys.argv[1]+'N/'
@@ -43,6 +43,9 @@ if cn == 0 or cn == 2:
     Ji = -0.3
     Jf = 0.3
     fig = plt.figure(figsize=(16,16))
+    tt = title + ': gap values'
+    plt.title(tt)
+    plt.axis('off')
     for a,ans in enumerate(list_ans):
         gaps[ans] = np.zeros((9,9))
         for j2 in range(len(E[ans])):
@@ -68,6 +71,8 @@ pts = len(os.listdir(dirname))
 #check on convergence
 plt.figure(figsize=(16,16))
 plt.subplot(2,3,2)
+tt = title + ': energy'
+plt.title(tt)
 for p in range(pts):
     J2 = float(minE[p][1])
     J3 = float(minE[p][2])
