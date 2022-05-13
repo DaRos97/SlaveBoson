@@ -33,6 +33,8 @@ def Sigma(P,*Args):
     temp = []
     final_Hess = []
     for i in range(len(P)): #for each parameter
+#        if ans == 'cb1' and i == len(P)-1:
+#            continue
         pp = np.array(P)
         dP = der_range[i]
         pp[i] = P[i] + dP
@@ -40,6 +42,9 @@ def Sigma(P,*Args):
         der1 = (init_plus[0]-init[0])/dP
         if np.abs(der1) > inp.der_lim and mi:
             temp.append(der1**2)
+#        elif ans == 'cb1' and i == len(P)-1:
+#            temp.append(der1**2)
+#            final_Hess.append(7)
         else:
         #compute Hessian to see if it is of correct sign
             pp[i] = P[i] + dP
@@ -57,7 +62,9 @@ def Sigma(P,*Args):
     final_E = init[0]
     final_L = init[1]
     final_gap = init[2][1]
-    #print("Res for P = ",P,"\nSigma: ",res,"\tEnergy:",final_E,"\tGap:",final_gap)
+#    if inp.min_S > res:
+#        inp.min_S = res
+#        print("Res for P = ",P,"\nSigma: ",res,"\tEnergy:",final_E,"\tGap:",final_gap)
     if mi:
         return res# if res > inp.cutoff else 0
     else:
@@ -79,6 +86,13 @@ def sumEigs(P,L,args):
             temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
             res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:inp.m])    #only diagonalization
     r2 = 0
+    for i in range(inp.m):
+        r2 += res[i].ravel().sum()
+    r2 /= inp.m
+    r2 /= (inp.Nx*inp.Ny)
+    gap = np.amin(res[0].ravel())
+    return r2, gap
+    # with interpolation
     for i in range(inp.m):
         func = RectBivariateSpline(inp.kxg,inp.kyg,res[i])
         r2 += func.integral(0,1,0,1)    #r2 += res[i].ravel().sum()/(inp.Nx*inp.Ny)
@@ -323,7 +337,7 @@ def SaveToCsv(Data,Hess,csvfile):
         D = init[i*4+1].split(',')
         if D[0] == ans:
             ac = True
-            if float(D[4]) > Data['Sigma']:
+            if float(D[4]) > Data['Sigma'] or ans == 'cb1':
                 N_ = i+1
     ###
     header = inp.header[ans]

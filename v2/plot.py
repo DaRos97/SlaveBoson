@@ -11,8 +11,10 @@ Color = {'3x3': ['b','orange'],
          'cb1':  ['m','g'],
          'cb2': 'k'}
 N = str(int(sys.argv[1]))
+dirname = '../Data/noDMbig/Data_24-12/'; title = 'Without DM interactions'
+#dirname = '../Data/yesDMbig/Data_24-12/'; title = 'With DM interactions'
 #dirname = '../Data/yesDMbig/Data_'+N+'-'+N+'/'; title = 'With DM interactions'
-dirname = '../Data/noDMbig/Data_'+N+'-'+N+'/'; title = 'Without DM interactions'
+#dirname = '../Data/noDMbig/Data_'+N+'-'+N+'/'; title = 'Without DM interactions'
 #dirname = '../Data/yesDMbig/Data_'+sys.argv[1]+'/'
 #dirname = '../Data/noDMbig/Data_'+sys.argv[1]+'/'
 #dirname = '../Data/yesDMbig/Data_'+sys.argv[1]+'N/'

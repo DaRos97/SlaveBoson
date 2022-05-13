@@ -44,6 +44,8 @@ for ans in ansatze:
     Pf = tuple(result.x)
     Args2 = (inp.J1,J2,J3,ans,der_range,False)
     S, HessVals, E, L, gap = cf.Sigma(Pf,*Args2)
+#    if len(HessVals) != len(Pf):
+#        HessVals = np.zeros(len(Pf))
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
     data = [ans,J2,J3,E,S,gap,L]
