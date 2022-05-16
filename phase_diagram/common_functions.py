@@ -3,14 +3,14 @@ import ansatze as an
 import numpy as np
 from scipy import linalg as LA
 from scipy.optimize import minimize_scalar
-from scipy.interpolate import RectBivariateSpline
+from scipy.interpolate import RectBivariateSpline as RBS
 from pathlib import Path
 import csv
 from time import time as t
 import os
 
-import matplotlib.pyplot as plt
-from matplotlib import cm
+#import matplotlib.pyplot as plt
+#from matplotlib import cm
 
 ####
 J = np.zeros((2*inp.m,2*inp.m))
@@ -87,6 +87,7 @@ def Final_Result(P,*Args):
     final_L = init[1]
     final_gap = init[2][1]
     return res, final_Hess, final_E, final_L, final_gap
+
 #### Computes the part of the energy given by the Bogoliubov eigen-modes
 def sumEigs(P,L,args):
     J1,J2,J3,ans = args
@@ -103,28 +104,37 @@ def sumEigs(P,L,args):
             temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
             res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:inp.m])    #only diagonalization
     r2 = 0
+    #for i in range(inp.m):
+    #    r2 += res[i].ravel().sum()
+    #r2 /= (inp.Nx*inp.Ny)
     for i in range(inp.m):
-        r2 += res[i].ravel().sum()
+        func = RBS(inp.kxg,inp.kyg,res[i])
+        r2 += func.integral(0,1,0,1)
     r2 /= inp.m
-    r2 /= (inp.Nx*inp.Ny)
     gap = np.amin(res[0].ravel())
-    #plot
-    print("P: ",P,"\nL:",L,"\ngap:",gap)
-    R = np.zeros((3,inp.Nx,inp.Ny))
-    for i in range(inp.Nx):
-        for j in range(inp.Ny):
-            R[0,i,j] = np.real(inp.kkg[0,i,j])
-            R[1,i,j] = np.real(inp.kkg[1,i,j])
-            R[2,i,j] = res[0,i,j]
-    #fig,(ax1,ax2) = plt.subplots(1,2)#,projection='3d')
-    fig = plt.figure(figsize=(10,5))
-    ax1 = fig.add_subplot(121, projection='3d')
-    #ax1 = fig.gca(projection='3d')
-    ax1.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
-    ax2 = fig.add_subplot(122, projection='3d')
-    ax2.plot_surface(inp.kkgp[0],inp.kkgp[1],res[0],cmap=cm.coolwarm)
-    plt.show()
     return r2, gap
+    if False:
+        #plot
+        print("P: ",P,"\nL:",L,"\ngap:",gap)
+        R = np.zeros((3,inp.Nx,inp.Ny))
+        for i in range(inp.Nx):
+            for j in range(inp.Ny):
+                R[0,i,j] = np.real(inp.kkg[0,i,j])
+                R[1,i,j] = np.real(inp.kkg[1,i,j])
+                R[2,i,j] = res[0,i,j]
+        func = RBS(inp.kxg,inp.kyg,res[0])
+        X,Y = np.meshgrid(inp.kxg,inp.kyg)
+        Z = func(inp.kxg,inp.kyg)
+        #fig,(ax1,ax2) = plt.subplots(1,2)#,projection='3d')
+        fig = plt.figure(figsize=(10,5))
+        ax1 = fig.add_subplot(131, projection='3d')
+        #ax1 = fig.gca(projection='3d')
+        ax1.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
+        ax2 = fig.add_subplot(132, projection='3d')
+        ax2.plot_surface(inp.kkgp[0],inp.kkgp[1],res[0],cmap=cm.coolwarm)
+        ax3 = fig.add_subplot(133, projection='3d')
+        ax3.plot_surface(X,Y,Z,cmap=cm.coolwarm)
+        plt.show()
 
 #### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
 def totE(P,args):

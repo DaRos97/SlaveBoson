@@ -9,9 +9,9 @@ DM3 = 0#2/3*np.pi
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 1
-list_ans = ['cb1']#,'q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Data/noDMbig/'
+mp_cpu = 8
+list_ans = ['3x3','q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Data/noDM/'
 #DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(Nx)+'-'+str(Ny)+'/'
 ReferenceDir = DirName + 'Data_12-12/'
@@ -69,7 +69,7 @@ bounds = {  '3x3':{ 'A1':(0.4,0.6),
                     'A3':(0,1),
                     'B1':(0,0.5),
                     'B2':(0,0.5),
-                    'phiA1':(0,2*np.pi)}
+                    'phiA1':(1,2.5)}
          }
 L_bounds = (0.1,10)
 shame1 = -1

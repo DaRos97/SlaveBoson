@@ -45,7 +45,9 @@ for ans in ansatze:
     try:
         S, HessVals, E, L, gap = cf.Final_Result(Pf,*Args)
     except TypeError:
-        S, HessVals, E, L, gap = (1,np.zeros(len(Pf)),0,0,1)
+        print("Not saving, there was some mistake")
+        print("Found values: Pf=",Pf,"\nSigma = ",result.fun)
+        continue
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
     data = [ans,J2,J3,E,S,gap,L]
