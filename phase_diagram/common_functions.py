@@ -9,6 +9,9 @@ import csv
 from time import time as t
 import os
 
+import matplotlib.pyplot as plt
+from matplotlib import cm
+
 ####
 J = np.zeros((2*inp.m,2*inp.m))
 for i in range(inp.m):
@@ -18,15 +21,13 @@ for i in range(inp.m):
 # Check also Hessians on the way --> more time (1 general + 2 energy evaluations for each P).
 # Calls only the totE func
 def Sigma(P,*Args):
-    #ti = t()
-    J1,J2,J3,ans,der_range,mi = Args
+    J1,J2,J3,ans,der_range = Args
     j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
     j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
-    args = (J1,J2,J3,ans,mi)
+    args = (J1,J2,J3,ans)
     init = totE(P,args)         #check initial point        #1
     if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
         return inp.shame2
-    res = 0
     temp = []
     final_Hess = []
     for i in range(len(P)): #for each parameter
@@ -35,10 +36,9 @@ def Sigma(P,*Args):
         pp[i] = P[i] + dP
         init_plus = totE(pp,args)   #compute derivative     #2
         der1 = (init_plus[0]-init[0])/dP
-        if np.abs(der1) > 1e-3:
+        if np.abs(der1) > inp.der_lim:
             temp.append(der1**2)
         else:
-        #compute Hessian to see if it is of correct sign
             pp[i] = P[i] + dP
             init_2plus = totE(pp,args)                          #3
             der2 = (init_2plus[0]-init_plus[0])/dP
@@ -49,24 +49,52 @@ def Sigma(P,*Args):
                 temp.append(der1**2)     #add it to the sum
             else:
                 return inp.shame3
+    res = np.array(temp).sum()
+    return res
+####
+def Final_Result(P,*Args):
+    J1,J2,J3,ans,der_range = Args
+    j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
+    j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
+    args = (J1,J2,J3,ans)
+    init = totE(P,args)         #check initial point        #1
+    if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
+        print("Not good initial point: ",init[2][0],init[1])
+        return 0
+    res = 0
+    temp = []
+    final_Hess = []
+    for i in range(len(P)): #for each parameter
+        pp = np.array(P)
+        dP = der_range[i]
+        pp[i] = P[i] + dP
+        init_plus = totE(pp,args)   #compute derivative     #2
+        der1 = (init_plus[0]-init[0])/dP
+        #compute Hessian to see if it is of correct sign
+        pp[i] = P[i] + dP
+        init_2plus = totE(pp,args)                          #3
+        der2 = (init_2plus[0]-init_plus[0])/dP
+        final_Hess.append((der2-der1)/dP)
+        hess = int(np.sign(final_Hess[-1]))    #order is important!!
+        sign = inp.HS[ans][j2][j3][i]
+        if sign == hess:
+            temp.append(der1**2)     #add it to the sum
+        else:
+            print("Sign of Hessian is not good for ans = ",ans," and i = ",i)
+            return 0
     res += np.array(temp).sum()
-    #print("time: ",t()-ti)
     final_E = init[0]
     final_L = init[1]
     final_gap = init[2][1]
-    if mi:
-        return res# if res > inp.cutoff else 0
-    else:
-        return res, final_Hess, final_E, final_L, final_gap
-
+    return res, final_Hess, final_E, final_L, final_gap
 #### Computes the part of the energy given by the Bogoliubov eigen-modes
 def sumEigs(P,L,args):
-    J1,J2,J3,ans,mi = args
+    J1,J2,J3,ans = args
     Args = (J1,J2,J3,ans)
     N = an.Nk(P,L,Args) #compute Hermitian matrix
-    res = np.zeros((inp.m,inp.grid_pts,inp.grid_pts))
-    for i in range(inp.grid_pts):
-        for j in range(inp.grid_pts):
+    res = np.zeros((inp.m,inp.Nx,inp.Ny))
+    for i in range(inp.Nx):
+        for j in range(inp.Ny):
             Nk = N[:,:,i,j]
             try:
                 K = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
@@ -76,15 +104,26 @@ def sumEigs(P,L,args):
             res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:inp.m])    #only diagonalization
     r2 = 0
     for i in range(inp.m):
-        interp = RectBivariateSpline(inp.kg[1],inp.kg[0],res[i])      #Interpolate the 2D surface
-        r2 += interp.integral(0,inp.maxK2,0,inp.maxK1)/(inp.maxK1*inp.maxK2)
-    if mi:
-        gap = 10
-    else:
-        func = RectBivariateSpline(inp.kg[1],inp.kg[0],res[0])
-        temp = func(inp.Kp[1],inp.Kp[0])
-        gap = np.amin(temp.ravel())
+        r2 += res[i].ravel().sum()
     r2 /= inp.m
+    r2 /= (inp.Nx*inp.Ny)
+    gap = np.amin(res[0].ravel())
+    #plot
+    print("P: ",P,"\nL:",L,"\ngap:",gap)
+    R = np.zeros((3,inp.Nx,inp.Ny))
+    for i in range(inp.Nx):
+        for j in range(inp.Ny):
+            R[0,i,j] = np.real(inp.kkg[0,i,j])
+            R[1,i,j] = np.real(inp.kkg[1,i,j])
+            R[2,i,j] = res[0,i,j]
+    #fig,(ax1,ax2) = plt.subplots(1,2)#,projection='3d')
+    fig = plt.figure(figsize=(10,5))
+    ax1 = fig.add_subplot(121, projection='3d')
+    #ax1 = fig.gca(projection='3d')
+    ax1.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
+    ax2 = fig.add_subplot(122, projection='3d')
+    ax2.plot_surface(inp.kkgp[0],inp.kkgp[1],res[0],cmap=cm.coolwarm)
+    plt.show()
     return r2, gap
 
 #### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
@@ -101,7 +140,7 @@ def totE(P,args):
 
 #### Computes the Energy given the paramters P and the Lagrange multiplier L
 def totEl(P,L,args):
-    J1,J2,J3,ans,mi = args
+    J1,J2,J3,ans = args
     J = (J1,J2,J3)
     j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or 1 --> problem for VERY small J2,J3 points
     j3 = np.sign(int(np.abs(J3)*1e8))
@@ -205,7 +244,7 @@ def FindInitialPoint(J2,J3,ansatze):
     return P
 
 #Constructs the bounds of the specific ansatz depending on the number and type of parameters involved in the minimization
-def FindBounds2(J2,J3,ansatze):
+def FindBounds(J2,J3,ansatze):
     B = {}
     j2 = np.abs(J2) > inp.cutoff_pts
     j3 = np.abs(J3) > inp.cutoff_pts
@@ -224,7 +263,7 @@ def FindBounds2(J2,J3,ansatze):
             B[ans] = B[ans] + (inp.bounds[ans]['phiA1'],)      #phiB1
     return B
 
-def FindBounds(Pi,ansatze):
+def FindBoundsSmall(Pi,ansatze):
     B = {}
     for ans in ansatze:
         B[ans] = []
@@ -281,13 +320,6 @@ def arangeP(P,ans,J2,J3):
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
         newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
         newP.append(P[-1])
-    elif ans == 'cb12':
-        newP.append(P[1*j2]*j2)
-        newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
-        newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
-        newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
-        newP.append(P[5*j3*j2]*j3*j2 + P[4*j2*(1-j3)]*j2*(1-j3) + P[3*j3*(1-j2)]*j3*(1-j2) + P[-1]*(1-j2)*(1-j3))
-        newP.append(P[-1]*j2)
     elif ans == 'octa':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j2]*j2 + P[1*(1-j2)]*(1-j2))
@@ -311,7 +343,7 @@ def SaveToCsv(Data,Hess,csvfile):
         D = init[i*4+1].split(',')
         if D[0] == ans:
             ac = True
-            if (float(D[4]) > Data['Sigma'] and float(Data['L']) > inp.L_bounds[0]+1e-3) or (np.abs(float(D[7])) < 0.5 and np.abs(Data['A1']) > 0.5):
+            if float(D[4]) > Data['Sigma'] or ans == 'cb1':
                 N_ = i+1
     ###
     header = inp.header[ans]
