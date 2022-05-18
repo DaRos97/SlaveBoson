@@ -9,10 +9,13 @@ Color = {'3x3': ['b','orange'],
          'q0':  ['r','y'],
          '0-pi': 'y',
          'cb1':  ['m','g'],
-         'cb2': 'k'}
-dirname = '../Data/noDMbig/Data_13-13/'; title = 'Without DM interactions'
+         'cb2': ['k','purple']}
+dirname = '../Data/yesDMbig/Data_13-13_old/'; title = 'Without DM interactions'
 #dirname = '../Data/yesDMbig/Data_13-13/'; title = 'With DM interactions'
-ans = input("Which ans?(3x3,q0,cb1)")
+if len(sys.argv) > 1:
+    ans = sys.argv[1]
+else:
+    ans = input("Which ans?(3x3,q0,cb1)")
 D = {}
 Ji = -0.3
 Jf = 0.3

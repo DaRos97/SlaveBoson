@@ -50,6 +50,7 @@ def Sigma(P,*Args):
             else:
                 return inp.shame3
     res = np.array(temp).sum()
+    print(res,P)
     return res
 ####
 def Final_Result(P,*Args):
@@ -245,10 +246,6 @@ def FindInitialPoint(J2,J3,ansatze):
             P[ans].append(inp.Pi[ans]['B3'])      #B3
         if ans == 'cb1':
             P[ans].append(inp.Pi[ans]['phiA1'])      #phiA1
-        if ans == 'cb12':
-            P[ans].append(inp.Pi[ans]['phiA1'])      #phiA1
-            if j2:
-                P[ans].append(inp.Pi[ans]['phiB2'])      #phiA1
         if ans == 'cb2' or ans == 'octa':
             P[ans].append(inp.Pi[ans]['phiB1'])      #phiA1
     return P
@@ -269,8 +266,10 @@ def FindBounds(J2,J3,ansatze):
             B[ans] = B[ans] + (inp.bounds[ans]['B2'],)      #B2
         if j3 and ans in inp.list_B3:
             B[ans] = B[ans] + (inp.bounds[ans]['B3'],)      #B3
-        if ans == 'cb1':# or ans == 'cb2' or ans == 'octa':
+        if ans == 'cb1':
             B[ans] = B[ans] + (inp.bounds[ans]['phiA1'],)      #phiB1
+        if ans == 'cb2':
+            B[ans] = B[ans] + (inp.bounds[ans]['phiB1'],)      #phiB1
     return B
 
 def FindBoundsSmall(Pi,ansatze):
@@ -300,8 +299,6 @@ def ComputeDerRanges(J2,J3,ansatze):
         R[ans] = [inp.der_par for i in range(Npar)]
         if ans in inp.list_chiral:
             R[ans].append(inp.der_phi)
-            if ans == 'cb12' and j2:
-                R[ans].append(inp.der_phi)
     return R
 #From the list of parameters obtained after the minimization constructs an array containing them and eventually 
 #some 0 parameters which may be omitted because j2 or j3 are equal to 0.
@@ -353,7 +350,7 @@ def SaveToCsv(Data,Hess,csvfile):
         D = init[i*4+1].split(',')
         if D[0] == ans:
             ac = True
-            if float(D[4]) > Data['Sigma'] or ans == 'cb1':
+            if float(D[4]) > Data['Sigma']:# or ans == 'cb1':
                 N_ = i+1
     ###
     header = inp.header[ans]
