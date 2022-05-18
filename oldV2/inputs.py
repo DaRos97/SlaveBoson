@@ -7,17 +7,18 @@ S = 0.5
 DM1 = 0#4/3*np.pi
 DM3 = 0#2/3*np.pi
 ####
-Nx = 24
-Ny = 12
-mp_cpu = 4
-list_ans = ['3x3']#,'q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
-DirName = '/home/users/r/rossid/Data/noDMbig/'
+Nx = 13
+Ny = 13
+mp_cpu = 8
+list_ans = ['3x3','q0','cb1']#,'q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Data/noDM/'
 #DirName = '../Data/test/'
 DataDir = DirName + 'Data_'+str(Nx)+'-'+str(Ny)+'/'
-ReferenceDir = 'none'#DirName + 'Data_18/'
+ReferenceDir = DirName + 'Data_12-12/'
 #derivative
 der_par = 1e-6
-der_phi = 1e-2
+der_phi = 1e-5
+der_lim = 1e-2  #limit under which compute the Hessian for that parameter
 cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
 MaxIter = 200
 prec_L = 1e-10       #precision required in L maximization
@@ -38,10 +39,13 @@ for i in range(Jpts):
 kxg = np.linspace(0,1,Nx)
 kyg = np.linspace(0,1,Ny)
 kkg = np.ndarray((2,Nx,Ny),dtype=complex)
+kkgp = np.ndarray((2,Nx,Ny))
 for i in range(Nx):
     for j in range(Ny):
         kkg[0,i,j] = kxg[i]*2*np.pi
         kkg[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
+        kkgp[0,i,j] = kxg[i]*2*np.pi
+        kkgp[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
 #initial point
 Pi = {  '3x3':{'A1':0.51706, 'A3':0.1, 'B1':0.17790, 'B2': 0.36, 'B3': 0.1},
         'q0':{'A1':0.51624, 'A2':0.1, 'B1':0.18036, 'B2': 0.17, 'B3': 0.13},
@@ -50,7 +54,7 @@ Pi = {  '3x3':{'A1':0.51706, 'A3':0.1, 'B1':0.17790, 'B2': 0.36, 'B3': 0.1},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
 #bounds
-bounds = {  '3x3':{ 'A1':(0,1),
+bounds = {  '3x3':{ 'A1':(0.4,0.6),
                     'A3':(0,1),
                     'B1':(0,0.5),
                     'B2':(0,0.5),
@@ -60,12 +64,12 @@ bounds = {  '3x3':{ 'A1':(0,1),
                     'B1':(0,0.5),
                     'B2':(0,0.5),
                     'B3':(0,0.5)},
-            'cb1':{ 'A1':(0.4,0.6),
-                    'A2':(0,0.6),
-                    'A3':(0,0.6),
+            'cb1':{ 'A1':(0.5,0.7),
+                    'A2':(0,1),
+                    'A3':(0,1),
                     'B1':(0,0.5),
                     'B2':(0,0.5),
-                    'phiA1':(0,0.5)}
+                    'phiA1':(1,2.5)}
          }
 L_bounds = (0.1,10)
 shame1 = -1
@@ -93,6 +97,8 @@ HS = {'3x3':[[[1,-1,-1,1,1], [1,-1,1], [1,1,-1,1,-1]  ],
              [[1,-1,-1,1],     [1,-1,1],     [1,1,-1,1]      ],
              [[1,1,-1,-1,-1,1],[1,1,-1,-1,1],[1,1,1,-1,-1,1]]]
       }
+
+min_S = 10
 
 print("Minimization precision (both tol and atol):",cutoff)
 print("Grid pts:",Nx,'*',Ny)

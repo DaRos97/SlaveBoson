@@ -9,8 +9,8 @@ import csv
 from time import time as t
 import os
 
-#import matplotlib.pyplot as plt
-#from matplotlib import cm
+import matplotlib.pyplot as plt
+from matplotlib import cm
 
 ####
 J = np.zeros((2*inp.m,2*inp.m))
@@ -39,7 +39,7 @@ def Sigma(P,*Args):
         if np.abs(der1) > inp.der_lim:
             temp.append(der1**2)
         else:
-            pp[i] = P[i] + dP
+            pp[i] = P[i] + 2*dP
             init_2plus = totE(pp,args)                          #3
             der2 = (init_2plus[0]-init_plus[0])/dP
             final_Hess.append((der2-der1)/dP)
@@ -71,7 +71,7 @@ def Final_Result(P,*Args):
         init_plus = totE(pp,args)   #compute derivative     #2
         der1 = (init_plus[0]-init[0])/dP
         #compute Hessian to see if it is of correct sign
-        pp[i] = P[i] + dP
+        pp[i] = P[i] + 2*dP
         init_2plus = totE(pp,args)                          #3
         der2 = (init_2plus[0]-init_plus[0])/dP
         final_Hess.append((der2-der1)/dP)

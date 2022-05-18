@@ -14,8 +14,8 @@ print("File name for saving: ",csvfile)
 ansatze = inp.list_ans
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
-#Bnds = cf.FindBounds(Pinitial,ansatze)
-Bnds = cf.FindBounds2(J2,J3,ansatze)
+Bnds = cf.FindBounds(J2,J3,ansatze)
+#Bnds = cf.FindBoundsSmall(Pinitial,ansatze)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
 for ans in ansatze:
     Tti = t()
@@ -24,15 +24,15 @@ for ans in ansatze:
     Pi = Pinitial[ans]
     bnds = Bnds[ans]
     der_range = DerRange[ans]
-    Args1 = (inp.J1,J2,J3,ans,der_range,True)
+    Args = (inp.J1,J2,J3,ans,der_range)
     DataDic = {}
     HessDic = {}
     print("Initial point and bounds: \n",Pi,'\n',bnds)
     result = d_e(cf.Sigma,
-        args = Args1,
+        args = Args,
         x0 = Pi,
         bounds = bnds,
-        popsize = 15,
+        popsize = inp.mp_cpu*2,
         maxiter = inp.MaxIter*len(Pi),
         disp = False,
         tol = 1e-7,#inp.cutoff,
@@ -42,8 +42,12 @@ for ans in ansatze:
         )
     print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter*len(Pi),'\n')
     Pf = tuple(result.x)
-    Args2 = (inp.J1,J2,J3,ans,der_range,False)
-    S, HessVals, E, L, gap = cf.Sigma(Pf,*Args2)
+    try:
+        S, HessVals, E, L, gap = cf.Final_Result(Pf,*Args)
+    except TypeError:
+        print("Not saving, there was some mistake")
+        print("Found values: Pf=",Pf,"\nSigma = ",result.fun)
+        continue
     #Add 0 values
     newP = cf.arangeP(Pf,ans,J2,J3)
     data = [ans,J2,J3,E,S,gap,L]

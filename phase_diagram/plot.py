@@ -11,8 +11,8 @@ Color = {'3x3': ['b','orange'],
          'cb1':  ['m','g'],
          'cb2': 'k'}
 N = str(int(sys.argv[1]))
-#dirname = '../Data/noDMbig/Data_13-13/'; title = 'Without DM interactions'
-dirname = '../Data/yesDMbig/Data_13-13/'; title = 'With DM interactions'
+dirname = '../Data/noDMbig/Data_13-13/'; title = 'Without DM interactions'
+#dirname = '../Data/yesDMbig/Data_13-13/'; title = 'With DM interactions'
 #dirname = '../Data/yesDMbig/Data_'+N+'-'+N+'/'; title = 'With DM interactions'
 #dirname = '../Data/noDMbig/Data_'+N+'-'+N+'/'; title = 'Without DM interactions'
 #dirname = '../Data/yesDMbig/Data_'+sys.argv[1]+'/'
@@ -20,6 +20,7 @@ dirname = '../Data/yesDMbig/Data_13-13/'; title = 'With DM interactions'
 #dirname = '../Data/yesDMbig/Data_'+sys.argv[1]+'N/'
 minE = []
 ct = {'3x3':10, 'q0':10,'cb1':10}
+ct2 = 1e-7
 E = {'3x3':[],
      'q0' :[],
      'cb1':[]
@@ -59,10 +60,35 @@ if cn == 0 or cn == 2:
         J2 = np.linspace(Ji,Jf,9)
         J3 = np.linspace(Ji,Jf,9)
         X,Y = np.meshgrid(J2,J3)
-        Z = np.sin(np.sqrt(X**2+Y**2))
         n = int(100 + len(list_ans)*10 +a+1)
         ax = fig.add_subplot(n,projection='3d')
         ax.plot_surface(X,Y,gaps[ans].T,cmap=cm.coolwarm)
+        ax.set_title(ans)
+        ax.set_xlabel("J2")
+        ax.set_ylabel("J3")
+    plt.show()
+if cn == 0 or cn == 2:
+    ener = {}
+    Ji = -0.3
+    Jf = 0.3
+    fig = plt.figure(figsize=(16,16))
+    tt = title + ': energy landscape'
+    plt.title(tt)
+    plt.axis('off')
+    for a,ans in enumerate(list_ans):
+        ener[ans] = np.full((9,9), -0.5)
+        for j2 in range(len(E[ans])):
+            J2 = E[ans][j2][1] - Ji
+            i2 = int(J2*8/(0.6))
+            J3 = E[ans][j2][2] - Ji
+            i3 = int(J3*8/(0.6))
+            ener[ans][i2,i3] = E[ans][j2][3]
+        J2 = np.linspace(Ji,Jf,9)
+        J3 = np.linspace(Ji,Jf,9)
+        X,Y = np.meshgrid(J2,J3)
+        n = int(100 + len(list_ans)*10 +a+1)
+        ax = fig.add_subplot(n,projection='3d')
+        ax.plot_surface(X,Y,ener[ans].T,cmap=cm.coolwarm)
         ax.set_title(ans)
         ax.set_xlabel("J2")
         ax.set_ylabel("J3")
@@ -79,7 +105,7 @@ for p in range(pts):
     J2 = float(minE[p][1])
     J3 = float(minE[p][2])
     conv = '^'
-    if float(minE[p][4]) < 1e-8:# and float(minE[p][6]) > 0.5:
+    if float(minE[p][4]) < ct2:# and float(minE[p][6]) > 0.5:
         conv = 'o'
     if float(minE[p][5]) < ct[minE[p][0]]:
         col = Color[minE[p][0]][0]
@@ -97,7 +123,7 @@ for ind,i in enumerate(['3x3', 'q0', 'cb1']):
         J2 = float(E[i][p][1])
         J3 = float(E[i][p][2])
         try:
-            if float(E[i][p][4]) < 1e-8:
+            if float(E[i][p][4]) < ct2:
                 conv = 'o'
             if float(E[i][p][5]) < ct[E[i][p][0]]:
                 col = Color[E[i][p][0]][0]
