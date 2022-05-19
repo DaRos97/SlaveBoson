@@ -50,7 +50,6 @@ def Sigma(P,*Args):
             else:
                 return inp.shame3
     res = np.array(temp).sum()
-    print(res,P)
     return res
 ####
 def Final_Result(P,*Args):
@@ -270,15 +269,6 @@ def FindBounds(J2,J3,ansatze):
             B[ans] = B[ans] + (inp.bounds[ans]['phiA1'],)      #phiB1
         if ans == 'cb2':
             B[ans] = B[ans] + (inp.bounds[ans]['phiB1'],)      #phiB1
-    return B
-
-def FindBoundsSmall(Pi,ansatze):
-    B = {}
-    for ans in ansatze:
-        B[ans] = []
-        for P in Pi[ans]:
-            B[ans].append((P-0.1,P+0.1))
-        B[ans] = tuple(B[ans])
     return B
 
 #Compute the derivative ranges for the various parameters of the minimization

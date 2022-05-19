@@ -10,12 +10,11 @@ print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 print("File name for saving: ",csvfile)
-#ansatze = cf.CheckCsv(csvfile)
-ansatze = inp.list_ans
+ansatze = cf.CheckCsv(csvfile)
+#ansatze = inp.list_ans
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
 Bnds = cf.FindBounds(J2,J3,ansatze)
-#Bnds = cf.FindBoundsSmall(Pinitial,ansatze)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
 for ans in ansatze:
     Tti = t()
@@ -35,8 +34,8 @@ for ans in ansatze:
         popsize = 16,#inp.mp_cpu*2,
         maxiter = inp.MaxIter*len(Pi),
         disp = True,
-        tol = 1e-7,#inp.cutoff,
-        atol = 1e-7,#inp.cutoff,
+        tol = inp.cutoff,
+        atol = inp.cutoff,
         updating='deferred' if inp.mp_cpu != 1 else 'immediate',
         workers = inp.mp_cpu     #parallelization
         )

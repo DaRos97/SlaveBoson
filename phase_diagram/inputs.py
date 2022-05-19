@@ -9,17 +9,17 @@ DM3 = 0#2/3*np.pi
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 4
-list_ans = ['cb2']#,'3x3','q0']#,'0-pi','cb2']#,'octa']
-#DirName = '/home/users/r/rossid/Data/noDM/'
-DirName = '../Data/test/'
-DataDir = DirName + 'Data_'+str(Nx)+'-'+str(Ny)+'/'
-ReferenceDir = 'none'#DirName + 'Data_12-12/'
+mp_cpu = 8
+list_ans = ['cb1','3x3','q0']#,'0-pi','cb2']#,'octa']
+DirName = '/home/users/r/rossid/Data/noDM/'
+#DirName = '../Data/test/'
+DataDir = DirName + 'Data_'+str(Nx)+'-'+str(Ny)+'_17/'
+ReferenceDir = DirName + 'Data_13-13/'
 #derivative
 der_par = 1e-6
 der_phi = 1e-5
-der_lim = 1e-1  #limit under which compute the Hessian for that parameter
-cutoff = 1e-10   ############      #accettable value of Sigma to accept result as converged
+der_lim = 0.5  #limit under which compute the Hessian for that parameter
+cutoff = 1e-8   ############      #accettable value of Sigma to accept result as converged
 MaxIter = 200
 prec_L = 1e-10       #precision required in L maximization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
@@ -30,7 +30,7 @@ z = (4,4,2)
 #small
 #J2i = -0.02; J2f = 0.03; J3i = -0.04; J3f = 0.01; Jpts = 11
 #big
-J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 9
+J2i = -0.3; J2f = 0.3; J3i = -0.3; J3f = 0.3; Jpts = 17
 J= []
 for i in range(Jpts):
     for j in range(Jpts):
@@ -54,22 +54,22 @@ Pi = {  '3x3':{'A1':0.51706, 'A3':0.1, 'B1':0.17790, 'B2': 0.15, 'B3': 0.15},
         'cb2':{'A1':0.5, 'A2':0.0, 'A3':0.0, 'B1':0.0, 'B2': 0.0, 'phiB1':np.pi}
         }
 #bounds
-bounds = {  '3x3':{ 'A1':(0.4,0.6),
-                    'A3':(0,1),
-                    'B1':(0,0.5),
-                    'B2':(0,0.5),
-                    'B3':(0,0.5)},
-            'q0': { 'A1':(0.4,0.6),
-                    'A2':(0,1),
-                    'B1':(0,0.5),
-                    'B2':(0,0.5),
-                    'B3':(0,0.5)},
-            'cb1':{ 'A1':(0.4,0.6),
-                    'A2':(0,1),
-                    'A3':(0,1),
-                    'B1':(0,0.5),
-                    'B2':(0,0.5),
-                    'phiA1':(0,2*np.pi)},
+bounds = {  '3x3':{ 'A1':(0.48,0.53),
+                    'A3':(0,0.45),
+                    'B1':(0.11,0.23),
+                    'B2':(0.1,0.45),
+                    'B3':(0,0.2)},
+            'q0': { 'A1':(0.48,0.53),
+                    'A2':(0.08,0.45),
+                    'B1':(0.12,0.25),
+                    'B2':(0.13,0.22),
+                    'B3':(0.1,0.45)},
+            'cb1':{ 'A1':(0.49,0.53),
+                    'A2':(0,0.1),
+                    'A3':(0.1,0.5),
+                    'B1':(0.13,0.22),
+                    'B2':(0,0.25),
+                    'phiA1':(1.5,2.3)},
             'cb2':{ 'A1':(-1,1),
                     'A2':(-1,1),
                     'A3':(-1,1),
