@@ -10,7 +10,7 @@ Color = {'3x3': ['b','orange'],
          '0-pi': 'y',
          'cb1':  ['m','g'],
          'cb2': ['k','purple']}
-dirname = '../Data/noDM/Data_13-13/'; title = 'Without DM interactions'
+dirname = '../Data/noDM/Data_13-13_old/'; title = 'Without DM interactions'
 #dirname = '../Data/yesDM/Data_13-13/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
     ans = sys.argv[1]
@@ -50,7 +50,7 @@ for filename in os.listdir(dirname):
 
 nP = len(head)
 fig = plt.figure(figsize=(16,16))
-#plt.title(title)
+plt.title(title)
 plt.axis('off')
 for i in range(nP):
     n = int(330+i+1)
