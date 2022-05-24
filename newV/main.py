@@ -15,7 +15,6 @@ print("File name for saving: ",csvfile)
 #ansatze = inp.list_ans
 ANS = int(sys.argv[1])//5
 ansatze = [inp.list_ans[ANS]]
-print('Ansatze: ',ansatze)
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
 Bnds = cf.FindBounds(J2,J3,ansatze)
@@ -38,7 +37,7 @@ for ans in ansatze:
             bounds = bnds,
             popsize = 16,#inp.mp_cpu*2,
             maxiter = inp.MaxIter*len(Pi),
-            disp = True,
+            #disp = True,
             tol = inp.cutoff,
             atol = inp.cutoff,
             updating='deferred' if inp.mp_cpu != 1 else 'immediate',
