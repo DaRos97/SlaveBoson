@@ -10,8 +10,8 @@ Color = {'3x3': ['b','orange'],
          '0-pi': 'y',
          'cb1':  ['m','g'],
          'cb2': 'k'}
-dirname = '../Data/noDM/Data_13-13_2/'; title = 'Without DM interactions'
-#dirname = '../Data/yesDM/Data_13-13_new/'; title = 'With DM interactions'
+#dirname = '../Data/noDM/Data_13-13_17/'; title = 'Without DM interactions'
+dirname = '../Data/yesDM/Data_13-13_aaaa/'; title = 'With DM interactions'
 minE = []
 ct = {'3x3':10, 'q0':10,'cb1':10}
 ct2 = 1e-7
