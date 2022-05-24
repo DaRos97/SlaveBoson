@@ -25,62 +25,125 @@ def Nk(P,L,args):
     j3 = np.sign(int(np.abs(J3)*1e8))
     A1 = P[0]
     #params
-    if ans == '3x3':
+    if ans == '3x3_1':
+        A2 = 0;     phiA2 = 0;    phiA2p = 0;
+        A3 = j3*P[1*j3]
+        B1 = P[2*j3]*j3 + P[1]*(1-j3)
+        B2 = P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2
+        B3 = P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2)
+        phiA3 = P[-1]*j3
+        phiA1p = np.pi
+        phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, np.pi)
+        p1 = 0
+    elif ans == '3x3_2':
         A2 = 0;     phiA2 = 0;    phiA2p = 0;
         A3 = j3*P[1]
         B1 = P[2*j3]*j3 + P[1]*(1-j3)
         B2 = P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2
         B3 = P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2)
-        phiA1p, phiA3 = (np.pi, 0)
-        phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, np.pi)
+        phiB1 = P[-2]*j2 + P[-1]*(1-j2)
+        phiB2 = P[-1]*j2
+        phiA1p, phiA3 = (np.pi, np.pi)
+        phiB1p, phiB2p, phiB3 = (phiB1, phiB2, np.pi)
         p1 = 0
-    elif ans == 'q0':
+    elif ans == '3x3_3':
+        A2 = 0;     phiA2 = 0;    phiA2p = 0;
+        A3 = j3*P[1]
+        B1 = P[2*j3]*j3 + P[1]*(1-j3)
+        B2 = P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2
+        B3 = P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2)
+        phiB1 = P[-2]*j3 + P[-1]*(1-j3)
+        phiB3 = P[-1]*j3
+        phiA1p, phiA3 = (np.pi, np.pi)
+        phiB1p, phiB2, phiB2p = ( -phiB1, 0, 0)
+        p1 = 0
+    elif ans == '3x3_4':
+        A2 = 0;     phiA2 = 0;    phiA2p = 0;
+        A3 = j3*P[1]
+        B1 = P[2*j3]*j3 + P[1]*(1-j3)
+        B2 = P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2
+        B3 = P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2)
+        phiA1p = P[-2]*j2 + P[-1]*(1-j2)
+        phiB2 = P[-1]*j2
+        phiA3 = (phiA1p+np.pi)/2
+        phiB1, phiB1p, phiB2p, phiB3 = (np.pi, np.pi, -phiB2, np.pi)
+        p1 = 0
+    elif ans == 'q0_1':
+        A3 = 0; phiA3 = 0
         A2 = P[1]*j2
-        A3 = 0.
         B1 = P[2*j2]*j2+P[1]*(1-j2)
         B2 = P[3*j2]*j2
         B3 = P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2)
-        phiA1p, phiA2, phiA2p, phiA3 = (0, np.pi, np.pi, 0)
+        phiA2 = P[-1]*j2
+        phiA1p, phiA2p = (0, phiA2)
         phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, np.pi, np.pi, 0)
         p1 = 0
-    elif ans == '0-pi':      #A1,A2,A3,B1,B2,phiA1p,phiB2
-        A2 = P[1*j2]*j2
-        A3 = P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2)
-        B1 = P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3)
-        B2 = P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3)
-        B3 = 0
-        phiA1p, phiA2, phiA2p, phiA3 = (0, np.pi, np.pi, np.pi)
-        phiB1, phiB1p, phiB2, phiB2p, phiB3 = ( np.pi, np.pi, np.pi, np.pi, 0)
-        p1 = 1
+    elif ans == 'q0_2':
+        A3 = 0; phiA3 = 0
+        A2 = P[1]*j2
+        B1 = P[2*j2]*j2+P[1]*(1-j2)
+        B2 = P[3*j2]*j2
+        B3 = P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2)
+        phiB1 = P[-2]*j2 + P[-1]*(1-j2)
+        phiB2 = P[-1]*j2
+        phiA1p, phiA2, phiA2p = (0, np.pi, np.pi)
+        phiB1p, phiB2p, phiB3 = (phiB1, phiB2, 0)
+        p1 = 0
+    elif ans == 'q0_3':
+        A3 = 0; phiA3 = 0
+        A2 = P[1]*j2
+        B1 = P[2*j2]*j2+P[1]*(1-j2)
+        B2 = P[3*j2]*j2
+        B3 = P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2)
+        phiB1 = P[-3*j2*j3]*j2*j3 + P[-2]*(1-j2)*j3 + P[-2]*j2*(1-j3) + P[-1]*(1-j2)*(1-j3)
+        phiA2 = P[-2]*j2*j3 + P[-1]*j2*(1-j3)
+        phiB3 = P[-1]*j3
+        phiA1p, phiA2p = (0, -phiA2)
+        phiB1p, phiB2, phiB2p = (-phiB1, np.pi, np.pi)
+        p1 = 0
+    elif ans == 'q0_4':
+        A3 = 0; phiA3 = 0
+        A2 = P[1]*j2
+        B1 = P[2*j2]*j2+P[1]*(1-j2)
+        B2 = P[3*j2]*j2
+        B3 = P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2)
+        phiA1p = P[-2]*j2 + P[-1]*(1-j2)
+        phiB2 = P[-1]*j2
+        phiA2, phiA2p = (phiA1p/2+np.pi, phiA1p/2+np.pi)
+        phiB1, phiB1p, phiB2p, phiB3 = (np.pi, np.pi, -phiB2, 0)
+        p1 = 0
     elif ans == 'cb1':      #A1,A2,A3,B1,B2,phiA1p,phiB2
+        B3 = 0; phiB3 = 0
         A2 = P[1*j2]*j2
         A3 = P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2)
         B1 = P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3)
         B2 = P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3)
-        B3 = 0
-        phiA1p = P[-1]
-        phiA2, phiA2p, phiA3 = (-phiA1p/2,-phiA1p/2,phiA1p/2)
-        phiB1, phiB1p, phiB2, phiB2p, phiB3 = (np.pi, np.pi, 0, 0, 0)
+        phiA1p = P[-2]*j2 + P[-1]*(1-j2)
+        phiB2 = P[-1]*j2
+        phiA2, phiA2p, phiA3 = (np.pi+phiA1p/2,np.pi+phiA1p/2,phiA1p/2)
+        phiB1, phiB1p, phiB2p= (np.pi, np.pi, -phiB2)
         p1 = 1
     elif ans == 'cb2':      #A1,A2,A3,B1,B2,phiA1p,phiB2
+        B3 = 0; phiB3 = 0
         A2 = P[1*j2]*j2
         A3 = P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2)
         B1 = P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3)
         B2 = P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3)
-        B3 = 0
-        phiB1 = P[-1]
-        phiA1p, phiA2, phiA2p, phiA3 = (0, np.pi, -np.pi, np.pi)        #all can be either 0 or pi except phiA1p
-        phiB1p, phiB2, phiB2p, phiB3 = (-phiB1, np.pi, np.pi, 0)
+        phiB1 = P[-2]*j2 + P[-1]*(1-j2)
+        phiA2 = P[-1]*j2
+        phiA1p, phiA2p, phiA3 = (0, -phiA2, 0)        #all can be either 0 or pi except phiA1p
+        phiB1p, phiB2, phiB2p = (-phiB1, 0, 0)
         p1 = 1
-    elif ans == 'octa':      #A1,A2,A3,B1,B2,phiA1p,phiB2
+    elif ans == 'oct':      #A1,A2,A3,B1,B2,phiA1p,phiB2
+        A3 = 0; phiA3 = 0
         A2 = P[1*j2]*j2
-        A3 = 0
         B1 = P[2*j2]*j2 + P[1*(1-j2)]*(1-j2)
         B2 = P[3*j2]*j2
         B3 = P[4*j2*j3]*j2*j3 + P[2*j3*(1-j2)]*j3*(1-j2)
-        phiB1 = P[-1]
-        phiA1p, phiA2, phiA2p, phiA3 = (np.pi, -np.pi/2, np.pi/2, 0)        #all can be either 0 or pi except phiA1p
-        phiB1p, phiB2, phiB2p, phiB3 = (phiB1, 0, 0, -np.pi/2)
+        phiB1 = P[-2]*j2 + P[-1]*(1-j2)
+        phiB2 = P[-1]*j2
+        phiA1p, phiA2, phiA2p = (np.pi, -np.pi/2, np.pi/2)        #all can be either 0 or pi except phiA1p
+        phiB1p, phiB2p, phiB3 = (phiB1, phiB2, -np.pi/2)
         p1 = 1
     ################
     N = np.zeros((2*m,2*m,inp.Nx,inp.Ny), dtype=complex)

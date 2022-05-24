@@ -25,11 +25,11 @@ def Sigma(P,*Args):
     j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
     j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
     args = (J1,J2,J3,ans)
-    pars = inp.Pi[ans].keys()
-    pars2 = []
-    for pPp in pars:
+    pars2 = inp.Pi[ans].keys()
+    pars = []
+    for pPp in pars2:
         if (pPp[-1] == '1') or (pPp[-1] == '2' and j2-1) or (pPp[-1] == '3' and j3-1):
-            pars2.append(pPp)
+            pars.append(pPp)
     init = totE(P,args)         #check initial point        #1
     if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
         return inp.shame2
@@ -59,7 +59,6 @@ def Sigma(P,*Args):
                     sign = -1
                 else:
                     sign = 1
-#            sign = inp.HS[ans][j2][j3][i]
             if sign == hess:
                 temp.append(der1**2)     #add it to the sum
             else:
@@ -72,11 +71,11 @@ def Final_Result(P,*Args):
     j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
     j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
     args = (J1,J2,J3,ans)
-    pars = inp.Pi[ans].keys()
-    pars2 = []
-    for pPp in pars:
+    pars2 = inp.Pi[ans].keys()
+    pars = []
+    for pPp in pars2:
         if (pPp[-1] == '1') or (pPp[-1] == '2' and j2-1) or (pPp[-1] == '3' and j3-1):
-            pars2.append(pPp)
+            pars.append(pPp)
     init = totE(P,args)         #check initial point        #1
     if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
         print("Not good initial point: ",init[2][0],init[1])
@@ -188,10 +187,10 @@ def totEl(P,L,args):
     n = 0
     Pp = np.zeros(6)
     Pp[0] = P[n]
-    if ans in list_A2 and j2:
+    if ans in inp.list_A2 and j2:
         n += 1
         Pp[1] = P[n]
-    if ans in list_A3 and j3:
+    if ans in inp.list_A3 and j3:
         n += 1
         Pp[2] = P[n]
     n += 1
@@ -199,7 +198,7 @@ def totEl(P,L,args):
     if j2:
         n += 1
         Pp[4] = P[n] #B2
-    if ans in list_B3 and j3:
+    if ans in inp.list_B3 and j3:
         n += 1
         Pp[5] = P[n]
     for i in range(3):
@@ -305,46 +304,74 @@ def ComputeDerRanges(J2,J3,ansatze):
         if j3 and ans in inp.list_B3:
             Npar +=1
         R[ans] = [inp.der_par for i in range(Npar)]
-        for n in inp.num_phi[ans]:
+        for n in range(inp.num_phi[ans]):
             R[ans].append(inp.der_phi)
     return R
 #From the list of parameters obtained after the minimization constructs an array containing them and eventually 
 #some 0 parameters which may be omitted because j2 or j3 are equal to 0.
-def arangeP(P,ans,J2,J3):
+def FormatParams(P,ans,J2,J3):
     j2 = np.sign(int(np.abs(J2)*1e8))
     j3 = np.sign(int(np.abs(J3)*1e8))
     newP = [P[0]]
-    if ans == '3x3':
+    if ans == '3x3_1':
         newP.append(P[1]*j3)
         newP.append(P[2*j3]*j3+P[1]*(1-j3))
         newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
         newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
-    elif ans == 'q0':
-        newP.append(P[1]*j2)
-        newP.append(P[2*j2]*j2+P[1]*(1-j2))
-        newP.append(P[3*j2]*j2)
-        newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
-    elif ans == '0-pi':
-        newP.append(P[1*j2]*j2)
-        newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
-        newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
-        newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
+        newP.append(P[-1]*j3)
+    elif ans == '3x3_2' or ans =='3x3_4':
+        newP.append(P[1]*j3)
+        newP.append(P[2*j3]*j3+P[1]*(1-j3))
+        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[-2]*j2+P[-1]*(1-j2))
+        newP.append(P[-1]*j2)
+    elif ans == '3x3_3':
+        newP.append(P[1]*j3)
+        newP.append(P[2*j3]*j3+P[1]*(1-j3))
+        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[-2]*j3+P[-1]*(1-j3))
+        newP.append(P[-1]*j3)
+    elif ans == 'q0_1':
+        newP.append(P[1]*j3)
+        newP.append(P[2*j3]*j3+P[1]*(1-j3))
+        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[-1]*j2)
+    elif ans == 'q0_2' or ans == 'q0_4':
+        newP.append(P[1]*j3)
+        newP.append(P[2*j3]*j3+P[1]*(1-j3))
+        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[-2]*j2+P[-1]*(1-j2))
+        newP.append(P[-1]*j2)
+    elif ans == 'q0_3':
+        newP.append(P[1]*j3)
+        newP.append(P[2*j3]*j3+P[1]*(1-j3))
+        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[-3*j2*j3]*j2*j3+P[-2]*j2*(1-j3)+P[-2]*(1-j2)*j3+P[-1]*(1-j2)*(1-j3))
+        newP.append(P[-2]*j2*j3+P[-1]*j2*(1-j3))
+        newP.append(P[-1]*j3)
     elif ans == 'cb1' or ans == 'cb2':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
         newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
-        newP.append(P[-1])
-    elif ans == 'octa':
+        newP.append(P[-2]*j2 + P[-1]*(1-j2))
+        newP.append(P[-1]*j2)
+    elif ans == 'oct':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j2]*j2 + P[1*(1-j2)]*(1-j2))
         newP.append(P[3*j2]*j2)
         newP.append(P[4*j3*j2]*j2*j3 + P[2*j3*(1-j2)]*j3*(1-j2))
-        newP.append(P[-1])
+        newP.append(P[-2]*j2 + P[-1]*(1-j2))
+        newP.append(P[-1]*j2)
     return tuple(newP)
 
 #Save the dictionaries in the file given, rewriting the already existing data if precision is better
-def SaveToCsv(Data,Hess,csvfile):
+def SaveToCsv(Data,csvfile):
     N_ = 0
     if Path(csvfile).is_file():
         with open(csvfile,'r') as f:
