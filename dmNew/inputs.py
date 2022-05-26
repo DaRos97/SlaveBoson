@@ -84,12 +84,15 @@ for ans in lAns:
             num_phi[ans] += 1
             bounds[ans][par] = (0,2*np.pi)
         elif par[0] == 'A':
-            bounds[ans][par] = (0,1)
+            if par[1] == '1':
+                bounds[ans][par] = (0.4,0.6)
+            else:
+                bounds[ans][par] = (0,1)
         elif par[0] == 'B':
             bounds[ans][par] = (0,0.5)
 L_bounds = (0.1,10)
 shame1 = -1
-shame2 = 5
+shame2 = 20
 shame3 = 10
 
 min_S = 10

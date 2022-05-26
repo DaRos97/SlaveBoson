@@ -21,6 +21,7 @@ for i in range(inp.m):
 # Check also Hessians on the way --> more time (1 general + 2 energy evaluations for each P).
 # Calls only the totE func
 def Sigma(P,*Args):
+    print(P)
     J1,J2,J3,ans,der_range = Args
     j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
     j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
@@ -327,18 +328,18 @@ def FormatParams(P,ans,J2,J3):
         newP.append(P[-2]*j2*j3 + P[-1]*j2*(1-j3))
         newP.append(P[-1]*j3)
     elif ans == 'q0_1':
-        newP.append(P[1]*j3)
-        newP.append(P[2*j3]*j3+P[1]*(1-j3))
-        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
-        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[1]*j2)
+        newP.append(P[2*j2]*j2+P[1]*(1-j2))
+        newP.append(P[3*j2]*j2+P[2*(1-j2)]*(1-j2))
+        newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[-3*j2]*j2 + P[-1]*(1-j2))
         newP.append(P[-2]*j2)
         newP.append(P[-1]*j2)
     elif ans == 'q0_2':
-        newP.append(P[1]*j3)
-        newP.append(P[2*j3]*j3+P[1]*(1-j3))
-        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
-        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[1]*j2)
+        newP.append(P[2*j2]*j2+P[1]*(1-j2))
+        newP.append(P[3*j2]*j2+P[2*(1-j2)]*(1-j2))
+        newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[-5*j3*j2]*j3*j2 + P[-3*j3]*j3*(1-j2) + P[-4*j2]*j2*(1-j3) + P[-2]*(1-j2)*(1-j3))
         newP.append(P[-4*j3*j2]*j3*j2 + P[-2]*j3*(1-j2) + P[-3*j2]*j2*(1-j3) + P[-1]*(1-j2)*(1-j3))
         newP.append(P[-3*j2*j3]*j2*j3 + P[-2]*j2*(1-j3))
@@ -370,8 +371,8 @@ def SaveToCsv(Data,csvfile):
         D = init[i*2+1].split(',')
         if D[0] == ans:
             ac = True
-            if float(D[4]) > Data['Sigma']:
-                N_ = i+1
+            #if float(D[4]) > Data['Sigma']:
+            N_ = i+1
     ###
     header = inp.header[ans]
     if N_:
