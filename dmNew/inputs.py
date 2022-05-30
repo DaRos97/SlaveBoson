@@ -79,17 +79,25 @@ for ans in lAns:
         list_A3.append(ans)
     if 'B3' in lPar:
         list_B3.append(ans)
+    #bounds
     for par in lPar:
         if par[0:3] == 'phi':
             num_phi[ans] += 1
             bounds[ans][par] = (0,2*np.pi)
         elif par[0] == 'A':
             if par[1] == '1':
-                bounds[ans][par] = (0.4,0.6)
+                bounds[ans][par] = (0.45,0.55)
+            elif par[1] == '3' and (ans == '3x3_2' or ans == 'cb1'):
+                bounds[ans][par] = (-1,1)
             else:
                 bounds[ans][par] = (0,1)
         elif par[0] == 'B':
-            bounds[ans][par] = (0,0.5)
+            if par[1] == '1':
+                bounds[ans][par] = (0.1,0.3)
+            elif par[1] == '3' and (ans == '3x3_1' or ans == 'q0_1'):
+                bounds[ans][par] = (-0.5,0.5)
+            else:
+                bounds[ans][par] = (0,0.5)
 L_bounds = (0.1,10)
 shame1 = -1
 shame2 = 20
