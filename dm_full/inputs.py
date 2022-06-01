@@ -83,21 +83,28 @@ for ans in lAns:
     for par in lPar:
         if par[0:3] == 'phi':
             num_phi[ans] += 1
-            bounds[ans][par] = (0,2*np.pi)
+            if par[3:] == 'B1':
+                bounds[ans][par] = (np.pi-0.1,np.pi+0.1)
+            elif par[3:] == 'A1' and ans == 'cb1':
+                bounds[ans][par] = (0.5,5.5)
+            else:
+                bounds[ans][par] = (0,2*np.pi)
         elif par[0] == 'A':
             if par[1] == '1':
                 bounds[ans][par] = (0.45,0.55)
             elif par[1] == '3' and (ans == '3x3_2' or ans == 'cb1'):
                 bounds[ans][par] = (-1,1)
             else:
-                bounds[ans][par] = (0,1)
+                bounds[ans][par] = (0.01,1)
         elif par[0] == 'B':
             if par[1] == '1':
                 bounds[ans][par] = (0.05,0.3)
-            elif par[1] == '3' and (ans == '3x3_1' or ans == 'q0_1'):
-                bounds[ans][par] = (-0.5,0.5)
-            else:
+            elif par[1] == '2':
                 bounds[ans][par] = (0,0.5)
+            elif par[1] == '3' and (ans == '3x3_1' or ans == 'q0_1'):
+                bounds[ans][par] = (-0.5,0)
+            elif par[1] == '3':
+                bounds[ans][par] = (0.01,0.5)
 L_bounds = (0.3,2)
 shame2 = 5
 
