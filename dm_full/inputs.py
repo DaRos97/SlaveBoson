@@ -9,11 +9,11 @@ DM3 = 2/3*np.pi
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 16
+mp_cpu = 1#16
 list_ans = ['3x3_1','3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
-DirName = '/home/users/r/rossid/Data/yesDM/'
-#DirName = '../Data/test/'
-DataDir = DirName + 'Data_'+str(Nx)+'-'+str(Ny)+'_full/'
+#DirName = '/home/users/r/rossid/Data/yesDM/'
+DirName = '../Data/test/'
+DataDir = DirName# + 'Data_'+str(Nx)+'-'+str(Ny)+'_full/'
 ReferenceDir = 'none'#DirName + 'Data_13-13/'
 #derivative
 der_par = 1e-6
@@ -98,10 +98,8 @@ for ans in lAns:
                 bounds[ans][par] = (-0.5,0.5)
             else:
                 bounds[ans][par] = (0,0.5)
-L_bounds = (0.1,10)
-shame1 = -1
-shame2 = 20
-shame3 = 10
+L_bounds = (0.3,2)
+shame2 = 5
 
 min_S = 10
 

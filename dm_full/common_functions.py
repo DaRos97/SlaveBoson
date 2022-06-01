@@ -8,6 +8,7 @@ from pathlib import Path
 import csv
 from time import time as t
 import os
+from colorama import Fore
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -21,7 +22,7 @@ for i in range(inp.m):
 # Check also Hessians on the way --> more time (1 general + 2 energy evaluations for each P).
 # Calls only the totE func
 def Sigma(P,*Args):
-    print(P)
+    _T = t()
     J1,J2,J3,ans,der_range = Args
     j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
     j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
@@ -32,39 +33,39 @@ def Sigma(P,*Args):
         if (pPp[-1] == '1') or (pPp[-1] == '2' and j2-1) or (pPp[-1] == '3' and j3-1):
             pars.append(pPp)
     init = totE(P,args)         #check initial point        #1
-    if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
-        return inp.shame2
+    if init[2][0] < 0 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
+        return np.abs(init[2][0])+inp.shame2
     temp = []
     final_Hess = []
     for i in range(len(P)): #for each parameter
         pp = np.array(P)
         dP = der_range[i]
         pp[i] = P[i] + dP
+        _T3 = t()
         init_plus = totE(pp,args)   #compute derivative     #2
         der1 = (init_plus[0]-init[0])/dP
-        if np.abs(der1) > inp.der_lim:
-            temp.append(der1**2)
+        pp[i] = P[i] + 2*dP
+        init_2plus = totE(pp,args)                          #3
+        der2 = (init_2plus[0]-init_plus[0])/dP
+        final_Hess.append((der2-der1)/dP)
+        hess = int(np.sign(final_Hess[-1]))    #order is important!!
+        if pars[i][-2] == 'A':
+            if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
+                sign = 1
+            else:
+                sign = -1
         else:
-            pp[i] = P[i] + 2*dP
-            init_2plus = totE(pp,args)                          #3
-            der2 = (init_2plus[0]-init_plus[0])/dP
-            final_Hess.append((der2-der1)/dP)
-            hess = int(np.sign(final_Hess[-1]))    #order is important!!
-            if pars[i][-2] == 'A':
-                if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
-                    sign = 1
-                else:
-                    sign = -1
+            if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
+                sign = -1
             else:
-                if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
-                    sign = -1
-                else:
-                    sign = 1
-            if sign == hess:
-                temp.append(der1**2)     #add it to the sum
-            else:
-                return inp.shame3
+                sign = 1
+        if sign == hess:
+            temp.append(der1**2)     #add it to the sum
+        else:
+            temp.append(1/der1)
     res = np.array(temp).sum()
+    print(t()-_T,res)
+    input()
     return res
 ####
 def Final_Result(P,*Args):
@@ -119,6 +120,7 @@ def Final_Result(P,*Args):
 
 #### Computes the part of the energy given by the Bogoliubov eigen-modes
 def sumEigs(P,L,args):
+    _T = t()
     J1,J2,J3,ans = args
     Args = (J1,J2,J3,ans)
     N = an.Nk(P,L,Args) #compute Hermitian matrix
@@ -129,16 +131,19 @@ def sumEigs(P,L,args):
             try:
                 K = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
             except LA.LinAlgError:      #matrix not pos def for that specific kx,ky
-                return inp.shame1, 10      #if that's the case even for a single k in the grid, return a defined value
+                res = np.amin(np.real(LA.eigvals(np.dot(J,Nk)).ravel()))
+                return res, 10      #if that's the case even for a single k in the grid, return a defined value
             temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
-            res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:inp.m])    #only diagonalization
-    r2 = 0
-    for i in range(inp.m):
-        func = RBS(inp.kxg,inp.kyg,res[i])
-        r2 += func.integral(0,1,0,1)
-    r2 /= inp.m
+            res[:,i,j] = np.sort(np.abs(LA.eigvalsh(temp)[:inp.m]))    #only diagonalization
+    r1 = res.ravel().sum()/(inp.m*inp.Nx*inp.Ny)
     gap = np.amin(res[0].ravel())
-    return r2, gap
+    #r2 = 0
+    #for i in range(inp.m):
+    #    func = RBS(inp.kxg,inp.kyg,res[i])
+    #    r2 += func.integral(0,1,0,1)
+    #r2 /= inp.m
+    #gap = np.amin(res[0].ravel())
+    return r1, gap
     if False:
         #plot
         print("P: ",P,"\nL:",L,"\ngap:",gap)
@@ -176,6 +181,7 @@ def totE(P,args):
 
 #### Computes the Energy given the paramters P and the Lagrange multiplier L
 def totEl(P,L,args):
+    _T = t()
     J1,J2,J3,ans = args
     J = (J1,J2,J3)
     j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or 1 --> problem for VERY small J2,J3 points

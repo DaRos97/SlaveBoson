@@ -4,6 +4,7 @@ import common_functions as cf
 from time import time as t
 from scipy.optimize import differential_evolution as d_e
 import sys
+from colorama import Fore
 ####### inputs
 li = [4,36,40,44,76]
 N = int(sys.argv[1])
@@ -23,20 +24,16 @@ for ans in ansatze:
     Tti = t()
     print("Using ansatz: ",ans)
     header = inp.header[ans]
-    Pi = Pinitial[ans]
-    bnds = Bnds[ans]
-    der_range = DerRange[ans]
-    Args = (inp.J1,J2,J3,ans,der_range)
+    Args = (inp.J1,J2,J3,ans,DerRange[ans])
     DataDic = {}
-    HessDic = {}
-    print("Initial point and bounds: \n",Pi,'\n',bnds)
+    print("Initial point and bounds: \n",Pinitial[ans],'\n',Bnds[ans])
     #
     result = d_e(cf.Sigma,
         args = Args,
-        x0 = Pi,
-        bounds = bnds,
+        x0 = Pinitial[ans],
+        bounds = Bnds[ans],
         popsize = 16,#inp.mp_cpu*2,
-        maxiter = inp.MaxIter*len(Pi),
+        maxiter = inp.MaxIter*len(Pinitial[ans]),
 #        disp = True,
         tol = inp.cutoff,
         atol = inp.cutoff,
@@ -50,6 +47,7 @@ for ans in ansatze:
     except TypeError:
         print("Not saving, there was some mistake")
         print("Found values: Pf=",Pf,"\nSigma = ",result.fun)
+        print("Time of ans",ans,": ",'{:5.2f}'.format((t()-Tti)/60),' minutes\n')              ################
         continue
     #Add 0 values
     newP = cf.FormatParams(Pf,ans,J2,J3)
