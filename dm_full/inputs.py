@@ -93,7 +93,7 @@ for ans in lAns:
                 bounds[ans][par] = (0,1)
         elif par[0] == 'B':
             if par[1] == '1':
-                bounds[ans][par] = (0.1,0.3)
+                bounds[ans][par] = (0.05,0.3)
             elif par[1] == '3' and (ans == '3x3_1' or ans == 'q0_1'):
                 bounds[ans][par] = (-0.5,0.5)
             else:
