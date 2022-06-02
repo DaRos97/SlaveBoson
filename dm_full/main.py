@@ -32,7 +32,7 @@ for ans in ansatze:
         args = Args,
         x0 = Pinitial[ans],
         bounds = Bnds[ans],
-        popsize = 16,#inp.mp_cpu*2,
+        popsize = 20,#inp.mp_cpu*2,
         maxiter = inp.MaxIter*len(Pinitial[ans]),
 #        disp = True,
         tol = inp.cutoff,
@@ -40,7 +40,7 @@ for ans in ansatze:
         updating='deferred' if inp.mp_cpu != 1 else 'immediate',
         workers = inp.mp_cpu     #parallelization
         )
-    print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter*len(Pi),'\n')
+    print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter*len(Pinitial[ans]),'\n')
     Pf = tuple(result.x)
     try:
         S, HessVals, E, L, gap = cf.Final_Result(Pf,*Args)

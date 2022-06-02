@@ -9,16 +9,16 @@ DM3 = 2/3*np.pi
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 1#16
+mp_cpu = 32
 list_ans = ['3x3_1','3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
-#DirName = '/home/users/r/rossid/Data/yesDM/'
-DirName = '../Data/test/'
-DataDir = DirName# + 'Data_'+str(Nx)+'-'+str(Ny)+'_full/'
+DirName = '/home/users/r/rossid/Data/yesDM/'
+#DirName = '../Data/test/'
+DataDir = DirName + 'Data_'+str(Nx)+'-'+str(Ny)+'_full2/'
 ReferenceDir = 'none'#DirName + 'Data_13-13/'
 #derivative
 der_par = 1e-6
 der_phi = 1e-5
-der_lim = 1e-1  #limit under which compute the Hessian for that parameter
+der_lim = 1  #limit under which compute the Hessian for that parameter
 cutoff = 1e-8   ############      #accettable value of Sigma to accept result as converged
 MaxIter = 200
 prec_L = 1e-10       #precision required in L maximization
@@ -39,13 +39,13 @@ for i in range(Jpts):
 kxg = np.linspace(0,1,Nx)
 kyg = np.linspace(0,1,Ny)
 kkg = np.ndarray((2,Nx,Ny),dtype=complex)
-kkgp = np.ndarray((2,Nx,Ny))
+#kkgp = np.ndarray((2,Nx,Ny))
 for i in range(Nx):
     for j in range(Ny):
         kkg[0,i,j] = kxg[i]*2*np.pi
         kkg[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
-        kkgp[0,i,j] = kxg[i]*2*np.pi
-        kkgp[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
+        #kkgp[0,i,j] = kxg[i]*2*np.pi
+        #kkgp[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
 #initial point
 header = {'3x3_1':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1','B2','B3','phiB1','phiB2','phiA3'],  #3x3
           '3x3_2':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1','B2','B3','phiA1','phiB1','phiB2','phiB3'],  #3x3
@@ -55,8 +55,8 @@ header = {'3x3_1':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1'
           'cb2':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiB1','phiA2'],  #cuboc2
           'oct':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiB2']}  #octahedral
 t_0 = np.arctan(np.sqrt(2))
-Pi = {  '3x3_1':{'A1':0.51, 'A3':0.17, 'B1':0.17, 'B2': 0.41, 'B3': 0.12, 'phiB1': np.pi, 'phiB2': 0, 'phiA3': np.pi},
-        '3x3_2':{'A1':0.51, 'A3':0.17, 'B1':0.17, 'B2': 0.41, 'B3': 0.12, 'phiA1': np.pi, 'phiB1': np.pi, 'phiB2': 0, 'phiB3': np.pi},
+Pi = {  '3x3_1':{'A1':0.51, 'A3':0.17, 'B1':0.17, 'B2': 0.41, 'B3': -0.12, 'phiB1': np.pi, 'phiB2': 0, 'phiA3': np.pi},
+        '3x3_2':{'A1':0.51, 'A3':0.17, 'B1':0.17, 'B2': 0.41, 'B3': -0.12, 'phiA1': np.pi, 'phiB1': np.pi, 'phiB2': 0, 'phiB3': np.pi},
         'q0_1':{'A1':0.51, 'A2':0.13, 'B1':0.18, 'B2': 0.18, 'B3': 0.15, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi},
         'q0_2':{'A1':0.51, 'A2':0.13, 'B1':0.18, 'B2': 0.18, 'B3': 0.15, 'phiA1': 0, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi, 'phiB3': 0},
         'cb1':{'A1':0.51, 'A2':0.05, 'A3':0.43, 'B1':0.17, 'B2': 0.17, 'phiA1': 2*t_0, 'phiB1': np.pi, 'phiA2': np.pi+t_0, 'phiB2': t_0},
@@ -100,7 +100,7 @@ for ans in lAns:
             if par[1] == '1':
                 bounds[ans][par] = (0.05,0.3)
             elif par[1] == '2':
-                bounds[ans][par] = (0,0.5)
+                bounds[ans][par] = (0.01,0.5)
             elif par[1] == '3' and (ans == '3x3_1' or ans == 'q0_1'):
                 bounds[ans][par] = (-0.5,0)
             elif par[1] == '3':
