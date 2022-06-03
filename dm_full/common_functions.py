@@ -62,11 +62,12 @@ def Sigma(P,*Args):
             temp.append(der1**2)     #add it to the sum
         else:
             try:
-                r2 = 1/der1
+                r2 = np.abs(1/der1)
             except RuntimeWarning:
                 r2 = 100
             temp.append(r2)
     res = np.array(temp).sum()
+    print(res,P)
     return res
 ####
 def Final_Result(P,*Args):
@@ -219,11 +220,11 @@ def CheckCsv(csvf):
     if my_file.is_file():
         with open(my_file,'r') as f:
             lines = f.readlines()
-        N = (len(lines)-1)//4 +1        #4 lines per ansatz
+        N = (len(lines)-1)//2 +1        #2 lines per ansatz
         for i in range(N):
-            data = lines[i*4+1].split(',')
-            if float(data[4]) < inp.cutoff:# and np.abs(float(data[6])) > 0.5:    #if Sigma accurate enough and Lambda not equal to the lower bound
-                ans.append(lines[i*4+1].split(',')[0])
+            data = lines[i*2+1].split(',')
+            if float(data[4]) < inp.cutoff:# if Sigma accurate enough
+                ans.append(lines[i*2+1].split(',')[0])
     res = []
     for a in inp.list_ans:
         if a not in ans:

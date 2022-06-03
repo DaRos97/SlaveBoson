@@ -5,11 +5,11 @@ import os
 import sys
 from matplotlib import cm
 
-Color = {'3x3': ['b','orange'],
-         'q0':  ['r','y'],
-         '0-pi': 'y',
-         'cb1':  ['m','g'],
-         'cb2': ['k','purple']}
+Color = {'3x3_1': ['b','orange'],
+         '3x3_2': ['k','gray'],
+         'q0_1':  ['r','y'],
+         'q0_2':  ['purple','k'],
+         'cb1':  ['m','g']}
 #dirname = '../Data/noDM/Data_13-13/'; title = 'Without DM interactions'
 dirname = '../Data/yesDM/Data_13-13/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
@@ -32,10 +32,10 @@ for h in head:
 for filename in os.listdir(dirname):
     with open(dirname+filename, 'r') as f:
         lines = f.readlines()
-    N = (len(lines)-1)//4 + 1
+    N = (len(lines)-1)//2 + 1
     tempE = []
     for i in range(N):
-        data = lines[i*4+1].split(',')
+        data = lines[i*2+1].split(',')
         if data[0] == ans:
             j2 =float(data[1]) - Ji
             j3 =float(data[2]) - Ji
@@ -53,7 +53,7 @@ fig = plt.figure(figsize=(16,16))
 #plt.title(title)
 plt.axis('off')
 for i in range(nP):
-    n = int(330+i+1)
+    n = int(440+i+1)
     ax = fig.add_subplot(n,projection='3d')
     ax.plot_surface(X,Y,D[head[i]].T,cmap=cm.coolwarm)
     ax.set_title(ans)

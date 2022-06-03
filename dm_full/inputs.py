@@ -56,10 +56,10 @@ header = {'3x3_1':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1'
           'oct':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiB2']}  #octahedral
 t_0 = np.arctan(np.sqrt(2))
 Pi = {  '3x3_1':{'A1':0.51, 'A3':0.17, 'B1':0.17, 'B2': 0.41, 'B3': -0.12, 'phiB1': np.pi, 'phiB2': 0, 'phiA3': np.pi},
-        '3x3_2':{'A1':0.51, 'A3':0.17, 'B1':0.17, 'B2': 0.41, 'B3': -0.12, 'phiA1': np.pi, 'phiB1': np.pi, 'phiB2': 0, 'phiB3': np.pi},
-        'q0_1':{'A1':0.51, 'A2':0.13, 'B1':0.18, 'B2': 0.18, 'B3': 0.15, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi},
-        'q0_2':{'A1':0.51, 'A2':0.13, 'B1':0.18, 'B2': 0.18, 'B3': 0.15, 'phiA1': 0, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi, 'phiB3': 0},
-        'cb1':{'A1':0.51, 'A2':0.05, 'A3':0.43, 'B1':0.17, 'B2': 0.17, 'phiA1': 2*t_0, 'phiB1': np.pi, 'phiA2': np.pi+t_0, 'phiB2': t_0},
+        '3x3_2':{'A1':0.51, 'A3':-0.17, 'B1':0.17, 'B2': 0.41, 'B3': 0.12, 'phiA1': np.pi, 'phiB1': np.pi, 'phiB2': 0, 'phiB3': np.pi},
+        'q0_1':{'A1':0.51, 'A2':0.3, 'B1':0.18, 'B2': 0.18, 'B3': -0.15, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi},
+        'q0_2':{'A1':0.51, 'A2':0.13, 'B1':0.18, 'B2': 0.18, 'B3': 0.3, 'phiA1': 0, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi, 'phiB3': np.pi},
+        'cb1':{'A1':0.51, 'A2':0.1, 'A3':-0.43, 'B1':0.17, 'B2': 0.17, 'phiA1': 2*t_0, 'phiB1': np.pi, 'phiA2': np.pi+t_0, 'phiB2': t_0},
         'cb2':{'A1':0.25, 'A2':0.433, 'A3':0.5, 'B1':0.433, 'B2': 0.25, 'phiB1':np.pi+t_0, 'phiA2':np.pi-t_0},
         'oct':{'A1':0.35, 'A2':0.35, 'B1':0.35, 'B2': 0.35, 'B3':0.35 ,'phiB1':-3*np.pi/4, 'phiB2':np.pi/4}
         }
@@ -80,31 +80,48 @@ for ans in lAns:
     if 'B3' in lPar:
         list_B3.append(ans)
     #bounds
-    for par in lPar:
-        if par[0:3] == 'phi':
-            num_phi[ans] += 1
-            if par[3:] == 'B1':
-                bounds[ans][par] = (np.pi-0.1,np.pi+0.1)
-            elif par[3:] == 'A1' and ans == 'cb1':
-                bounds[ans][par] = (0.5,5.5)
-            else:
-                bounds[ans][par] = (0,2*np.pi)
-        elif par[0] == 'A':
-            if par[1] == '1':
-                bounds[ans][par] = (0.45,0.55)
-            elif par[1] == '3' and (ans == '3x3_2' or ans == 'cb1'):
-                bounds[ans][par] = (-1,1)
-            else:
-                bounds[ans][par] = (0.01,1)
-        elif par[0] == 'B':
-            if par[1] == '1':
-                bounds[ans][par] = (0.05,0.3)
-            elif par[1] == '2':
-                bounds[ans][par] = (0.01,0.5)
-            elif par[1] == '3' and (ans == '3x3_1' or ans == 'q0_1'):
-                bounds[ans][par] = (-0.5,0)
-            elif par[1] == '3':
-                bounds[ans][par] = (0.01,0.5)
+    bounds[ans]['A1'] = (0.46,0.54)
+    bounds[ans]['B1'] = (0.1,0.23)
+    bounds[ans]['phiB1'] = (np.pi-0.1,np.pi+0.1)
+    if ans == '3x3_1':
+        bounds[ans]['A3'] = (0.1,0.43)
+        bounds[ans]['B2'] = (0.1,0.48)
+        bounds[ans]['B3'] = (-0.2,-0.02)
+        bounds[ans]['phiB2'] = (0,0.2)
+        bounds[ans]['phiA3'] = (np.pi-0.2,np.pi+0.2)
+        num_phi[ans] = 3
+    elif ans == '3x3_2':
+        bounds[ans]['A3'] = (-1,0)
+        bounds[ans]['B2'] = (0.001,0.6)
+        bounds[ans]['B3'] = (0.001,0.5)
+        bounds[ans]['phiA1'] = (0,2*np.pi)
+        bounds[ans]['phiB2'] = (0,2*np.pi)
+        bounds[ans]['phiB3'] = (0,2*np.pi)
+        num_phi[ans] = 4
+    elif ans == 'q0_1':
+        bounds[ans]['A2'] = (0.2,0.6)
+        bounds[ans]['B2'] = (0.08,0.3)
+        bounds[ans]['B3'] = (-0.42,-0.08)
+        bounds[ans]['phiA2'] = (np.pi-0.5,np.pi+0.5)
+        bounds[ans]['phiB2'] = (np.pi-0.5,np.pi+0.5)
+        num_phi[ans] = 3
+    elif ans == 'q0_2':
+        bounds[ans]['A2'] = (0.001,0.5)
+        bounds[ans]['B2'] = (0.001,0.5)
+        bounds[ans]['B3'] = (0.001,0.5
+        bounds[ans]['phiA1'] = (0,2*np.pi)
+        bounds[ans]['phiA2'] = (0,2*np.pi)
+        bounds[ans]['phiB2'] = (0,2*np.pi)
+        bounds[ans]['phiB3'] = (np.pi-1,np.pi+1)
+        num_phi[ans] = 5
+    elif ans == 'cb1':
+        bounds[ans]['A2'] = (0.001,0.2)
+        bounds[ans]['A3'] = (-0.5,-0.07)
+        bounds[ans]['B2'] = (0.05,0.35)
+        bounds[ans]['phiA1'] = (1.2,2.8)
+        bounds[ans]['phiA2'] = (0,2*np.pi)
+        bounds[ans]['phiB2'] = (0,2*np.pi)
+        num_phi[ans] = 4
 L_bounds = (0.3,2)
 shame2 = 5
 

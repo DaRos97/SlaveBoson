@@ -5,34 +5,36 @@ import os
 import sys
 from matplotlib import cm
 
-Color = {'3x3': ['b','orange'],
-         'q0':  ['r','y'],
-         '0-pi': 'y',
-         'cb1':  ['m','g'],
-         'cb2': 'k'}
+Color = {'3x3_1': ['b','orange'],
+         '3x3_2': ['k','gray'],
+         'q0_1':  ['r','y'],
+         'q0_2':  ['purple','k'],
+         'cb1':  ['m','g']}
 #dirname = '../Data/noDM/Data_13-13_17/'; title = 'Without DM interactions'
 dirname = '../Data/yesDM/Data_13-13_aaaa/'; title = 'With DM interactions'
 minE = []
 ct = {'3x3':10, 'q0':10,'cb1':10}
 ct2 = 1e-7
-E = {'3x3':[],
-     'q0' :[],
+E = {'3x3_1':[],
+     '3x3_2' :[],
+     'q0_1' :[],
+     'q0_2' :[],
      'cb1':[]
      }
 for filename in os.listdir(dirname):
     with open(dirname+filename, 'r') as f:
         lines = f.readlines()
-    N = (len(lines)-1)//4 + 1
+    N = (len(lines)-1)// + 1
     tempE = []
     for i in range(N):
-        data = lines[i*4+1].split(',')
+        data = lines[i*2+1].split(',')
         tE = [data[0]]
         tempE.append(float(data[3]))     #ans,J2,J3,E,S
         for j in range(1,len(data)):
             tE.append(float(data[j]))
         E[data[0]].append(tE)
     minInd = np.argmin(np.array(tempE))
-    minE.append(lines[minInd*4+1].split(','))
+    minE.append(lines[minInd*2+1].split(','))
 cn = int(input("Compute gaps(0), energies(1) or both(2)?"))
 list_ans = E.keys()
 if cn == 0 or cn == 2:
@@ -89,8 +91,8 @@ if cn == 0 or cn == 2:
     plt.show()
 if cn == 0:
     exit()
+##########
 pts = len(os.listdir(dirname))
-#check on convergence
 plt.figure(figsize=(16,16))
 plt.subplot(2,3,2)
 tt = title + ': energy'
@@ -109,7 +111,7 @@ for p in range(pts):
 plt.hlines(0,inp.J2i,inp.J2f,'g',linestyles = 'dashed')
 plt.vlines(0,inp.J3i,inp.J3f,'g',linestyles = 'dashed')
 
-for ind,i in enumerate(['3x3', 'q0', 'cb1']):
+for ind,i in enumerate(['3x3_1', '3x3_2', 'q0_1', 'q0_2', 'cb1']):
     plt.subplot(2,3,ind+4)
     plt.title(i)
     for p in range(len(E[i])):
