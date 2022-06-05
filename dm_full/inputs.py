@@ -9,7 +9,7 @@ DM3 = 2/3*np.pi
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 32
+mp_cpu = 1#32
 list_ans = ['3x3_1','3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
 DirName = '/home/users/r/rossid/Data/yesDM/'
 #DirName = '../Data/test/'
@@ -39,13 +39,13 @@ for i in range(Jpts):
 kxg = np.linspace(0,1,Nx)
 kyg = np.linspace(0,1,Ny)
 kkg = np.ndarray((2,Nx,Ny),dtype=complex)
-#kkgp = np.ndarray((2,Nx,Ny))
+kkgp = np.ndarray((2,Nx,Ny))
 for i in range(Nx):
     for j in range(Ny):
         kkg[0,i,j] = kxg[i]*2*np.pi
         kkg[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
-        #kkgp[0,i,j] = kxg[i]*2*np.pi
-        #kkgp[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
+        kkgp[0,i,j] = kxg[i]*2*np.pi
+        kkgp[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
 #initial point
 header = {'3x3_1':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1','B2','B3','phiB1','phiB2','phiA3'],  #3x3
           '3x3_2':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1','B2','B3','phiA1','phiB1','phiB2','phiB3'],  #3x3
@@ -108,7 +108,7 @@ for ans in lAns:
     elif ans == 'q0_2':
         bounds[ans]['A2'] = (0.001,0.5)
         bounds[ans]['B2'] = (0.001,0.5)
-        bounds[ans]['B3'] = (0.001,0.5
+        bounds[ans]['B3'] = (0.001,0.5)
         bounds[ans]['phiA1'] = (0,2*np.pi)
         bounds[ans]['phiA2'] = (0,2*np.pi)
         bounds[ans]['phiB2'] = (0,2*np.pi)

@@ -67,7 +67,6 @@ def Sigma(P,*Args):
                 r2 = 100
             temp.append(r2)
     res = np.array(temp).sum()
-    print(res,P)
     return res
 ####
 def Final_Result(P,*Args):
@@ -135,17 +134,18 @@ def sumEigs(P,L,args):
                 res = np.amin(np.real(LA.eigvals(np.dot(J,Nk)).ravel()))
                 return res, 10      #if that's the case even for a single k in the grid, return a defined value
             temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
-            res[:,i,j] = np.sort(np.abs(LA.eigvalsh(temp)[:inp.m]))    #only diagonalization
+            res[:,i,j] = LA.eigvalsh(temp)[inp.m:]
+            #res[:,i,j] = np.sort(np.abs(LA.eigvalsh(temp)[:inp.m]))    #only diagonalization
     r1 = res.ravel().sum()/(inp.m*inp.Nx*inp.Ny)
     gap = np.amin(res[0].ravel())
-    return r1, gap
+    #return r1, gap
     #r2 = 0
     #for i in range(inp.m):
     #    func = RBS(inp.kxg,inp.kyg,res[i])
     #    r2 += func.integral(0,1,0,1)
     #r2 /= inp.m
     #gap = np.amin(res[0].ravel())
-    if False:
+    if True:
         #plot
         print("P: ",P,"\nL:",L,"\ngap:",gap)
         R = np.zeros((3,inp.Nx,inp.Ny))
@@ -167,6 +167,7 @@ def sumEigs(P,L,args):
         ax3 = fig.add_subplot(133, projection='3d')
         ax3.plot_surface(X,Y,Z,cmap=cm.coolwarm)
         plt.show()
+    return r1, gap
 
 #### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
 def totE(P,args):
