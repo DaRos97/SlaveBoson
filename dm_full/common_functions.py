@@ -138,14 +138,14 @@ def sumEigs(P,L,args):
             #res[:,i,j] = np.sort(np.abs(LA.eigvalsh(temp)[:inp.m]))    #only diagonalization
     r1 = res.ravel().sum()/(inp.m*inp.Nx*inp.Ny)
     gap = np.amin(res[0].ravel())
-    #return r1, gap
+    return r1, gap
     #r2 = 0
     #for i in range(inp.m):
     #    func = RBS(inp.kxg,inp.kyg,res[i])
     #    r2 += func.integral(0,1,0,1)
     #r2 /= inp.m
     #gap = np.amin(res[0].ravel())
-    if True:
+    if False:
         #plot
         print("P: ",P,"\nL:",L,"\ngap:",gap)
         R = np.zeros((3,inp.Nx,inp.Ny))
@@ -159,12 +159,14 @@ def sumEigs(P,L,args):
         Z = func(inp.kxg,inp.kyg)
         #fig,(ax1,ax2) = plt.subplots(1,2)#,projection='3d')
         fig = plt.figure(figsize=(10,5))
+        plt.axis('off')
+        plt.title(str(inp.Nx)+' * '+str(inp.Ny))
         ax1 = fig.add_subplot(131, projection='3d')
         #ax1 = fig.gca(projection='3d')
         ax1.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
         ax2 = fig.add_subplot(132, projection='3d')
         ax2.plot_surface(inp.kkgp[0],inp.kkgp[1],res[0],cmap=cm.coolwarm)
-        ax3 = fig.add_subplot(133, projection='3d')
+        ax3 = fig.add_subplot(133, projection='3d')     #works only for square grid
         ax3.plot_surface(X,Y,Z,cmap=cm.coolwarm)
         plt.show()
     return r1, gap
@@ -224,7 +226,7 @@ def CheckCsv(csvf):
         N = (len(lines)-1)//2 +1        #2 lines per ansatz
         for i in range(N):
             data = lines[i*2+1].split(',')
-            if float(data[4]) < inp.cutoff:# if Sigma accurate enough
+            if float(data[5]) < inp.cutoff:# if Sigma accurate enough
                 ans.append(lines[i*2+1].split(',')[0])
     res = []
     for a in inp.list_ans:
@@ -243,12 +245,12 @@ def FindInitialPoint(J2,J3,ansatze):
             if np.abs(j2-J2) < inp.cutoff_pts and np.abs(j3 - J3) < inp.cutoff_pts:         #once found read it
                 with open(inp.ReferenceDir+file, 'r') as f:
                     lines = f.readlines()
-                N = (len(lines)-1)//4 + 1
+                N = (len(lines)-1)//2 + 1
                 for Ans in ansatze:
                     for i in range(N):
-                        data = lines[i*4+1].split(',')
+                        data = lines[i*2+1].split(',')
                         if data[0] == Ans:              #correct ansatz
-                            P[data[0]] = data[7:]
+                            P[data[0]] = data[8:]
                             for j in range(len(P[data[0]])):    #cast to float
                                 P[data[0]][j] = float(P[data[0]][j])
     j2 = np.abs(J2) > inp.cutoff_pts    #bool for j2 not 0
@@ -378,8 +380,8 @@ def SaveToCsv(Data,csvfile):
         D = init[i*2+1].split(',')
         if D[0] == ans:
             ac = True
-            #if float(D[4]) > Data['Sigma']:
-            N_ = i+1
+            if float(D[5]) > Data['Sigma']:
+                N_ = i+1
     ###
     header = inp.header[ans]
     if N_:
@@ -398,4 +400,15 @@ def SaveToCsv(Data,csvfile):
             writer = csv.DictWriter(f, fieldnames = header)
             writer.writeheader()
             writer.writerow(Data)
+
+##
+def IsConverged(P,bnds):
+    for n,p in enumerate(P):
+        m = np.abs(p - bnds[n][0]) > 1e-3
+        M = np.abs(p - bnds[n][1]) > 1e-3
+        if m and M:
+            continue
+        else:
+            return False
+    return True
 

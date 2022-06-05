@@ -6,16 +6,14 @@ from scipy.optimize import differential_evolution as d_e
 import sys
 from colorama import Fore
 ####### inputs
-li = [4,36,40,44,76]
 N = int(sys.argv[1])
-J2, J3 = inp.J[li[N%5]]
+J2, J3 = inp.J[N%5]
 print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 print("File name for saving: ",csvfile)
-#ansatze = cf.CheckCsv(csvfile)
+ansatze = cf.CheckCsv(csvfile)
 #ansatze = inp.list_ans
-ansatze = [inp.list_ans[N//5]]
 Ti = t()
 Pinitial = cf.FindInitialPoint(J2,J3,ansatze)
 Bnds = cf.FindBounds(J2,J3,ansatze)
@@ -45,17 +43,18 @@ for ans in ansatze:
     try:
         S, HessVals, E, L, gap = cf.Final_Result(Pf,*Args)
     except TypeError:
-        print("Not saving, there was some mistake")
+        print("Not saving, an Hessian sign is not right")
         print("Found values: Pf=",Pf,"\nSigma = ",result.fun)
         print("Time of ans",ans,": ",'{:5.2f}'.format((t()-Tti)/60),' minutes\n')              ################
         continue
     #Add 0 values
+    conv = cf.IsConverged(Pf,Bnds[ans])
     newP = cf.FormatParams(Pf,ans,J2,J3)
-    data = [ans,J2,J3,E,S,gap,L]
+    data = [ans,J2,J3,conv,E,S,gap,L]
     for ind in range(len(data)):
         DataDic[header[ind]] = data[ind]
     for ind2 in range(len(newP)):
-        DataDic[header[7+ind2]] = newP[ind2]
+        DataDic[header[len(data)+ind2]] = newP[ind2]
     #save values
     print(DataDic)
     print(HessVals)

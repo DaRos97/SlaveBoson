@@ -46,10 +46,10 @@ for filename in os.listdir(dirname):
                 #else:
                 #    N = n
                 N = n
-                if N != 1:
+                if N != 0:
                     D[h][i2,i3] = float(data[N+3])
                 else:
-                    D[h][i2,i3] = 1 if (float(data[N+3]) < inp.cutoff) else 0
+                    D[h][i2,i3] = 1 if data[N+3] else 0
 nP = len(head)
 fig = plt.figure()#(figsize=(16,16))
 figManager = plt.get_current_fig_manager()

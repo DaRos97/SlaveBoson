@@ -9,11 +9,11 @@ DM3 = 2/3*np.pi
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 1#32
+mp_cpu = 32
 list_ans = ['3x3_1','3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
 DirName = '/home/users/r/rossid/Data/yesDM/'
 #DirName = '../Data/test/'
-DataDir = DirName + 'Data_'+str(Nx)+'-'+str(Ny)+'_full2/'
+DataDir = DirName + 'fullDM_' + str(Nx) + '/'
 ReferenceDir = 'none'#DirName + 'Data_13-13/'
 #derivative
 der_par = 1e-6
@@ -47,13 +47,13 @@ for i in range(Nx):
         kkgp[0,i,j] = kxg[i]*2*np.pi
         kkgp[1,i,j] = (kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)
 #initial point
-header = {'3x3_1':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1','B2','B3','phiB1','phiB2','phiA3'],  #3x3
-          '3x3_2':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A3','B1','B2','B3','phiA1','phiB1','phiB2','phiB3'],  #3x3
-          'q0_1':     ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiA2','phiB2'],  #q0
-          'q0_2':     ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiA1','phiB1','phiA2','phiB2','phiB3'],  #q0
-          'cb1':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiA1','phiB1','phiA2','phiB2'],  #cuboc1
-          'cb2':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiB1','phiA2'],  #cuboc2
-          'oct':    ['ans','J2','J3','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiB2']}  #octahedral
+header = {'3x3_1':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A3','B1','B2','B3','phiB1','phiB2','phiA3'],  #3x3
+          '3x3_2':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A3','B1','B2','B3','phiA1','phiB1','phiB2','phiB3'],  #3x3
+          'q0_1':     ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiA2','phiB2'],  #q0
+          'q0_2':     ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiA1','phiB1','phiA2','phiB2','phiB3'],  #q0
+          'cb1':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiA1','phiB1','phiA2','phiB2'],  #cuboc1
+          'cb2':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiB1','phiA2'],  #cuboc2
+          'oct':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiB2']}  #octahedral
 t_0 = np.arctan(np.sqrt(2))
 Pi = {  '3x3_1':{'A1':0.51, 'A3':0.17, 'B1':0.17, 'B2': 0.41, 'B3': -0.12, 'phiB1': np.pi, 'phiB2': 0, 'phiA3': np.pi},
         '3x3_2':{'A1':0.51, 'A3':-0.17, 'B1':0.17, 'B2': 0.41, 'B3': 0.12, 'phiA1': np.pi, 'phiB1': np.pi, 'phiB2': 0, 'phiB3': np.pi},
@@ -125,12 +125,9 @@ for ans in lAns:
 L_bounds = (0.3,2)
 shame2 = 5
 
-min_S = 10
-
 print("Minimization precision (both tol and atol):",cutoff)
 print("Grid pts:",Nx,'*',Ny)
 print("Derivative distance (par / phi):",der_par,'/',der_phi)
 print("Lagrange multiplier maximization precision:",prec_L)
 print("Dzyaloshinskii-Moriya angles:",DM1,"  ",DM3)
 print("Number of CPUs used: ",mp_cpu)
-print("Limit under which look for Hessian: ",der_lim)
