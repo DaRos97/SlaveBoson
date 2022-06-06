@@ -402,7 +402,7 @@ def SaveToCsv(Data,csvfile):
             writer.writerow(Data)
 
 ##
-def IsConverged(P,bnds):
+def IsConverged(P,bnds,Sigma):
     for n,p in enumerate(P):
         m = np.abs(p - bnds[n][0]) > 1e-3
         M = np.abs(p - bnds[n][1]) > 1e-3
@@ -410,5 +410,7 @@ def IsConverged(P,bnds):
             continue
         else:
             return False
+    if Sigma > inp.cutoff:
+        return False
     return True
 

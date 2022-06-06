@@ -48,7 +48,7 @@ for ans in ansatze:
         print("Time of ans",ans,": ",'{:5.2f}'.format((t()-Tti)/60),' minutes\n')              ################
         continue
     #Add 0 values
-    conv = cf.IsConverged(Pf,Bnds[ans])
+    conv = cf.IsConverged(Pf,Bnds[ans],S)
     newP = cf.FormatParams(Pf,ans,J2,J3)
     data = [ans,J2,J3,conv,E,S,gap,L]
     for ind in range(len(data)):

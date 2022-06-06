@@ -84,9 +84,9 @@ for ans in lAns:
     bounds[ans]['B1'] = (0.1,0.23)
     bounds[ans]['phiB1'] = (np.pi-0.1,np.pi+0.1)
     if ans == '3x3_1':
-        bounds[ans]['A3'] = (0.1,0.43)
-        bounds[ans]['B2'] = (0.1,0.48)
-        bounds[ans]['B3'] = (-0.2,-0.02)
+        bounds[ans]['A3'] = (0.001,0.45)
+        bounds[ans]['B2'] = (0.001,0.45)
+        bounds[ans]['B3'] = (-0.3,0)
         bounds[ans]['phiB2'] = (0,0.2)
         bounds[ans]['phiA3'] = (np.pi-0.2,np.pi+0.2)
         num_phi[ans] = 3
@@ -99,14 +99,14 @@ for ans in lAns:
         bounds[ans]['phiB3'] = (0,2*np.pi)
         num_phi[ans] = 4
     elif ans == 'q0_1':
-        bounds[ans]['A2'] = (0.2,0.6)
-        bounds[ans]['B2'] = (0.08,0.3)
-        bounds[ans]['B3'] = (-0.42,-0.08)
+        bounds[ans]['A2'] = (0.07,0.6)
+        bounds[ans]['B2'] = (0.12,0.5)
+        bounds[ans]['B3'] = (-0.5,-0.1)
         bounds[ans]['phiA2'] = (np.pi-0.5,np.pi+0.5)
         bounds[ans]['phiB2'] = (np.pi-0.5,np.pi+0.5)
         num_phi[ans] = 3
     elif ans == 'q0_2':
-        bounds[ans]['A2'] = (0.001,0.5)
+        bounds[ans]['A2'] = (0.001,0.5) 
         bounds[ans]['B2'] = (0.001,0.5)
         bounds[ans]['B3'] = (0.001,0.5)
         bounds[ans]['phiA1'] = (0,2*np.pi)
@@ -115,9 +115,9 @@ for ans in lAns:
         bounds[ans]['phiB3'] = (np.pi-1,np.pi+1)
         num_phi[ans] = 5
     elif ans == 'cb1':
-        bounds[ans]['A2'] = (0.001,0.2)
-        bounds[ans]['A3'] = (-0.5,-0.07)
-        bounds[ans]['B2'] = (0.05,0.35)
+        bounds[ans]['A2'] = (0.01,0.6)
+        bounds[ans]['A3'] = (-0.5,-0.001)
+        bounds[ans]['B2'] = (0.01,0.5)
         bounds[ans]['phiA1'] = (1.2,2.8)
         bounds[ans]['phiA2'] = (0,2*np.pi)
         bounds[ans]['phiB2'] = (0,2*np.pi)
