@@ -10,10 +10,10 @@ DM3 = 2/3*np.pi
 Nx = 13
 Ny = 13
 mp_cpu = 32
-list_ans = ['3x3_1','3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
+list_ans = ['3x3_1','q0_1','cb1']#'3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
 DirName = '/home/users/r/rossid/Data/'
-#DirName = '../Data/test/'
-DataDir = DirName + 'fullDM_' + str(Nx) + '/'
+#DirName = '../Data/fullDM/'
+DataDir = DirName 'fullDM_' + str(Nx) + '_3/'
 ReferenceDir = DirName + 'fullDM_13_2/'
 #derivative
 der_par = 1e-6
@@ -81,7 +81,7 @@ for ans in lAns:
         list_B3.append(ans)
     #bounds
     bounds[ans]['A1'] = (0.46,0.54)
-    bounds[ans]['B1'] = (0.1,0.23)
+    bounds[ans]['B1'] = (0.05,0.3)
     bounds[ans]['phiB1'] = (np.pi-0.1,np.pi+0.1)
     if ans == '3x3_1':
         bounds[ans]['A3'] = (0.001,0.45)

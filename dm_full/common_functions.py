@@ -238,6 +238,7 @@ def CheckCsv(csvf):
 #If the file matching the j2,j3 point is not found initialize the initial point with default parameters defined in inputs.py
 def FindInitialPoint(J2,J3,ansatze):
     P = {}  #parameters
+    done = {}
     if Path(inp.ReferenceDir).is_dir():
         for file in os.listdir(inp.ReferenceDir):     #find file in dir
             j2 = float(file[7:-5].split('_')[0])/10000  #specific for the name of the file
@@ -265,6 +266,7 @@ def FindInitialPoint(J2,J3,ansatze):
     #check eventual missing ansatze from the reference fileand initialize with default values
     for ans in ansatze:
         if ans in list(P.keys()):
+            done[ans] = 1
             continue
         P[ans] = []
         for par in inp.Pi[ans].keys():
@@ -274,14 +276,32 @@ def FindInitialPoint(J2,J3,ansatze):
                 P[ans].append(inp.Pi[ans][par])
             elif par[-1] == '3' and j3:
                 P[ans].append(inp.Pi[ans][par])
-    return P
+        done[ans] = 0
+    return P, done
 
 #Constructs the bounds of the specific ansatz depending on the number and type of parameters involved in the minimization
-def FindBounds(J2,J3,ansatze):
+def FindBounds(J2,J3,ansatze,done,Pin):
     B = {}
     j2 = np.abs(J2) > inp.cutoff_pts
     j3 = np.abs(J3) > inp.cutoff_pts
     for ans in ansatze:
+        if done[ans]:
+            B[ans] = tuple()
+            list_p = list(inp.Pi[ans].keys())
+            new_list = []
+            for t in list_p:
+                if t[-1] == '2' and j2:
+                    new_list.append(t)
+                elif t[-1] == '3' and j3:
+                    new_list.append(t)
+                elif t[-1] == '1':
+                    new_list.append(t)
+            for n,p in enumerate(Pin[ans]):
+                t = new_list[n]
+                mB = p - 0.1 if (p - 0.1 > inp.bounds[ans][t][0]) else inp.bounds[ans][t][0]
+                MB = p + 0.1 if (p + 0.1 < inp.bounds[ans][t][1]) else inp.bounds[ans][t][1]
+                B[ans] += ((mB,MB),)
+            continue
         B[ans] = (inp.bounds[ans]['A1'],)
         for par in inp.Pi[ans].keys():
             if par == 'A1':
