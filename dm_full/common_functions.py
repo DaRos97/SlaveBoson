@@ -404,8 +404,8 @@ def SaveToCsv(Data,csvfile):
 ##
 def IsConverged(P,bnds,Sigma):
     for n,p in enumerate(P):
-        m = np.abs(p - bnds[n][0]) > 1e-3
-        M = np.abs(p - bnds[n][1]) > 1e-3
+        m = np.abs((p - bnds[n][0])/bnds[n][0]) > 1e-3
+        M = np.abs((p - bnds[n][1])/bnds[n][1]) > 1e-3
         if m and M:
             continue
         else:

@@ -11,10 +11,10 @@ Nx = 13
 Ny = 13
 mp_cpu = 32
 list_ans = ['3x3_1','3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
-DirName = '/home/users/r/rossid/Data/yesDM/'
+DirName = '/home/users/r/rossid/Data/'
 #DirName = '../Data/test/'
 DataDir = DirName + 'fullDM_' + str(Nx) + '/'
-ReferenceDir = 'none'#DirName + 'Data_13-13/'
+ReferenceDir = DirName + 'fullDM_13_2/'
 #derivative
 der_par = 1e-6
 der_phi = 1e-5
