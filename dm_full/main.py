@@ -12,8 +12,8 @@ print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 print("File name for saving: ",csvfile)
-ansatze = cf.CheckCsv(csvfile)
-#ansatze = inp.list_ans
+#ansatze = cf.CheckCsv(csvfile)
+ansatze = inp.list_ans
 Ti = t()
 Pinitial, done  = cf.FindInitialPoint(J2,J3,ansatze)
 Bnds = cf.FindBounds(J2,J3,ansatze,done,Pinitial)

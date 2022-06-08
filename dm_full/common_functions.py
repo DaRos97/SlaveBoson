@@ -138,14 +138,14 @@ def sumEigs(P,L,args):
             #res[:,i,j] = np.sort(np.abs(LA.eigvalsh(temp)[:inp.m]))    #only diagonalization
     r1 = res.ravel().sum()/(inp.m*inp.Nx*inp.Ny)
     gap = np.amin(res[0].ravel())
-    return r1, gap
+    #return r1, gap
     #r2 = 0
     #for i in range(inp.m):
     #    func = RBS(inp.kxg,inp.kyg,res[i])
     #    r2 += func.integral(0,1,0,1)
     #r2 /= inp.m
     #gap = np.amin(res[0].ravel())
-    if False:
+    if 1:
         #plot
         print("P: ",P,"\nL:",L,"\ngap:",gap)
         R = np.zeros((3,inp.Nx,inp.Ny))
@@ -424,8 +424,8 @@ def SaveToCsv(Data,csvfile):
 ##
 def IsConverged(P,bnds,Sigma):
     for n,p in enumerate(P):
-        m = np.abs((p - bnds[n][0])/bnds[n][0]) > 1e-3
-        M = np.abs((p - bnds[n][1])/bnds[n][1]) > 1e-3
+        m = np.abs((p - bnds[n][0])/bnds[n][0]) > 1e-3 if bnds[n][0] != 0 else np.abs(p) > 1e-3
+        M = np.abs((p - bnds[n][1])/bnds[n][1]) > 1e-3 if bnds[n][0] != 0 else np.abs(p) > 1e-3
         if m and M:
             continue
         else:

@@ -24,7 +24,6 @@ X,Y = np.meshgrid(J2,J3)
 Head = inp.header[ans][3:]
 head = []
 for h in Head:
-    #if h != 'Sigma':
     head.append(h)
 for h in head:
     D[h] = np.zeros((9,9))
@@ -41,20 +40,16 @@ for filename in os.listdir(dirname):
             i2 = int(j2*8/(0.6))
             i3 = int(j3*8/(0.6))
             for n,h in enumerate(head):
-                #if n >= 1:
-                #    N = n+1
-                #else:
-                #    N = n
                 N = n
                 if N != 0:
                     D[h][i2,i3] = float(data[N+3])
                 else:
                     D[h][i2,i3] = 1 if data[N+3]=='True' else 0
+print("Non converged points: ",int(81-D['Converge'].ravel().sum()),"\n",D['Converge'])
 nP = len(head)
 fig = plt.figure()#(figsize=(16,16))
 figManager = plt.get_current_fig_manager()
 figManager.window.showMaximized()
-#plt.title(title)
 plt.axis('off')
 for i in range(nP):
     ax = fig.add_subplot(4,4,i+1,projection='3d')

@@ -9,12 +9,12 @@ DM3 = 2/3*np.pi
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 32
-list_ans = ['3x3_1','q0_1','cb1']#'3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
-DirName = '/home/users/r/rossid/Data/'
-#DirName = '../Data/fullDM/'
-DataDir = DirName 'fullDM_' + str(Nx) + '_3/'
-ReferenceDir = DirName + 'fullDM_13_2/'
+mp_cpu = 1#16
+list_ans = ['cb1','q0_1','cb1']#'3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
+#DirName = '/home/users/r/rossid/Data/'
+DirName = '../Data/fullDM/'
+DataDir = DirName + 'fullDM_' + str(Nx) + '_4/'
+ReferenceDir = DirName + 'fullDM_13_3/'
 #derivative
 der_par = 1e-6
 der_phi = 1e-5
@@ -36,7 +36,7 @@ for i in range(Jpts):
     for j in range(Jpts):
         J.append((J2i+(J2f-J2i)/(Jpts-1)*i,J3i+(J3f-J3i)/(Jpts-1)*j))
 #summation over BZ
-kxg = np.linspace(0,1,Nx)
+kxg = np.linspace(0,0.5,Nx)
 kyg = np.linspace(0,1,Ny)
 kkg = np.ndarray((2,Nx,Ny),dtype=complex)
 kkgp = np.ndarray((2,Nx,Ny))
