@@ -35,7 +35,6 @@ def Sigma(P,*Args):
     if init[2][0] < 0 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
         return np.abs(init[2][0])+inp.shame2
     temp = []
-#    final_Hess = []
     for i in range(len(P)): #for each parameter
         pp = np.array(P)
         dP = der_range[i]
@@ -136,16 +135,17 @@ def sumEigs(P,L,args):
             temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
             res[:,i,j] = LA.eigvalsh(temp)[inp.m:]
             #res[:,i,j] = np.sort(np.abs(LA.eigvalsh(temp)[:inp.m]))    #only diagonalization
-    r1 = res.ravel().sum()/(inp.m*inp.Nx*inp.Ny)
-    gap = np.amin(res[0].ravel())
-    #return r1, gap
-    #r2 = 0
-    #for i in range(inp.m):
-    #    func = RBS(inp.kxg,inp.kyg,res[i])
-    #    r2 += func.integral(0,1,0,1)
-    #r2 /= inp.m
+    #r1 = res.ravel().sum()/(inp.m*inp.Nx*inp.Ny)
     #gap = np.amin(res[0].ravel())
-    if 1:
+    #return r1, gap
+    r2 = 0
+    for i in range(inp.m):
+        func = RBS(inp.kxg,inp.kyg,res[i])
+        r2 += func.integral(0,1,0,1)
+    r2 /= inp.m
+    gap = np.amin(res[0].ravel())
+    return r2, gap
+    if 0:
         #plot
         print("P: ",P,"\nL:",L,"\ngap:",gap)
         R = np.zeros((3,inp.Nx,inp.Ny))
@@ -226,7 +226,7 @@ def CheckCsv(csvf):
         N = (len(lines)-1)//2 +1        #2 lines per ansatz
         for i in range(N):
             data = lines[i*2+1].split(',')
-            if float(data[5]) < inp.cutoff:# if Sigma accurate enough
+            if data[3] == 'True':
                 ans.append(lines[i*2+1].split(',')[0])
     res = []
     for a in inp.list_ans:
@@ -297,9 +297,10 @@ def FindBounds(J2,J3,ansatze,done,Pin):
                 elif t[-1] == '1':
                     new_list.append(t)
             for n,p in enumerate(Pin[ans]):
+                s_b = inp.s_b
                 t = new_list[n]
-                mB = p - 0.1 if (p - 0.1 > inp.bounds[ans][t][0]) else inp.bounds[ans][t][0]
-                MB = p + 0.1 if (p + 0.1 < inp.bounds[ans][t][1]) else inp.bounds[ans][t][1]
+                mB = p - s_b if (p - s_b > inp.bounds[ans][t][0]) else inp.bounds[ans][t][0]
+                MB = p + s_b if (p + s_b < inp.bounds[ans][t][1]) else inp.bounds[ans][t][1]
                 B[ans] += ((mB,MB),)
             continue
         B[ans] = (inp.bounds[ans]['A1'],)
@@ -400,7 +401,7 @@ def SaveToCsv(Data,csvfile):
         D = init[i*2+1].split(',')
         if D[0] == ans:
             ac = True
-            if float(D[5]) > Data['Sigma']:
+            if Data['Converge'] == True:
                 N_ = i+1
     ###
     header = inp.header[ans]

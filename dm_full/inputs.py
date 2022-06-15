@@ -3,19 +3,21 @@ from colorama import Fore
 #
 m = 6
 S = 0.5
+#S = (np.sqrt(3)-1)/2#0.5
 ####
 DM1 = 4/3*np.pi
 DM3 = 2/3*np.pi
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 1#16
-list_ans = ['cb1','q0_1','cb1']#'3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
-#DirName = '/home/users/r/rossid/Data/'
-DirName = '../Data/fullDM/'
-DataDir = DirName + 'fullDM_' + str(Nx) + '_4/'
-ReferenceDir = DirName + 'fullDM_13_3/'
+mp_cpu = 16
+list_ans = ['3x3_1','q0_1','cb1']#'3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
+DirName = '/home/users/r/rossid/Data/'
+#DirName = '../Data/fullDM/'
+DataDir = DirName + 'DM_13/'
+ReferenceDir = DirName + 'fullDM_13/'
 #derivative
+s_b = 0.01 #bound on values given by smaller grids
 der_par = 1e-6
 der_phi = 1e-5
 der_lim = 1  #limit under which compute the Hessian for that parameter
@@ -36,7 +38,7 @@ for i in range(Jpts):
     for j in range(Jpts):
         J.append((J2i+(J2f-J2i)/(Jpts-1)*i,J3i+(J3f-J3i)/(Jpts-1)*j))
 #summation over BZ
-kxg = np.linspace(0,0.5,Nx)
+kxg = np.linspace(0,1,Nx)
 kyg = np.linspace(0,1,Ny)
 kkg = np.ndarray((2,Nx,Ny),dtype=complex)
 kkgp = np.ndarray((2,Nx,Ny))
@@ -80,9 +82,9 @@ for ans in lAns:
     if 'B3' in lPar:
         list_B3.append(ans)
     #bounds
-    bounds[ans]['A1'] = (0.46,0.54)
-    bounds[ans]['B1'] = (0.05,0.3)
-    bounds[ans]['phiB1'] = (np.pi-0.1,np.pi+0.1)
+    bounds[ans]['A1'] = (0,(2*S+1)/2)
+    bounds[ans]['B1'] = (0,S)
+    bounds[ans]['phiB1'] = (0,2*np.pi)
     if ans == '3x3_1':
         bounds[ans]['A3'] = (0.001,0.45)
         bounds[ans]['B2'] = (0.001,0.45)
@@ -128,6 +130,6 @@ shame2 = 5
 print("Minimization precision (both tol and atol):",cutoff)
 print("Grid pts:",Nx,'*',Ny)
 print("Derivative distance (par / phi):",der_par,'/',der_phi)
-print("Lagrange multiplier maximization precision:",prec_L)
-print("Dzyaloshinskii-Moriya angles:",DM1,"  ",DM3)
+print("Spin: ",S)
+print("Bound on values given by smaller grids: ",s_b)
 print("Number of CPUs used: ",mp_cpu)
