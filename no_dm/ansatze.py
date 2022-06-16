@@ -1,6 +1,7 @@
 import inputs as inp
 import numpy as np
 from scipy import linalg as LA
+from time import time as t
 
 #### vectors of 1nn, 2nn and 3nn
 a1 = (1,0)

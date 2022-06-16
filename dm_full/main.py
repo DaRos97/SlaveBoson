@@ -57,7 +57,6 @@ for ans in ansatze:
         DataDic[header[len(data)+ind2]] = newP[ind2]
     #save values
     print(DataDic)
-    print(HessVals)
     print("Time of ans",ans,": ",'{:5.2f}'.format((t()-Tti)/60),' minutes\n')              ################
     cf.SaveToCsv(DataDic,csvfile)
 

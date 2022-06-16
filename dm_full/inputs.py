@@ -82,45 +82,57 @@ for ans in lAns:
     if 'B3' in lPar:
         list_B3.append(ans)
     #bounds
-    bounds[ans]['A1'] = (0,(2*S+1)/2)
-    bounds[ans]['B1'] = (0,S)
-    bounds[ans]['phiB1'] = (0,2*np.pi)
     if ans == '3x3_1':
+        bounds[ans]['A1'] = (0,(2*S+1)/2)
         bounds[ans]['A3'] = (0.001,0.45)
+        bounds[ans]['B1'] = (0,S)
         bounds[ans]['B2'] = (0.001,0.45)
         bounds[ans]['B3'] = (-0.3,0)
+        bounds[ans]['phiB1'] = (0,2*np.pi)
         bounds[ans]['phiB2'] = (0,0.2)
         bounds[ans]['phiA3'] = (np.pi-0.2,np.pi+0.2)
         num_phi[ans] = 3
     elif ans == '3x3_2':
+        bounds[ans]['A1'] = (0,(2*S+1)/2)
         bounds[ans]['A3'] = (-1,0)
+        bounds[ans]['B1'] = (0,S)
         bounds[ans]['B2'] = (0.001,0.6)
         bounds[ans]['B3'] = (0.001,0.5)
         bounds[ans]['phiA1'] = (0,2*np.pi)
+        bounds[ans]['phiB1'] = (0,2*np.pi)
         bounds[ans]['phiB2'] = (0,2*np.pi)
         bounds[ans]['phiB3'] = (0,2*np.pi)
         num_phi[ans] = 4
     elif ans == 'q0_1':
+        bounds[ans]['A1'] = (0,(2*S+1)/2)
         bounds[ans]['A2'] = (0.07,0.6)
+        bounds[ans]['B1'] = (0,S)
         bounds[ans]['B2'] = (0.12,0.5)
         bounds[ans]['B3'] = (-0.5,-0.1)
+        bounds[ans]['phiB1'] = (0,2*np.pi)
         bounds[ans]['phiA2'] = (np.pi-0.5,np.pi+0.5)
         bounds[ans]['phiB2'] = (np.pi-0.5,np.pi+0.5)
         num_phi[ans] = 3
     elif ans == 'q0_2':
+        bounds[ans]['A1'] = (0,(2*S+1)/2)
         bounds[ans]['A2'] = (0.001,0.5) 
+        bounds[ans]['B1'] = (0,S)
         bounds[ans]['B2'] = (0.001,0.5)
         bounds[ans]['B3'] = (0.001,0.5)
         bounds[ans]['phiA1'] = (0,2*np.pi)
+        bounds[ans]['phiB1'] = (0,2*np.pi)
         bounds[ans]['phiA2'] = (0,2*np.pi)
         bounds[ans]['phiB2'] = (0,2*np.pi)
         bounds[ans]['phiB3'] = (np.pi-1,np.pi+1)
         num_phi[ans] = 5
     elif ans == 'cb1':
+        bounds[ans]['A1'] = (0,(2*S+1)/2)
         bounds[ans]['A2'] = (0.01,0.6)
         bounds[ans]['A3'] = (-0.5,-0.001)
+        bounds[ans]['B1'] = (0,S)
         bounds[ans]['B2'] = (0.01,0.5)
         bounds[ans]['phiA1'] = (1.2,2.8)
+        bounds[ans]['phiB1'] = (0,2*np.pi)
         bounds[ans]['phiA2'] = (0,2*np.pi)
         bounds[ans]['phiB2'] = (0,2*np.pi)
         num_phi[ans] = 4

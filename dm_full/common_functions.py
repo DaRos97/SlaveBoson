@@ -334,6 +334,7 @@ def ComputeDerRanges(J2,J3,ansatze):
         for n in range(inp.num_phi[ans]):
             R[ans].append(inp.der_phi)
     return R
+
 #From the list of parameters obtained after the minimization constructs an array containing them and eventually 
 #some 0 parameters which may be omitted because j2 or j3 are equal to 0.
 def FormatParams(P,ans,J2,J3):
@@ -401,7 +402,7 @@ def SaveToCsv(Data,csvfile):
         D = init[i*2+1].split(',')
         if D[0] == ans:
             ac = True
-            if Data['Converge'] == True:
+            if Data['Converge'] == 'True':
                 N_ = i+1
     ###
     header = inp.header[ans]

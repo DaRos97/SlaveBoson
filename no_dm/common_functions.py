@@ -8,6 +8,7 @@ from pathlib import Path
 import csv
 from time import time as t
 import os
+from colorama import Fore
 
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -31,38 +32,39 @@ def Sigma(P,*Args):
         if (pPp[-1] == '1') or (pPp[-1] == '2' and j2-1) or (pPp[-1] == '3' and j3-1):
             pars.append(pPp)
     init = totE(P,args)         #check initial point        #1
-    if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
-        return inp.shame2
+    if init[2][0] < 0 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
+        return np.abs(init[2][0])+inp.shame2
     temp = []
-    final_Hess = []
     for i in range(len(P)): #for each parameter
         pp = np.array(P)
         dP = der_range[i]
         pp[i] = P[i] + dP
+        _T3 = t()
         init_plus = totE(pp,args)   #compute derivative     #2
         der1 = (init_plus[0]-init[0])/dP
-        if np.abs(der1) > inp.der_lim:
-            temp.append(der1**2)
+        pp[i] = P[i] + 2*dP
+        init_2plus = totE(pp,args)                          #3
+        der2 = (init_2plus[0]-init_plus[0])/dP
+        Hess = (der2-der1)/dP
+        hess = int(np.sign(Hess))    #order is important!!
+        if pars[i][-2] == 'A':
+            if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
+                sign = 1
+            else:
+                sign = -1
         else:
-            pp[i] = P[i] + 2*dP
-            init_2plus = totE(pp,args)                          #3
-            der2 = (init_2plus[0]-init_plus[0])/dP
-            final_Hess.append((der2-der1)/dP)
-            hess = int(np.sign(final_Hess[-1]))    #order is important!!
-            if pars[i][-2] == 'A':
-                if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
-                    sign = 1
-                else:
-                    sign = -1
+            if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
+                sign = -1
             else:
-                if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
-                    sign = -1
-                else:
-                    sign = 1
-            if sign == hess:
-                temp.append(der1**2)     #add it to the sum
-            else:
-                return inp.shame3
+                sign = 1
+        if sign == hess:
+            temp.append(der1**2)     #add it to the sum
+        else:
+            try:
+                r2 = np.abs(1/der1)
+            except RuntimeWarning:
+                r2 = 100
+            temp.append(r2)
     res = np.array(temp).sum()
     return res
 ####
@@ -77,7 +79,7 @@ def Final_Result(P,*Args):
         if (pPp[-1] == '1') or (pPp[-1] == '2' and j2-1) or (pPp[-1] == '3' and j3-1):
             pars.append(pPp)
     init = totE(P,args)         #check initial point        #1
-    if init[2][0] == inp.shame1 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
+    if init[2][0] < 0 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
         print("Not good initial point: ",init[2][0],init[1])
         return 0
     res = 0
@@ -105,7 +107,6 @@ def Final_Result(P,*Args):
                 sign = -1
             else:
                 sign = 1
-#        sign = inp.HS[ans][j2][j3][i]
         if sign == hess:
             temp.append(der1**2)     #add it to the sum
         else:
@@ -129,20 +130,22 @@ def sumEigs(P,L,args):
             try:
                 K = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
             except LA.LinAlgError:      #matrix not pos def for that specific kx,ky
-                return inp.shame1, 10      #if that's the case even for a single k in the grid, return a defined value
+                res = np.amin(np.real(LA.eigvals(np.dot(J,Nk)).ravel()))
+                return res, 10      #if that's the case even for a single k in the grid, return a defined value
             temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
-            res[:,i,j] = np.sort(np.tensordot(J,LA.eigvalsh(temp),1)[:inp.m])    #only diagonalization
+            res[:,i,j] = LA.eigvalsh(temp)[inp.m:]
+            #res[:,i,j] = np.sort(np.abs(LA.eigvalsh(temp)[:inp.m]))    #only diagonalization
+    #r1 = res.ravel().sum()/(inp.m*inp.Nx*inp.Ny)
+    #gap = np.amin(res[0].ravel())
+    #return r1, gap
     r2 = 0
-    #for i in range(inp.m):
-    #    r2 += res[i].ravel().sum()
-    #r2 /= (inp.Nx*inp.Ny)
     for i in range(inp.m):
         func = RBS(inp.kxg,inp.kyg,res[i])
         r2 += func.integral(0,1,0,1)
     r2 /= inp.m
     gap = np.amin(res[0].ravel())
     return r2, gap
-    if False:
+    if 0:
         #plot
         print("P: ",P,"\nL:",L,"\ngap:",gap)
         R = np.zeros((3,inp.Nx,inp.Ny))
@@ -156,14 +159,17 @@ def sumEigs(P,L,args):
         Z = func(inp.kxg,inp.kyg)
         #fig,(ax1,ax2) = plt.subplots(1,2)#,projection='3d')
         fig = plt.figure(figsize=(10,5))
+        plt.axis('off')
+        plt.title(str(inp.Nx)+' * '+str(inp.Ny))
         ax1 = fig.add_subplot(131, projection='3d')
         #ax1 = fig.gca(projection='3d')
         ax1.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
         ax2 = fig.add_subplot(132, projection='3d')
         ax2.plot_surface(inp.kkgp[0],inp.kkgp[1],res[0],cmap=cm.coolwarm)
-        ax3 = fig.add_subplot(133, projection='3d')
+        ax3 = fig.add_subplot(133, projection='3d')     #works only for square grid
         ax3.plot_surface(X,Y,Z,cmap=cm.coolwarm)
         plt.show()
+    return r1, gap
 
 #### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
 def totE(P,args):
@@ -217,11 +223,11 @@ def CheckCsv(csvf):
     if my_file.is_file():
         with open(my_file,'r') as f:
             lines = f.readlines()
-        N = (len(lines)-1)//4 +1        #4 lines per ansatz
+        N = (len(lines)-1)//2 +1        #2 lines per ansatz
         for i in range(N):
-            data = lines[i*4+1].split(',')
-            if float(data[4]) < inp.cutoff:# and np.abs(float(data[6])) > 0.5:    #if Sigma accurate enough and Lambda not equal to the lower bound
-                ans.append(lines[i*4+1].split(',')[0])
+            data = lines[i*2+1].split(',')
+            if data[3] == 'True':
+                ans.append(lines[i*2+1].split(',')[0])
     res = []
     for a in inp.list_ans:
         if a not in ans:
@@ -232,6 +238,7 @@ def CheckCsv(csvf):
 #If the file matching the j2,j3 point is not found initialize the initial point with default parameters defined in inputs.py
 def FindInitialPoint(J2,J3,ansatze):
     P = {}  #parameters
+    done = {}
     if Path(inp.ReferenceDir).is_dir():
         for file in os.listdir(inp.ReferenceDir):     #find file in dir
             j2 = float(file[7:-5].split('_')[0])/10000  #specific for the name of the file
@@ -239,12 +246,12 @@ def FindInitialPoint(J2,J3,ansatze):
             if np.abs(j2-J2) < inp.cutoff_pts and np.abs(j3 - J3) < inp.cutoff_pts:         #once found read it
                 with open(inp.ReferenceDir+file, 'r') as f:
                     lines = f.readlines()
-                N = (len(lines)-1)//4 + 1
+                N = (len(lines)-1)//2 + 1
                 for Ans in ansatze:
                     for i in range(N):
-                        data = lines[i*4+1].split(',')
+                        data = lines[i*2+1].split(',')
                         if data[0] == Ans:              #correct ansatz
-                            P[data[0]] = data[7:]
+                            P[data[0]] = data[8:]
                             for j in range(len(P[data[0]])):    #cast to float
                                 P[data[0]][j] = float(P[data[0]][j])
     j2 = np.abs(J2) > inp.cutoff_pts    #bool for j2 not 0
@@ -259,6 +266,7 @@ def FindInitialPoint(J2,J3,ansatze):
     #check eventual missing ansatze from the reference fileand initialize with default values
     for ans in ansatze:
         if ans in list(P.keys()):
+            done[ans] = 1
             continue
         P[ans] = []
         for par in inp.Pi[ans].keys():
@@ -268,14 +276,33 @@ def FindInitialPoint(J2,J3,ansatze):
                 P[ans].append(inp.Pi[ans][par])
             elif par[-1] == '3' and j3:
                 P[ans].append(inp.Pi[ans][par])
-    return P
+        done[ans] = 0
+    return P, done
 
 #Constructs the bounds of the specific ansatz depending on the number and type of parameters involved in the minimization
-def FindBounds(J2,J3,ansatze):
+def FindBounds(J2,J3,ansatze,done,Pin):
     B = {}
     j2 = np.abs(J2) > inp.cutoff_pts
     j3 = np.abs(J3) > inp.cutoff_pts
     for ans in ansatze:
+        if done[ans]:
+            B[ans] = tuple()
+            list_p = list(inp.Pi[ans].keys())
+            new_list = []
+            for t in list_p:
+                if t[-1] == '2' and j2:
+                    new_list.append(t)
+                elif t[-1] == '3' and j3:
+                    new_list.append(t)
+                elif t[-1] == '1':
+                    new_list.append(t)
+            for n,p in enumerate(Pin[ans]):
+                s_b = inp.s_b
+                t = new_list[n]
+                mB = p - s_b if (p - s_b > inp.bounds[ans][t][0]) else inp.bounds[ans][t][0]
+                MB = p + s_b if (p + s_b < inp.bounds[ans][t][1]) else inp.bounds[ans][t][1]
+                B[ans] += ((mB,MB),)
+            continue
         B[ans] = (inp.bounds[ans]['A1'],)
         for par in inp.Pi[ans].keys():
             if par == 'A1':
@@ -307,6 +334,7 @@ def ComputeDerRanges(J2,J3,ansatze):
         for n in range(inp.num_phi[ans]):
             R[ans].append(inp.der_phi)
     return R
+
 #From the list of parameters obtained after the minimization constructs an array containing them and eventually 
 #some 0 parameters which may be omitted because j2 or j3 are equal to 0.
 def FormatParams(P,ans,J2,J3):
@@ -385,7 +413,7 @@ def SaveToCsv(Data,csvfile):
         D = init[i*2+1].split(',')
         if D[0] == ans:
             ac = True
-            if float(D[4]) > Data['Sigma']:
+            if Data['Converge'] == 'True':
                 N_ = i+1
     ###
     header = inp.header[ans]
@@ -405,4 +433,17 @@ def SaveToCsv(Data,csvfile):
             writer = csv.DictWriter(f, fieldnames = header)
             writer.writeheader()
             writer.writerow(Data)
+
+##
+def IsConverged(P,bnds,Sigma):
+    for n,p in enumerate(P):
+        m = np.abs((p - bnds[n][0])/bnds[n][0]) > 1e-3 if bnds[n][0] != 0 else np.abs(p) > 1e-3
+        M = np.abs((p - bnds[n][1])/bnds[n][1]) > 1e-3 if bnds[n][0] != 0 else np.abs(p) > 1e-3
+        if m and M:
+            continue
+        else:
+            return False
+    if Sigma > inp.cutoff:
+        return False
+    return True
 
