@@ -389,6 +389,9 @@ def FormatParams(P,ans,J2,J3):
 
 #Save the dictionaries in the file given, rewriting the already existing data if precision is better
 def SaveToCsv(Data,csvfile):
+    if Data['Converge'] == 'False':
+        print('Not saving because it did not converge')
+        return 0
     N_ = 0
     if Path(csvfile).is_file():
         with open(csvfile,'r') as f:
@@ -397,16 +400,15 @@ def SaveToCsv(Data,csvfile):
         init = []
     ans = Data['ans']       #computed ansatz
     N = (len(init)-1)//2+1
-    ac = False      #ac i.e. already-computed
+    subscribe = False
     for i in range(N):
         D = init[i*2+1].split(',')
         if D[0] == ans:
-            ac = True
-            if Data['Converge'] == 'True':
-                N_ = i+1
+            subscribe = True
+            N_ = i+1
     ###
     header = inp.header[ans]
-    if N_:
+    if subscribe:
         with open(csvfile,'w') as f:
             for i in range(2*N_-2):
                 f.write(init[i])
@@ -417,7 +419,7 @@ def SaveToCsv(Data,csvfile):
         with open(csvfile,'a') as f:
             for l in range(2*N_,len(init)):
                 f.write(init[l])
-    elif not ac:
+    else:
         with open(csvfile,'a') as f:
             writer = csv.DictWriter(f, fieldnames = header)
             writer.writeheader()
