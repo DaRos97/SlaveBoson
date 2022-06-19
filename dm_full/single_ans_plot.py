@@ -11,7 +11,8 @@ Color = {'3x3_1': ['b','orange'],
          'q0_2':  ['purple','k'],
          'cb1':  ['m','g']}
 #dirname = '../Data/fullDM/DM_13/'; title = 'With DM interactions'
-dirname = '../Data/S03/DM_13/'; title = 'With DM interactions'
+dirname = '../Data/fullDM/no_DM_13/'; title = 'Without DM interactions'
+#dirname = '../Data/S03/DM_13/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
     ans = sys.argv[1]
 else:
@@ -43,7 +44,10 @@ for filename in os.listdir(dirname):
             for n,h in enumerate(head):
                 N = n
                 if N != 0:
-                    D[h][i2,i3] = float(data[N+3])
+                    try:
+                        D[h][i2,i3] = float(data[N+3])
+                    except:
+                        print("not good: ",h,i2,i3)
                 else:
                     D[h][i2,i3] = 1 if data[N+3]=='True' else 0
 print("Non converged points: ",int(81-D['Converge'].ravel().sum()),"\n",D['Converge'])

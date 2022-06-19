@@ -5,17 +5,17 @@ import os
 import sys
 from matplotlib import cm
 
-Color = {'3x3': ['b','orange'],
-         'q0':  ['r','y'],
-         '0-pi': 'y',
-         'cb1':  ['m','g'],
-         'cb2': ['k','purple']}
-#dirname = '../Data/noDM/Data_13-13/'; title = 'Without DM interactions'
-dirname = '../Data/yesDM/Data_13-13/'; title = 'With DM interactions'
+Color = {'3x3_1': ['b','orange'],
+         '3x3_2': ['k','gray'],
+         'q0_1':  ['r','y'],
+         'q0_2':  ['purple','k'],
+         'cb1':  ['m','g']}
+dirname = '../Data/fullDM/no_DM_13/'; title = 'Without DM interactions'
+#dirname = '../Data/S03/no_DM_13/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
     ans = sys.argv[1]
 else:
-    ans = input("Which ans?(3x3,q0,cb1)")
+    ans = input("Which ans?(3x3_1,q0_1,cb1)")
 D = {}
 Ji = -0.3
 Jf = 0.3
@@ -25,36 +25,38 @@ X,Y = np.meshgrid(J2,J3)
 Head = inp.header[ans][3:]
 head = []
 for h in Head:
-    if h != 'Sigma':
-        head.append(h)
+    head.append(h)
 for h in head:
     D[h] = np.zeros((9,9))
 for filename in os.listdir(dirname):
     with open(dirname+filename, 'r') as f:
         lines = f.readlines()
-    N = (len(lines)-1)//4 + 1
+    N = (len(lines)-1)//2 + 1
     tempE = []
     for i in range(N):
-        data = lines[i*4+1].split(',')
+        data = lines[i*2+1].split(',')
         if data[0] == ans:
-            j2 =float(data[1]) - Ji
-            j3 =float(data[2]) - Ji
+            j2 = float(data[1]) - Ji
+            j3 = float(data[2]) - Ji
             i2 = int(j2*8/(0.6))
             i3 = int(j3*8/(0.6))
             for n,h in enumerate(head):
-                if n >= 1:
-                    N = n+1
+                N = n
+                if N != 0:
+                    try:
+                        D[h][i2,i3] = float(data[N+3])
+                    except:
+                        print("not good: ",h,i2,i3)
                 else:
-                    N = n
-                D[h][i2,i3] = float(data[N+3])
-
+                    D[h][i2,i3] = 1 if data[N+3]=='True' else 0
+print("Non converged points: ",int(81-D['Converge'].ravel().sum()),"\n",D['Converge'])
 nP = len(head)
-fig = plt.figure(figsize=(16,16))
-#plt.title(title)
+fig = plt.figure()#(figsize=(16,16))
+figManager = plt.get_current_fig_manager()
+figManager.window.showMaximized()
 plt.axis('off')
 for i in range(nP):
-    n = int(330+i+1)
-    ax = fig.add_subplot(n,projection='3d')
+    ax = fig.add_subplot(4,4,i+1,projection='3d')
     ax.plot_surface(X,Y,D[head[i]].T,cmap=cm.coolwarm)
     ax.set_title(ans)
     ax.set_xlabel("J2")
