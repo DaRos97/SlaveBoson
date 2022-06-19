@@ -169,7 +169,7 @@ def sumEigs(P,L,args):
         ax3 = fig.add_subplot(133, projection='3d')     #works only for square grid
         ax3.plot_surface(X,Y,Z,cmap=cm.coolwarm)
         plt.show()
-    return r1, gap
+    return r2, gap
 
 #### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
 def totE(P,args):
@@ -376,12 +376,20 @@ def FormatParams(P,ans,J2,J3):
         newP.append(P[-3*j2*j3]*j2*j3 + P[-2]*j2*(1-j3))
         newP.append(P[-2]*j2*j3 + P[-1]*j2*(1-j3))
         newP.append(P[-1]*j3)
-    elif ans == 'cb1':
+    elif ans == 'cb1' or ans == 'cb2':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
         newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
         newP.append(P[-4*j2]*j2 + P[-2]*(1-j2))
+        newP.append(P[-3*j2]*j2 + P[-1]*(1-j2))
+        newP.append(P[-2]*j2)
+        newP.append(P[-1]*j2)
+    elif ans == 'oct':
+        newP.append(P[1*j2]*j2)
+        newP.append(P[2*j2]*j2+P[1]*(1-j2))
+        newP.append(P[3*j2]*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[-3*j2]*j2 + P[-1]*(1-j2))
         newP.append(P[-2]*j2)
         newP.append(P[-1]*j2)

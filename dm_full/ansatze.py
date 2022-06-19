@@ -77,7 +77,7 @@ def Nk(P,L,args):
         phiA2p = phiA1p - phiA2
         phiB1p ,phiB2p = (-phiB1, -phiB2)
         p1 = 0
-    elif ans == 'cb1':      #A1,A2,A3,B1,B2,phiA1p,phiB2
+    elif ans == 'cb1' or ans == 'cb2':      #A1,A2,A3,B1,B2,phiA1p,phiB2
         B3 = 0; phiB3 = 0
         A2 = P[1*j2]*j2
         A3 = P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2)
@@ -89,6 +89,18 @@ def Nk(P,L,args):
         phiB2 = P[-1]*j2
         phiA2p, phiA3 = (phiA1p-phiA2,phiA1p/2)
         phiB1p, phiB2p= (-phiB1 ,-phiB2)
+        p1 = 1
+    elif ans == 'oct':
+        A3 = 0; phiA3 = 0
+        A2 = P[1]*j2
+        B1 = P[2*j2]*j2+P[1]*(1-j2)
+        B2 = P[3*j2]*j2
+        B3 = P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2)
+        phiB1 = P[-3*j2]*j2 + P[-1]*(1-j2)
+        phiA2 = P[-2]*j2
+        phiB2 = P[-1]*j2
+        phiA1p, phiA2p = (np.pi, phiA2+np.pi)
+        phiB1p, phiB2p, phiB3 = (phiB1, phiB2, 3/2*np.pi)
         p1 = 1
     ################
     N = np.zeros((2*m,2*m,inp.Nx,inp.Ny), dtype=complex)

@@ -11,11 +11,11 @@ DM3 = 2/3*np.pi
 Nx = 13
 Ny = 13
 mp_cpu = 16
-list_ans = ['3x3_1','q0_1','cb1']#'3x3_2','q0_1','q0_2','cb1']#,'cb2','oct']
+list_ans = ['cb2','oct']
 DirName = '/home/users/r/rossid/Data/'
-#DirName = '../Data/fullDM/'
-DataDir = DirName + 'DM_13/'
-ReferenceDir = DirName + 'fullDM_13/'
+#DirName = '../Data/test/'
+DataDir = DirName# + 'DM_13/'
+ReferenceDir = 'none'#DirName + 'fullDM_13/'
 #derivative
 s_b = 0.01 #bound on values given by smaller grids
 der_par = 1e-6
@@ -54,16 +54,16 @@ header = {'3x3_1':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1
           'q0_1':     ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiA2','phiB2'],  #q0
           'q0_2':     ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiA1','phiB1','phiA2','phiB2','phiB3'],  #q0
           'cb1':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiA1','phiB1','phiA2','phiB2'],  #cuboc1
-          'cb2':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiB1','phiA2'],  #cuboc2
-          'oct':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiB2']}  #octahedral
+          'cb2':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','A3','B1','B2','phiA1','phiB1','phiA2','phiB2'],  #cuboc2
+          'oct':    ['ans','J2','J3','Converge','Energy','Sigma','gap','L','A1','A2','B1','B2','B3','phiB1','phiB2','phiA2']}  #octahedral
 t_0 = np.arctan(np.sqrt(2))
 Pi = {  '3x3_1':{'A1':0.51, 'A3':0.17, 'B1':0.17, 'B2': 0.41, 'B3': -0.12, 'phiB1': np.pi, 'phiB2': 0, 'phiA3': np.pi},
         '3x3_2':{'A1':0.51, 'A3':-0.17, 'B1':0.17, 'B2': 0.41, 'B3': 0.12, 'phiA1': np.pi, 'phiB1': np.pi, 'phiB2': 0, 'phiB3': np.pi},
         'q0_1':{'A1':0.51, 'A2':0.3, 'B1':0.18, 'B2': 0.18, 'B3': -0.15, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi},
         'q0_2':{'A1':0.51, 'A2':0.13, 'B1':0.18, 'B2': 0.18, 'B3': 0.3, 'phiA1': 0, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi, 'phiB3': np.pi},
         'cb1':{'A1':0.51, 'A2':0.1, 'A3':-0.43, 'B1':0.17, 'B2': 0.17, 'phiA1': 2*t_0, 'phiB1': np.pi, 'phiA2': np.pi+t_0, 'phiB2': t_0},
-        'cb2':{'A1':0.25, 'A2':0.433, 'A3':0.5, 'B1':0.433, 'B2': 0.25, 'phiB1':np.pi+t_0, 'phiA2':np.pi-t_0},
-        'oct':{'A1':0.35, 'A2':0.35, 'B1':0.35, 'B2': 0.35, 'B3':0.35 ,'phiB1':-3*np.pi/4, 'phiB2':np.pi/4}
+        'cb2':{'A1':0.5, 'A2':0.1, 'A3':0.43, 'B1':0.17, 'B2': 0.17, 'phiA1': 0, 'phiB1': np.pi+t_0, 'phiA2': np.pi+t_0, 'phiB2': 0},
+        'oct':{'A1':0.5, 'A2':0.35, 'B1':0.35, 'B2': 0.35, 'B3':0.35 ,'phiB1':-3*np.pi/4, 'phiA2':np.pi/2}
         }
 lAns = header.keys()
 bounds = {}
@@ -136,7 +136,28 @@ for ans in lAns:
         bounds[ans]['phiA2'] = (0,2*np.pi)
         bounds[ans]['phiB2'] = (0,2*np.pi)
         num_phi[ans] = 4
-L_bounds = (0.3,2)
+    elif ans == 'cb2':
+        bounds[ans]['A1'] = (0,1)
+        bounds[ans]['A2'] = (0,1)
+        bounds[ans]['A3'] = (-1,1)
+        bounds[ans]['B1'] = (0,0.5)
+        bounds[ans]['B2'] = (0,0.5)
+        bounds[ans]['phiA1'] = (-1,1)
+        bounds[ans]['phiB1'] = (0,2*np.pi)
+        bounds[ans]['phiA2'] = (0,2*np.pi)
+        bounds[ans]['phiB2'] = (0,2*np.pi)
+        num_phi[ans] = 4
+    elif ans == 'oct':
+        bounds[ans]['A1'] = (-1,1)
+        bounds[ans]['A2'] = (0,1)
+        bounds[ans]['B1'] = (0,0.5)
+        bounds[ans]['B2'] = (0,0.5)
+        bounds[ans]['B3'] = (-0.5,0.5)
+        bounds[ans]['phiB1'] = (0,2*np.pi)
+        bounds[ans]['phiA2'] = (0,2*np.pi)
+        bounds[ans]['phiB2'] = (0,2*np.pi)
+        num_phi[ans] = 4
+L_bounds = (0.3,3)
 shame2 = 5
 
 print("Minimization precision (both tol and atol):",cutoff)
