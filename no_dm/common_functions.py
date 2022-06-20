@@ -362,10 +362,10 @@ def FormatParams(P,ans,J2,J3):
         newP.append(P[-2]*j3+P[-1]*(1-j3))
         newP.append(P[-1]*j3)
     elif ans == 'q0_1':
-        newP.append(P[1]*j3)
-        newP.append(P[2*j3]*j3+P[1]*(1-j3))
-        newP.append(P[3*j2*j3]*j2*j3+P[2*j2*(1-j3)]*(1-j3)*j2)
-        newP.append(P[4*j3*j2]*j3*j2+P[3*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[1]*j2)
+        newP.append(P[2*j2]*j2+P[1]*(1-j2))
+        newP.append(P[3*j2]*j2)
+        newP.append(P[4*j3*j2]*j3*j2+P[2*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[-1]*j2)
     elif ans == 'q0_2' or ans == 'q0_4':
         newP.append(P[1]*j3)
@@ -382,7 +382,14 @@ def FormatParams(P,ans,J2,J3):
         newP.append(P[-3*j2*j3]*j2*j3+P[-2]*j2*(1-j3)+P[-2]*(1-j2)*j3+P[-1]*(1-j2)*(1-j3))
         newP.append(P[-2]*j2*j3+P[-1]*j2*(1-j3))
         newP.append(P[-1]*j3)
-    elif ans == 'cb1' or ans == 'cb2':
+    elif ans == 'cb1':
+        newP.append(P[1*j2]*j2)
+        newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
+        newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))
+        newP.append(P[4*j3*j2]*j2*j3 + P[3*j2*(1-j3)]*j2*(1-j3))
+        newP.append(P[-2]*j2 + P[-1]*(1-j2))
+        newP.append(P[-1]*j2)
+    elif ans == 'cb2':
         newP.append(P[1*j2]*j2)
         newP.append(P[2*j3*j2]*j2*j3 + P[1*j3*(1-j2)]*j3*(1-j2))
         newP.append(P[3*j2*j3]*j2*j3 + P[2*j2*(1-j3)]*j2*(1-j3) + P[2*j3*(1-j2)]*j3*(1-j2) + P[1*(1-j2)*(1-j3)]*(1-j2)*(1-j3))

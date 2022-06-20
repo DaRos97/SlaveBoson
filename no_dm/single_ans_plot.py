@@ -9,13 +9,15 @@ Color = {'3x3_1': ['b','orange'],
          '3x3_2': ['k','gray'],
          'q0_1':  ['r','y'],
          'q0_2':  ['purple','k'],
-         'cb1':  ['m','g']}
+         'cb1':  ['m','g'],
+         'cb2':  ['m','g'],
+         'oct':  ['m','g']}
 dirname = '../Data/fullDM/no_DM_13/'; title = 'Without DM interactions'
 #dirname = '../Data/S03/no_DM_13/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
     ans = sys.argv[1]
 else:
-    ans = input("Which ans?(3x3_1,q0_1,cb1)")
+    ans = input("Which ans?(3x3_1,q0_1,cb1,cb2,oct)")
 D = {}
 Ji = -0.3
 Jf = 0.3
