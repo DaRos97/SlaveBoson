@@ -40,8 +40,6 @@ def full_func(P):
             K[1,i,j] = -4*np.pi/np.sqrt(3) + 8*np.pi/np.sqrt(3)/(Ny-1)*j
             Sxy[i,j], Sz[i,j] = Ss(K[:,i,j],L)
             coeff = is_inside(K[:,i,j])
-#            print(K[:,i,j],coeff)
-#            input()
             cntxy += coeff*Sxy[i,j]
             cntz  += coeff*Sz[i,j]
     if cntxy != 0:
@@ -50,7 +48,6 @@ def full_func(P):
         Sz  /= cntz
     plot2(K,Sxy,Sz,P,UC,U,D,V,V_,av)
 #    plot(K,Sxy,Sz,S,ru,rx,rz1,rz2,UC,av,U,D)
-    #print("Time taken: ",T.time()-ti)
     return 0
 def Ss(k,L):
     resxy = 0
@@ -125,30 +122,68 @@ def umbXtz(L,UC,ru,rx,rz1,rz2):  #umbrella along X with 3x3 order b/w unit cells
     print(c1)
     return upCH, dwCH
 ######################################################
-q = np.pi
-def cb1(L,UC,P):
+def cb1(L,UC,P):            #not really cb1
     t0 = np.arccos(1/np.sqrt(3))
     a_ = np.array([1/2,0,0])
     b_ = np.array([1/4,np.sqrt(3)/4,0])
     c_ = np.array([-1/4,np.sqrt(3)/4,0])
     d_ = np.array([0,1/2*np.cos(t0),1/2*np.sin(t0)])
-#    d_ = np.array([0,1/(2*np.sqrt(3)),np.sqrt(2/3)/2])
     e_ = np.array([-1/2*np.cos(t0)*np.sqrt(3)/2,-1/2*np.cos(t0)/2,1/2*np.sin(t0)])
-#    e_ = np.array([-1/4,-1/(4*np.sqrt(3)),np.sqrt(2/3)/2])
     f_ = np.array([1/2*np.cos(t0)*np.sqrt(3)/2,-1/2*np.cos(t0)/2,1/2*np.sin(t0)])
-#    f_ = np.array([1/4,-1/(4*np.sqrt(3)),np.sqrt(2/3)/2])
+    ########################
+    the = 0
+    a = np.array([0,0,1/2])
+    b = np.array([0,-np.sqrt(3)/4,-1/4])
+    c = np.array([0,np.sqrt(3)/4,-1/4])
+    Ry = R_y(the)
+    a = np.tensordot(Ry,a,1)
+    b = np.tensordot(Ry,b,1)
+    c = np.tensordot(Ry,c,1)
+    for i in range(0,UC):
+        for j in range(0,UC):
+            L[i,j,0] = b
+            L[i,j,1] = c
+            L[i,j,2] = a
+    btl = []
+    btr = []
+    sml = []
+    smu = []
+    for i in range(2):
+        for j in range(2):
+            btl.append(np.dot(np.cross(L[1+i,0+j,0],L[0+i,1+j,1]),L[0+i,0+j,2]))
+            btr.append(np.dot(np.cross(L[0+i,0+j,1],L[1+i,0+j,2]),L[0+i,1+j,0]))
+            sml.append(np.dot(np.cross(L[0+i,0+j,1],L[0+i,1+j,0]),L[0+i,0+j,2]))
+            smu.append(np.dot(np.cross(L[0+i,0+j,2],L[0+i,1+j,1]),L[0+i,1+j,0]))
+            print(i,j)
+            print("left pointing ch: ", btl[-1])
+            print("right pointing ch: ",btr[-1])
+            print("small 1 ch: ", sml[-1])
+            print("small 2 ch: ", smu[-1])
+    #
+    return 0, 0, [a_,b_,c_,d_,e_,f_], [-a_,-b_,-c_,-d_,-e_,-f_]
+######################################################
+q = np.pi
+def cb12(L,UC,P):
+    t0 = 0.5#np.arccos(1/np.sqrt(3))
+    a_ = np.array([1/2,0,0])
+    b_ = np.array([1/4,np.sqrt(3)/4,0])
+    c_ = np.array([-1/4,np.sqrt(3)/4,0])
+    d_ = np.array([0,1/2*np.cos(t0),1/2*np.sin(t0)])
+    e_ = np.array([-1/2*np.cos(t0)*np.sqrt(3)/2,-1/2*np.cos(t0)/2,1/2*np.sin(t0)])
+    f_ = np.array([1/2*np.cos(t0)*np.sqrt(3)/2,-1/2*np.cos(t0)/2,1/2*np.sin(t0)])
     rza = 0
     rzb = 0
     rzc = 0
-    rzd = 0
-    rze = 0
-    rzf = 0
+    tt = 0#np.pi/5
+    rzd = tt
+    rze = tt
+    rzf = tt
     rza_ = 0
     rzb_ = 0
     rzc_ = 0
-    rzd_ = 0
-    rze_ = 0
-    rzf_ = 0
+    rzd_ = tt
+    rze_ = tt
+    rzf_ = tt
     a1 = np.tensordot(R_z(rza),a_,1)
     b1 = np.tensordot(R_z(rzb),b_,1)
     c1 = np.tensordot(R_z(rzc),c_,1)
@@ -163,20 +198,27 @@ def cb1(L,UC,P):
     f1_ = np.tensordot(R_z(rzf_),-f_,1)
     for i in range(0,UC,2):
         for j in range(0,UC,2):
-            t = 0#np.pi/2*(i%2) - np.pi/2*(j%2)
-            Rz = R_z(t)
-            L[i+1,j+1,0] = np.tensordot(Rz,e1,1);           L[i,j+1,0] = np.tensordot(Rz,c1_,1);
-            L[i+1,j+1,1] = np.tensordot(Rz,d1_,1);          L[i,j+1,1] = np.tensordot(Rz,d1,1);
-            L[i+1,j+1,2] = np.tensordot(Rz,b1,1);           L[i,j+1,2] = np.tensordot(Rz,f1_,1);
-            L[i+1,j,0] = np.tensordot(Rz,c1,1);         L[i,j,0] = np.tensordot(Rz,e1_,1);
-            L[i+1,j,1] = np.tensordot(Rz,a1,1);         L[i,j,1] = np.tensordot(Rz,a1_,1);
-            L[i+1,j,2] = np.tensordot(Rz,b1_,1);        L[i,j,2] = np.tensordot(Rz,f1,1);
+            t = 0#np.pi*(i//2)# + np.pi*(j//2) #np.pi*2/3*(i/2) + np.pi*2/3*(j/2)
+            tz = 0#np.pi/4*(i//2)# + np.pi*(j//2) #np.pi*2/3*(i/2) + np.pi*2/3*(j/2)
+            Rz = np.dot(R_z(tz),R_y(t))
+            L[i,j,0] = np.tensordot(Rz,e1,1);           L[i,j+1,0] = np.tensordot(Rz,c1_,1);
+            L[i,j,1] = np.tensordot(Rz,d1_,1);          L[i,j+1,1] = np.tensordot(Rz,d1,1);
+            L[i,j,2] = np.tensordot(Rz,b1,1);           L[i,j+1,2] = np.tensordot(Rz,f1_,1);
+            L[i+1,j,0] = np.tensordot(Rz,c1,1);         L[i+1,j+1,0] = np.tensordot(Rz,e1_,1);
+            L[i+1,j,1] = np.tensordot(Rz,a1,1);         L[i+1,j+1,1] = np.tensordot(Rz,a1_,1);
+            L[i+1,j,2] = np.tensordot(Rz,b1_,1);        L[i+1,j+1,2] = np.tensordot(Rz,f1,1);
+            #L[i,j,0] = np.tensordot(Rz,e1_,1);           L[i,j+1,0] = np.tensordot(Rz,c1,1);
+            #L[i,j,1] = np.tensordot(Rz,d1,1);          L[i,j+1,1] = np.tensordot(Rz,d1_,1);
+            #L[i,j,2] = np.tensordot(Rz,b1,1);           L[i,j+1,2] = np.tensordot(Rz,f1_,1);
+            #L[i+1,j,0] = np.tensordot(Rz,c1_,1);         L[i+1,j+1,0] = np.tensordot(Rz,e1,1);
+            #L[i+1,j,1] = np.tensordot(Rz,a1,1);         L[i+1,j+1,1] = np.tensordot(Rz,a1_,1);
+            #L[i+1,j,2] = np.tensordot(Rz,b1_,1);        L[i+1,j+1,2] = np.tensordot(Rz,f1,1);
     btl = []
     btr = []
     sml = []
     smu = []
-    for i in range(3):
-        for j in range(3):
+    for i in range(2):
+        for j in range(2):
             btl.append(np.dot(np.cross(L[1+i,0+j,0],L[0+i,1+j,1]),L[0+i,0+j,2]))
             btr.append(np.dot(np.cross(L[0+i,0+j,1],L[1+i,0+j,2]),L[0+i,1+j,0]))
             sml.append(np.dot(np.cross(L[0+i,0+j,1],L[0+i,1+j,0]),L[0+i,0+j,2]))
