@@ -27,21 +27,21 @@ def initial_state(v,ang,UC):
     f = np.tensordot(Rz,np.tensordot(Ry,v[5],1),1)
     for i in range(0,UC,2):
         for j in range(0,UC,2):
-            t1 = 2*np.pi/3*(i//2%3-j//2%3)
+            t1 = -2*np.pi/3*(i//2%3-j//2%3)
             B = np.tensordot(R_z(0+t1),b,1)
             E = np.tensordot(R_z(-2*np.pi/3+t1),e,1)
             D_ = np.tensordot(R_z(2*np.pi/3+t1),-d,1)
             L[i,j,0] = E
             L[i,j,1] = D_
             L[i,j,2] = B
-            t2 = t1 - 2*np.pi/3
+            t2 = t1 + 2*np.pi/3
             B_ = np.tensordot(R_z(0+t2),-b,1)
             C = np.tensordot(R_z(-2*np.pi/3+t2),c,1)
             A = np.tensordot(R_z(2*np.pi/3+t2),a,1)
             L[i+1,j,0] = C
             L[i+1,j,1] = A
             L[i+1,j,2] = B_
-            t3 = t1 + 2*np.pi/3
+            t3 = t1 - 2*np.pi/3
             F_ = np.tensordot(R_z(0+t3),-f,1)
             C_ = np.tensordot(R_z(-2*np.pi/3+t3),-c,1)
             D = np.tensordot(R_z(2*np.pi/3+t3),d,1)

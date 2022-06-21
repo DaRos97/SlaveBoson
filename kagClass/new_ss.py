@@ -84,3 +84,4 @@ plt.colorbar()
 dirname = "Figs/"
 title = dirname+"theta="+"{:.5f}".format(the).replace('.',',')+"phi="+"{:.5f}".format(phi).replace('.',',')+".png"
 plt.savefig(title)
+plt.show()

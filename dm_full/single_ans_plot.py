@@ -11,8 +11,7 @@ Color = {'3x3_1': ['b','orange'],
          'q0_2':  ['purple','k'],
          'cb1':  ['m','g']}
 #dirname = '../Data/fullDM/DM_13/'; title = 'With DM interactions'
-dirname = '../Data/fullDM/no_DM_13/'; title = 'Without DM interactions'
-#dirname = '../Data/S03/DM_13/'; title = 'With DM interactions'
+dirname = '../Data/S03/DM_13/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
     ans = sys.argv[1]
 else:
