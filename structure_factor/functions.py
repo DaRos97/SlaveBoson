@@ -14,23 +14,22 @@ def import_data(ans,filename):
             print("Non-converged point, abort")
             exit()
         for d in data[7:]:
-            P.append(float(d))
+            if float(d) != 0.0:
+                P.append(float(d))
     return P
 ####
 m = 6
-J = np.zeros((m,m))
+J = np.zeros((2*m,2*m))
 for i in range(m):
     J[i,i] = -1
     J[i+m,i+m] = 1
 def M(K,P,args):
-    J1,J2,J3,ans = args
-    Ch = LA.cholesky(Nk(K,P,args))
-    #check if it is lower or upper triangular
-    w,U = LA.eigh(np.dot(np.dot(Ch,J),np.conjugate(Ch.T)))
-    w = np.diag(np.dot(np.sqrt(w)))
-    #check that w is now all positive
-    Mk = np.dot(LA.inv(K),U),w)
     m = 6
+    N = Nk(K,P,args)
+    Ch = LA.cholesky(N) #upper triangular
+    w,U = LA.eigh(np.dot(np.dot(Ch,J),np.conjugate(Ch.T)))
+    w = np.diag(np.sqrt(np.einsum('ij,j->i',J,w)))
+    Mk = np.dot(np.dot(LA.inv(Ch),U),w)
     U,V,X,Y = split(Mk,m,m)
     return U,X,V,Y
 ####
@@ -40,11 +39,11 @@ def split(array, nrows, ncols):
                  .swapaxes(1, 2)
                  .reshape(-1, nrows, ncols))
 ####
-a1 = (1,0)
-a2 = (-1,np.sqrt(3))
-a12p = (a1[0]+a2[0],a1[1]+a2[1])
-a12m = (a1[0]-a2[0],a1[1]-a2[1])
 def Nk(K,par,args):
+    a1 = (1,0)
+    a2 = (-1,np.sqrt(3))
+    a12p = (a1[0]+a2[0],a1[1]+a2[1])
+    a12m = (a1[0]-a2[0],a1[1]-a2[1])
     ka1 = np.exp(1j*np.dot(a1,K));   ka1_ = np.conjugate(ka1);
     ka2 = np.exp(1j*np.dot(a2,K));   ka2_ = np.conjugate(ka2);
     ka12p = np.exp(1j*np.dot(a12p,K));   ka12p_ = np.conjugate(ka12p);
@@ -55,8 +54,8 @@ def Nk(K,par,args):
     if DM:
         DM1 = 4*np.pi/3
         DM3 = 2*np.pi/3
-    t1 = np.exp(-1j*inp.DM1/2);    t1_ = np.conjugate(t1)
-    t3 = np.exp(-1j*inp.DM3/2);    t3_ = np.conjugate(t3)
+    t1 = np.exp(-1j*DM1/2);    t1_ = np.conjugate(t1)
+    t3 = np.exp(-1j*DM3/2);    t3_ = np.conjugate(t3)
     m = 6
     L = par[0]
     P = par[1:]
