@@ -238,3 +238,24 @@ def Nk(K,par,args):
     return N
 
 
+def fd1(x):
+    return -np.sqrt(3)*x-4*np.pi/np.sqrt(3)
+def fd3(x):
+    return np.sqrt(3)*x-4*np.pi/np.sqrt(3)
+def fu1(x):
+    return np.sqrt(3)*x+4*np.pi/np.sqrt(3)
+def fu3(x):
+    return -np.sqrt(3)*x+4*np.pi/np.sqrt(3)
+def Fd1(x):
+    return -np.sqrt(3)*x-8*np.pi/np.sqrt(3)
+def Fd3(x):
+    return np.sqrt(3)*x-8*np.pi/np.sqrt(3)
+def Fu1(x):
+    return np.sqrt(3)*x+8*np.pi/np.sqrt(3)
+def Fu3(x):
+    return -np.sqrt(3)*x+8*np.pi/np.sqrt(3)
+
+X1 = np.linspace(-4*np.pi/3,-2*np.pi/3,1000)
+X2 = np.linspace(2*np.pi/3,4*np.pi/3,1000)
+X3 = np.linspace(-8*np.pi/3,-4*np.pi/3,1000)
+X4 = np.linspace(4*np.pi/3,8*np.pi/3,1000)

@@ -6,132 +6,51 @@ import sys
 from matplotlib import cm
 
 Color = {'3x3_1': ['b','orange'],
-         '3x3_2': ['k','gray'],
          'q0_1':  ['r','y'],
-         'q0_2':  ['purple','k'],
-         'cb1':  ['m','g']}
-#dirname = '../Data/noDM/Data_13-13_17/'; title = 'Without DM interactions'
-dirname = '../Data/yesDM/Data_13-13_aaaa/'; title = 'With DM interactions'
-minE = []
-ct = {'3x3':10, 'q0':10,'cb1':10}
-ct2 = 1e-7
-E = {'3x3_1':[],
-     '3x3_2' :[],
-     'q0_1' :[],
-     'q0_2' :[],
-     'cb1':[]
-     }
+         'cb1':  ['g','m']}
+#dirname = '../Data/S05/DM_13/'; title = "S = 0.5, with DM"
+dirname = '../Data/S03/DM_13/'; title = "S = 0.366, with DM"
+#
+D = np.ndarray((9,9),dtype='object')
+Ji = -0.3
+Jf = 0.3
+J2 = np.linspace(Ji,Jf,9)
+J3 = np.linspace(Ji,Jf,9)
+X,Y = np.meshgrid(J2,J3)
 for filename in os.listdir(dirname):
     with open(dirname+filename, 'r') as f:
         lines = f.readlines()
-    N = (len(lines)-1)// + 1
-    tempE = []
+    N = (len(lines)-1)//2 + 1
+    minE = 0
     for i in range(N):
         data = lines[i*2+1].split(',')
-        tE = [data[0]]
-        tempE.append(float(data[3]))     #ans,J2,J3,E,S
-        for j in range(1,len(data)):
-            tE.append(float(data[j]))
-        E[data[0]].append(tE)
-    minInd = np.argmin(np.array(tempE))
-    minE.append(lines[minInd*2+1].split(','))
-cn = int(input("Compute gaps(0), energies(1) or both(2)?"))
-list_ans = E.keys()
-if cn == 0 or cn == 2:
-    gaps = {}
-    Ji = -0.3
-    Jf = 0.3
-    fig = plt.figure(figsize=(16,16))
-    tt = title + ': gap values'
-    plt.title(tt)
-    plt.axis('off')
-    for a,ans in enumerate(list_ans):
-        gaps[ans] = np.zeros((9,9))
-        for j2 in range(len(E[ans])):
-            J2 = E[ans][j2][1] - Ji
-            i2 = int(J2*8/(0.6))
-            J3 = E[ans][j2][2] - Ji
-            i3 = int(J3*8/(0.6))
-            gaps[ans][i2,i3] = E[ans][j2][5]
-        J2 = np.linspace(Ji,Jf,9)
-        J3 = np.linspace(Ji,Jf,9)
-        X,Y = np.meshgrid(J2,J3)
-        n = int(100 + len(list_ans)*10 +a+1)
-        ax = fig.add_subplot(n,projection='3d')
-        ax.plot_surface(X,Y,gaps[ans].T,cmap=cm.coolwarm)
-        ax.set_title(ans)
-        ax.set_xlabel("J2")
-        ax.set_ylabel("J3")
-    plt.show()
-if cn == 0 or cn == 2:
-    ener = {}
-    Ji = -0.3
-    Jf = 0.3
-    fig = plt.figure(figsize=(16,16))
-    tt = title + ': energy landscape'
-    plt.title(tt)
-    plt.axis('off')
-    for a,ans in enumerate(list_ans):
-        ener[ans] = np.full((9,9), -0.5)
-        for j2 in range(len(E[ans])):
-            J2 = E[ans][j2][1] - Ji
-            i2 = int(J2*8/(0.6))
-            J3 = E[ans][j2][2] - Ji
-            i3 = int(J3*8/(0.6))
-            ener[ans][i2,i3] = E[ans][j2][3]
-        J2 = np.linspace(Ji,Jf,9)
-        J3 = np.linspace(Ji,Jf,9)
-        X,Y = np.meshgrid(J2,J3)
-        n = int(100 + len(list_ans)*10 +a+1)
-        ax = fig.add_subplot(n,projection='3d')
-        ax.plot_surface(X,Y,ener[ans].T,cmap=cm.coolwarm)
-        ax.set_title(ans)
-        ax.set_xlabel("J2")
-        ax.set_ylabel("J3")
-    plt.show()
-if cn == 0:
-    exit()
+        if data[0] not in Color.keys():
+            continue
+        j2 = float(data[1]) - Ji
+        j3 = float(data[2]) - Ji
+        i2 = int(j2*8/(0.6))
+        i3 = int(j3*8/(0.6))
+        if float(data[4]) < minE:
+            txt_conv = 'g' if data[3] == 'True' else 'b'
+            D[i2,i3] = data[0] + txt_conv
+            minE = float(data[4])
 ##########
 pts = len(os.listdir(dirname))
-plt.figure(figsize=(16,16))
-plt.subplot(2,3,2)
-tt = title + ': energy'
-plt.title(tt)
-for p in range(pts):
-    J2 = float(minE[p][1])
-    J3 = float(minE[p][2])
-    conv = '^'
-    if float(minE[p][4]) < ct2:# and float(minE[p][6]) > 0.5:
-        conv = 'o'
-    if float(minE[p][5]) < ct[minE[p][0]]:
-        col = Color[minE[p][0]][0]
-    else:
-        col = Color[minE[p][0]][1]
-    plt.scatter(float(minE[p][1]),float(minE[p][2]),color=col,marker = conv)
-plt.hlines(0,inp.J2i,inp.J2f,'g',linestyles = 'dashed')
-plt.vlines(0,inp.J3i,inp.J3f,'g',linestyles = 'dashed')
-
-for ind,i in enumerate(['3x3_1', '3x3_2', 'q0_1', 'q0_2', 'cb1']):
-    plt.subplot(2,3,ind+4)
-    plt.title(i)
-    for p in range(len(E[i])):
-        conv='^'
-        J2 = float(E[i][p][1])
-        J3 = float(E[i][p][2])
-        try:
-            if float(E[i][p][4]) < ct2:
-                conv = 'o'
-            if float(E[i][p][5]) < ct[E[i][p][0]]:
-                col = Color[E[i][p][0]][0]
-            else:
-                col = Color[E[i][p][0]][1]
-            plt.scatter(J2,J3,color=col,marker = conv)
-        except:
-            print(J2,J3,i," did not")
-#Legenda
-plt.subplot(2,3,3)
+plt.figure(figsize=(10,5))
 plt.axis('off')
-for a,ans in enumerate(list_ans):
+plt.subplot(1,2,1)
+plt.title(title)
+for i in range(9):
+    for j in range(9):
+        c = Color[D[i,j][:-1]][0]
+        m = 'o' if D[i,j][-1] == 'g' else '*'
+        J2 = -0.3+i*0.6/8
+        J3 = -0.3+j*0.6/8
+        plt.scatter(J2,J3,color=c,marker=m)
+#Legenda
+plt.subplot(1,2,2)
+plt.axis('off')
+for a,ans in enumerate(Color.keys()):
     txt = ans + ': LRO -> '+Color[ans][0]+', SL -> '+Color[ans][1]
     plt.text(0.1,0.1+a/5,txt)
 

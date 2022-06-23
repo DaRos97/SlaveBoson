@@ -3,8 +3,8 @@ import functions as fs
 from time import time as T
 
 #structure factor of ansatz ans at (J2,J3) from data in filename
-ans = '3x3_1'
-J1, J2, J3 = (1,0.225,0)
+ans = 'cb1'
+J1, J2, J3 = (1,0,0)
 S = 0.5
 DM = False
 
@@ -13,12 +13,14 @@ txt_DM = 'DM' if DM else 'no_DM'
 filename = '../Data/S'+txt_S+'/'+txt_DM+'_13/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 savename = "SF_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
 Kx = 13     #points to compute in the SF BZ
-Ky = 13
-kxg = np.linspace(0,1,Kx)
-kyg = np.linspace(0,1,Ky)
+Ky = 27
+kxg = np.linspace(-1,1,Kx)
+kyg = np.linspace(-1,1,Ky)
+#kxg = np.linspace(-8*np.pi/3,8*np.pi/3,Kx)
+#kyg = np.linspace(-4*np.pi/np.sqrt(3),4*np.pi/np.sqrt(3),Ky)
 ##
-Nx = 19     #points for summation over BZ
-Ny = 19
+Nx = 13     #points for summation over BZ
+Ny = 13
 nxg = np.linspace(0,1,Nx)
 nyg = np.linspace(0,1,Ny)
 
@@ -29,12 +31,13 @@ args = (J1,J2,J3,ans,DM)
 SF = np.zeros((Kx,Ky))
 for i in range(Kx):
     for j in range(Ky):
-        K = np.array([kxg[i]*2*np.pi,(kxg[i]+kyg[j])*2*np.pi/np.sqrt(3)])
+        K = np.array([kxg[i]*2*np.pi,(kxg[i]+2*kyg[j])*2*np.pi/np.sqrt(3)])
+        #K = np.array([kxg[i],kyg[j]])
         res = 0
         Ti = T()
         for ii in range(Nx):
             for ij in range(Ny):
-                Q = np.array([nxg[ii]*2*np.pi,(nxg[ii]+nyg[ij])*2*np.pi/np.sqrt(3)])
+                Q = np.array([nxg[ii]*2*np.pi,(nxg[ii]+2*nyg[ij])*2*np.pi/np.sqrt(3)])
                 U1,X1,V1,Y1 = fs.M(Q,params,args)
                 U2,X2,V2,Y2 = fs.M(-Q,params,args)
                 U3,X3,V3,Y3 = fs.M(K-Q,params,args)
@@ -72,5 +75,5 @@ for i in range(Kx):
                 E1 = np.einsum('mr,ri->mi',D1,X4)
                 res -= np.einsum('ii',E1)
         SF[i,j] = 3/2*np.real(res)/(Nx*Ny)
-
+        print("Step ",i*Kx+j,"/",Kx*Ky)
 np.save(savename,SF)
