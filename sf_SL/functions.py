@@ -259,3 +259,15 @@ X1 = np.linspace(-4*np.pi/3,-2*np.pi/3,1000)
 X2 = np.linspace(2*np.pi/3,4*np.pi/3,1000)
 X3 = np.linspace(-8*np.pi/3,-4*np.pi/3,1000)
 X4 = np.linspace(4*np.pi/3,8*np.pi/3,1000)
+
+#extended brillouin zone
+def EBZ(K):
+    x = K[0]
+    y = K[1]
+    a = np.sqrt(3)
+    b = np.pi*8/np.sqrt(3)
+    if x < -4*np.pi/3 and (y < -a*x-b or y > a*x+b):
+        return False
+    if x > 4*np.pi/3 and (y < a*x-b or y > -a*x+b):
+        return False
+    return True
