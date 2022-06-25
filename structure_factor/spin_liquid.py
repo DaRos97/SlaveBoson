@@ -3,9 +3,9 @@ import functions as fs
 from time import time as T
 
 #structure factor of ansatz ans at (J2,J3) from data in filename
-ans = '3x3_1'
-J1, J2, J3 = (1,0.3,0)
-S = 0.5
+ans = 'cb1'
+J1, J2, J3 = (1,0,0)
+S = 0.366
 DM = True
 
 txt_S = '05' if S == 0.5 else '03'
@@ -20,8 +20,8 @@ Ky = 17
 kxg = np.linspace(-8*np.pi/3,8*np.pi/3,Kx)
 kyg = np.linspace(-4*np.pi/np.sqrt(3),4*np.pi/np.sqrt(3),Ky)
 ##
-Nx = 13     #points for summation over BZ
-Ny = 13
+Nx = 19     #points for summation over BZ
+Ny = 19
 nxg = np.linspace(0,1,Nx)
 nyg = np.linspace(0,1,Ny)
 

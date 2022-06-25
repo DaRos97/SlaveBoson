@@ -12,8 +12,8 @@ Color = {'3x3_1': ['b','orange'],
          'cb1':  ['m','g'],
          'cb2':  ['m','g'],
          'oct':  ['m','g']}
-#dirname = '../Data/S05/no_DM_13/'; title = 'Without DM interactions'
-dirname = '../Data/S03/no_DM_13/'; title = 'With DM interactions'
+dirname = '../Data/S05/no_DM_19/'; title = 'Without DM interactions'
+#dirname = '../Data/S03/no_DM_13/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
     ans = sys.argv[1]
 else:

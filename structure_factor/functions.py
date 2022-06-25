@@ -1,5 +1,8 @@
 import numpy as np
 from scipy import linalg as LA
+import matplotlib.pyplot as plt
+from matplotlib import cm
+
 
 def import_data(ans,filename):
     with open(filename, 'r') as f:
@@ -23,6 +26,7 @@ J = np.zeros((2*m,2*m))
 for i in range(m):
     J[i,i] = -1
     J[i+m,i+m] = 1
+
 def M(K,P,args):
     m = 6
     N = Nk(K,P,args)
@@ -38,6 +42,99 @@ def split(array, nrows, ncols):
     return (array.reshape(h//nrows, nrows, -1, ncols)
                  .swapaxes(1, 2)
                  .reshape(-1, nrows, ncols))
+#extended brillouin zone
+def EBZ(K):
+    x = K[0]
+    y = K[1]
+    a = np.sqrt(3)
+    b = np.pi*8/np.sqrt(3)
+    if x < -4*np.pi/3 and (y < -a*x-b or y > a*x+b):
+        return False
+    if x > 4*np.pi/3 and (y < a*x-b or y > -a*x+b):
+        return False
+    return True
+####
+def find_minima(pars,args,Nx,Ny):
+    nxg = np.linspace(-1/2,1/2,Nx)
+    nyg = np.linspace(-1/2,1/2,Ny)
+    K = np.zeros((2,Nx,Ny))
+    en = np.zeros((Nx,Ny))
+    for i in range(Nx):
+        for j in range(Ny):
+            K[:,i,j] = np.array([nxg[i]*2*np.pi,(nxg[i]+nyg[j])*2*np.pi/np.sqrt(3)])
+            N = Nk(K[:,i,j],pars,args)
+            Ch = LA.cholesky(N)
+            temp = np.dot(np.dot(Ch,J),np.conjugate(Ch.T))
+            en[i,j] = LA.eigvalsh(temp)[m]
+    ind1 = np.argmin(en)
+    k1 = K[:,ind1//Nx,ind1%Ny]
+    en[ind1//Nx,ind1%Ny] += 10
+    ind2 = np.argmin(en)
+    k2 = K[:,ind2//Nx,ind2%Ny]
+    en[ind1//Nx,ind1%Ny] -= 10
+    print("Found Ks: ",k1,k2)
+    if LA.norm(k1-k2) < 4*np.pi/np.sqrt(3)/(Ny-2):
+        K_ = [k1]
+    else: 
+        K_ = [k1,k2]
+    plt.figure()
+    plt.scatter(K[0],K[1],c=en,cmap = cm.plasma)
+    for k in K_:
+        plt.scatter(k[0],k[1],c='r',marker='*')
+        print(k)
+    plt.colorbar()
+    plt.show()
+    ok = input("Is it ok?[y/n]\t")
+    if ok == 'n':
+        exit()
+    LRO = True if en[ind1//Nx,ind1%Ny] < 0.05 else False
+    return K_, LRO
+####
+def get_V(K_,pars,args):
+    V = []
+    for K in K_:
+        N = Nk(K,pars,args)
+        Ch = LA.cholesky(N) #upper triangular
+        w,U = LA.eigh(np.dot(np.dot(Ch,J),np.conjugate(Ch.T)))
+        w_ = np.diag(np.sqrt(np.einsum('ij,j->i',J,w)))
+        Mk = np.dot(np.dot(LA.inv(Ch),U),w_)
+        V.append(Mk[:,m])
+        if np.abs(w[m]-w[m+1]) < 1e-3:
+            V.append(Mk[:,m+1])
+    return V
+####
+dx = np.array([ [0,3/4,1/4,1/2,5/4,3/4],
+                [-3/4,0,-1/2,-1/4,1/2,0],
+                [-1/4,1/2,0,1/4,1,1/2],
+                [-1/2,1/4,-1/4,0,3/4,1/4],
+                [-5/4,-1/2,-1,-3/4,0,-1/2],
+                [-3/4,0,-1/2,-1/4,1/2,0]])
+f = np.sqrt(3)/4
+dy = np.array([ [0,-f,-f,-2*f,-3*f,-3*f],
+                [f,0,0,-f,-2*f,-2*f],
+                [f,0,0,-f,-2*f,-2*f],
+                [2*f,f,f,0,-f,-f],
+                [3*f,2*f,2*f,f,0,0],
+                [3*f,2*f,2*f,f,0,0]])
+def SpinStructureFactor(k,L,UC):
+    resxy = 0
+    resz = 0
+    dist = np.zeros(2)
+    for i in range(UC):
+        for i2 in range(UC):
+            for j in range(UC//2):
+                for j2 in range(UC//2):
+                    for l in range(6):
+                        Li = L[:,l,i,j]
+                        for l2 in range(6):
+                            Lj = L[:,l2,i2,j2]
+                            dist[0] = i - i2 + j2 - j + dx[l,l2]
+                            dist[1] = j*np.sqrt(3) - j2*np.sqrt(3) + dy[l,l2]
+                            SiSjxy = Li[0]*Lj[0] + Li[1]*Lj[1]#np.dot(Li,L[i2,j2,l2])
+                            SiSjz = Li[2]*Lj[2]
+                            resxy += np.cos(np.dot(k,dist))*SiSjxy
+                            resz += np.cos(np.dot(k,dist))*SiSjz
+    return resxy, resz
 ####
 def Nk(K,par,args):
     a1 = (1,0)
@@ -260,14 +357,3 @@ X2 = np.linspace(2*np.pi/3,4*np.pi/3,1000)
 X3 = np.linspace(-8*np.pi/3,-4*np.pi/3,1000)
 X4 = np.linspace(4*np.pi/3,8*np.pi/3,1000)
 
-#extended brillouin zone
-def EBZ(K):
-    x = K[0]
-    y = K[1]
-    a = np.sqrt(3)
-    b = np.pi*8/np.sqrt(3)
-    if x < -4*np.pi/3 and (y < -a*x-b or y > a*x+b):
-        return False
-    if x > 4*np.pi/3 and (y < a*x-b or y > -a*x+b):
-        return False
-    return True
