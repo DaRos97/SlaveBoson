@@ -6,16 +6,16 @@ ans = '3x3_1'
 J1, J2, J3 = (1,0,0)
 S = 0.5
 DM = False
+pts = '13'
 
 txt_S = '05' if S == 0.5 else '03'
 txt_DM = 'DM' if DM else 'no_DM'
-filename = '../Data/S'+txt_S+'/'+txt_DM+'_13/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
-print(filename)
+filename = '../Data/'+pts+'/'+txt_S+txt_DM+'/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 params = fs.import_data(ans,filename)
 args = (J1,J2,J3,ans,DM)
 #compute the Ks of the minimum band
-Nx = 101     #points for looking at minima in BZ
-Ny = 101
+Nx = 97     #points for looking at minima in BZ
+Ny = 97
 K_,is_LRO = fs.find_minima(params,args,Nx,Ny)
 if not is_LRO:
     print("Not LRO, there is a gap")

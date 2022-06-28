@@ -3,14 +3,15 @@ import functions as fs
 from time import time as T
 
 #structure factor of ansatz ans at (J2,J3) from data in filename
-ans = '3x3_1'
-J1, J2, J3 = (1,0.3,0)
+ans = 'cb1'
+J1, J2, J3 = (1,0.15,0.225)
 S = 0.5
 DM = False
+pts = '13'
 
 txt_S = '05' if S == 0.5 else '03'
 txt_DM = 'DM' if DM else 'no_DM'
-filename = '../Data/S'+txt_S+'/'+txt_DM+'_13/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
+filename = '../Data/'+pts+'/'+txt_S+txt_DM+'/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 savenameZZ = "SFs/SFzz_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
 savenameXY = "SFs/SFxy_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
 Kx = 17     #points to compute in the SF BZ

@@ -55,8 +55,8 @@ def EBZ(K):
     return True
 ####
 def find_minima(pars,args,Nx,Ny):
-    nxg = np.linspace(-1/2,1/2,Nx)
-    nyg = np.linspace(-1/2,1/2,Ny)
+    nxg = np.linspace(0,1,Nx)
+    nyg = np.linspace(0,1,Ny)
     K = np.zeros((2,Nx,Ny))
     en = np.zeros((Nx,Ny))
     for i in range(Nx):
