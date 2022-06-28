@@ -3,10 +3,10 @@ import functions as fs
 from time import time as T
 
 #structure factor of ansatz ans at (J2,J3) from data in filename
-ans = 'cb1'
-J1, J2, J3 = (1,0,0)
-S = 0.366
-DM = True
+ans = '3x3_1'
+J1, J2, J3 = (1,0.3,0)
+S = 0.5
+DM = False
 
 txt_S = '05' if S == 0.5 else '03'
 txt_DM = 'DM' if DM else 'no_DM'

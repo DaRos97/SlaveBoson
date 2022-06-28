@@ -2,14 +2,15 @@ import numpy as np
 import functions as fs
 
 #import parameters from file
-ans = 'q0_1'
+ans = '3x3_1'
 J1, J2, J3 = (1,0,0)
 S = 0.5
-DM = True
+DM = False
 
 txt_S = '05' if S == 0.5 else '03'
 txt_DM = 'DM' if DM else 'no_DM'
 filename = '../Data/S'+txt_S+'/'+txt_DM+'_13/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
+print(filename)
 params = fs.import_data(ans,filename)
 args = (J1,J2,J3,ans,DM)
 #compute the Ks of the minimum band

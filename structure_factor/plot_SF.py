@@ -4,15 +4,17 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 
-ans = 'q0_1'
-J1, J2, J3 = (1,0,0)
+ans = '3x3_1'
+J1, J2, J3 = (1,0.3,0)
 S = 0.5
-DM = True
+DM = False
 
 txt_S = '05' if S == 0.5 else '03'
 txt_DM = 'DM' if DM else 'no_DM'
-savenameZZ = "SSF/SSFzz_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
-savenameXY = "SSF/SSFxy_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
+#savenameZZ = "SSF/SSFzz_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
+#savenameXY = "SSF/SSFxy_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
+savenameZZ = "SFs/SFzz_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
+savenameXY = "SFs/SFxy_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
 SFzz = np.load(savenameZZ)
 SFxy = np.load(savenameXY)
 Kx,Ky = SFzz.shape
