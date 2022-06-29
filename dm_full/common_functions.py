@@ -175,8 +175,8 @@ def sumEigs(P,L,args):
 def totE(P,args):
     res = minimize_scalar(lambda l: -totEl(P,l,args)[0],  #maximize energy wrt L with fixed P
             method = inp.L_method,
-            bounds = inp.L_bounds,
-            options={'xatol':inp.prec_L}
+            bracket = inp.L_bounds,#bounds = inp.L_bounds,
+            options={'xtol':inp.prec_L}
             )
     L = res.x
     minE = -res.fun
@@ -185,6 +185,8 @@ def totE(P,args):
 
 #### Computes the Energy given the paramters P and the Lagrange multiplier L
 def totEl(P,L,args):
+    if L < inp.L_bounds[0] or L > L_bounds[1]:
+        return -5, (-1,10)
     J1,J2,J3,ans = args
     J = (J1,J2,J3)
     j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or 1 --> problem for VERY small J2,J3 points

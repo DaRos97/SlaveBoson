@@ -25,7 +25,8 @@ cutoff = 1e-8   ############      #accettable value of Sigma to accept result as
 MaxIter = 200
 prec_L = 1e-10       #precision required in L maximization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
-L_method = 'bounded'
+L_method = 'Brent'
+L_bounds = (0.3,3)
 #phase diagram
 J1 = 1
 z = (4,4,2)
@@ -133,7 +134,6 @@ for ans in lAns:
         bounds[ans]['phiB1'] = (np.pi-0.2,np.pi+0.2)
         bounds[ans]['phiB2'] = (np.pi-0.2,np.pi+0.2)
         num_phi[ans] = 2
-L_bounds = (0.3,3)
 shame2 = 5
 
 print("Minimization precision (both tol and atol):",cutoff)
