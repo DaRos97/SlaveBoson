@@ -55,8 +55,8 @@ def EBZ(K):
     return True
 ####
 def find_minima(pars,args,Nx,Ny):
-    nxg = np.linspace(0,1,Nx)
-    nyg = np.linspace(0,1,Ny)
+    nxg = np.linspace(-1/2,1/2,Nx)
+    nyg = np.linspace(-1/2,1/2,Ny)
     K = np.zeros((2,Nx,Ny))
     en = np.zeros((Nx,Ny))
     for i in range(Nx):
@@ -72,7 +72,6 @@ def find_minima(pars,args,Nx,Ny):
     ind2 = np.argmin(en)
     k2 = K[:,ind2//Nx,ind2%Ny]
     en[ind1//Nx,ind1%Ny] -= 10
-    print("Found Ks: ",k1,k2)
     if LA.norm(k1-k2) < 4*np.pi/np.sqrt(3)/(Ny-2):
         K_ = [k1]
     else: 
@@ -83,8 +82,8 @@ def find_minima(pars,args,Nx,Ny):
         plt.scatter(k[0],k[1],c='r',marker='*')
         print(k)
     plt.colorbar()
-    plt.show()
-    ok = input("Is it ok?[y/n]\t")
+    #plt.show()
+    ok = 'y'#input("Is it ok?[y/n]\t")
     if ok == 'n':
         exit()
     LRO = True if en[ind1//Nx,ind1%Ny] < 0.05 else False
@@ -97,44 +96,42 @@ def get_V(K_,pars,args):
         Ch = LA.cholesky(N) #upper triangular
         w,U = LA.eigh(np.dot(np.dot(Ch,J),np.conjugate(Ch.T)))
         w_ = np.diag(np.sqrt(np.einsum('ij,j->i',J,w)))
+        W = np.diag(np.dot(J,w))
         Mk = np.dot(np.dot(LA.inv(Ch),U),w_)
-        V.append(Mk[:,m])
+        V.append(Mk[:,m-1])
         if np.abs(w[m]-w[m+1]) < 1e-3:
+            print("degenerate K point")
             V.append(Mk[:,m+1])
     return V
 ####
-dx = np.array([ [0,3/4,1/4,1/2,5/4,3/4],
-                [-3/4,0,-1/2,-1/4,1/2,0],
-                [-1/4,1/2,0,1/4,1,1/2],
-                [-1/2,1/4,-1/4,0,3/4,1/4],
-                [-5/4,-1/2,-1,-3/4,0,-1/2],
-                [-3/4,0,-1/2,-1/4,1/2,0]])
 f = np.sqrt(3)/4
-dy = np.array([ [0,-f,-f,-2*f,-3*f,-3*f],
-                [f,0,0,-f,-2*f,-2*f],
-                [f,0,0,-f,-2*f,-2*f],
-                [2*f,f,f,0,-f,-f],
-                [3*f,2*f,2*f,f,0,0],
-                [3*f,2*f,2*f,f,0,0]])
 def SpinStructureFactor(k,L,UC):
+    a1 = np.array([1,0])
+    a2 = np.array([-1/2,np.sqrt(3)/2])
+    d = np.array([  [1/2,-1/4,1/4,0,-3/4,-1/4],
+                    [0,f,f,2*f,3*f,3*f]])
     resxy = 0
     resz = 0
     dist = np.zeros(2)
     for i in range(UC):
-        for i2 in range(UC):
-            for j in range(UC//2):
-                for j2 in range(UC//2):
-                    for l in range(6):
-                        Li = L[:,l,i,j]
-                        for l2 in range(6):
-                            Lj = L[:,l2,i2,j2]
-                            dist[0] = i - i2 + j2 - j + dx[l,l2]
-                            dist[1] = j*np.sqrt(3) - j2*np.sqrt(3) + dy[l,l2]
+        for j in range(UC):
+            for l in range(3):
+                Li = L[:,l+j%2*3,i,j//2*(j+1)%2 + (j-1)*j%2]
+#                Li = L[:,l,i,j]
+                ri = i*a1+j*a2+d[:,l]
+                for i2 in range(UC):
+                    for j2 in range(UC):
+                        for l2 in range(3):
+                            Lj = L[:,l2+j2%2*3,i2,j2//2*(j2+1)%2 + (j2-1)*j2%2]
+#                            Lj = L[:,l2,i2,j2]
+                            rj = i2*a1+j2*a2+d[:,l2]
+                            dist = ri-rj
                             SiSjxy = Li[0]*Lj[0] + Li[1]*Lj[1]#np.dot(Li,L[i2,j2,l2])
                             SiSjz = Li[2]*Lj[2]
-                            resxy += np.cos(np.dot(k,dist))*SiSjxy
-                            resz += np.cos(np.dot(k,dist))*SiSjz
-    return resxy, resz
+                            resxy += np.exp(1j*np.dot(k,dist))*SiSjxy
+                            resz += np.exp(1j*np.dot(k,dist))*SiSjz
+    #print(resxy,resz)
+    return np.real(resxy), np.real(resz)
 ####
 def Nk(K,par,args):
     a1 = (1,0)
