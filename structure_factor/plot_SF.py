@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 
-ans = 'cb1'
-J1, J2, J3 = (1,0,0)
+ans = 'q0_1'
+J1, J2, J3 = (1,0.3,0)
 S = 0.5
-DM = False
+DM = 1
 
 ph = 0 #0->LRO, 1->SL
 txt_S = '05' if S == 0.5 else '03'

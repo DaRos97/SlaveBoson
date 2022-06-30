@@ -71,6 +71,11 @@ def find_minima(pars,args,Nx,Ny):
     en[ind1//Nx,ind1%Ny] += 10
     ind2 = np.argmin(en)
     k2 = K[:,ind2//Nx,ind2%Ny]
+    if np.abs(np.abs(k1[0]-k2[0])-2*np.pi) < 1e-3 or np.abs(np.abs(k1[1]-k2[1])-2*np.pi/np.sqrt(3)) < 1e-3:
+        en[ind2//Nx,ind2%Ny] += 10
+        ind3 = np.argmin(en)
+        k2 = K[:,ind3//Nx,ind3%Ny]
+        en[ind2//Nx,ind2%Ny] -= 10
     en[ind1//Nx,ind1%Ny] -= 10
     if LA.norm(k1-k2) < 4*np.pi/np.sqrt(3)/(Ny-2):
         K_ = [k1]
@@ -82,8 +87,8 @@ def find_minima(pars,args,Nx,Ny):
         plt.scatter(k[0],k[1],c='r',marker='*')
         print(k)
     plt.colorbar()
-    #plt.show()
-    ok = 'y'#input("Is it ok?[y/n]\t")
+    plt.show()
+    ok = input("Is it ok?[y/n]\t")
     if ok == 'n':
         exit()
     LRO = True if en[ind1//Nx,ind1%Ny] < 0.05 else False
@@ -96,7 +101,6 @@ def get_V(K_,pars,args):
         Ch = LA.cholesky(N) #upper triangular
         w,U = LA.eigh(np.dot(np.dot(Ch,J),np.conjugate(Ch.T)))
         w_ = np.diag(np.sqrt(np.einsum('ij,j->i',J,w)))
-        W = np.diag(np.dot(J,w))
         Mk = np.dot(np.dot(LA.inv(Ch),U),w_)
         V.append(Mk[:,m-1])
         if np.abs(w[m]-w[m+1]) < 1e-3:
@@ -107,29 +111,29 @@ def get_V(K_,pars,args):
 f = np.sqrt(3)/4
 def SpinStructureFactor(k,L,UC):
     a1 = np.array([1,0])
-    a2 = np.array([-1/2,np.sqrt(3)/2])
+    a2 = np.array([-1,np.sqrt(3)])
     d = np.array([  [1/2,-1/4,1/4,0,-3/4,-1/4],
                     [0,f,f,2*f,3*f,3*f]])
     resxy = 0
     resz = 0
     dist = np.zeros(2)
-    for i in range(UC):
-        for j in range(UC):
-            for l in range(3):
-                Li = L[:,l+j%2*3,i,j//2*(j+1)%2 + (j-1)*j%2]
-#                Li = L[:,l,i,j]
+    for i in range(UC//2,UC//2+1):
+        for j in range(UC//2,UC//2+1):
+            for l in range(6):
+#                Li = L[:,l+j%2*3,i,j//2*(j+1)%2 + (j-1)*j%2]
+                Li = L[:,l,i,j]
                 ri = i*a1+j*a2+d[:,l]
                 for i2 in range(UC):
                     for j2 in range(UC):
-                        for l2 in range(3):
-                            Lj = L[:,l2+j2%2*3,i2,j2//2*(j2+1)%2 + (j2-1)*j2%2]
-#                            Lj = L[:,l2,i2,j2]
+                        for l2 in range(6):
+#                            Lj = L[:,l2+j2%2*3,i2,j2//2*(j2+1)%2 + (j2-1)*j2%2]
+                            Lj = L[:,l2,i2,j2]
                             rj = i2*a1+j2*a2+d[:,l2]
                             dist = ri-rj
                             SiSjxy = Li[0]*Lj[0] + Li[1]*Lj[1]#np.dot(Li,L[i2,j2,l2])
                             SiSjz = Li[2]*Lj[2]
-                            resxy += np.exp(1j*np.dot(k,dist))*SiSjxy
-                            resz += np.exp(1j*np.dot(k,dist))*SiSjz
+                            resxy += np.cos(np.dot(k,dist))*SiSjxy/2
+                            resz += np.cos(np.dot(k,dist))*SiSjz/2
     #print(resxy,resz)
     return np.real(resxy), np.real(resz)
 ####

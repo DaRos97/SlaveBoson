@@ -185,7 +185,7 @@ def totE(P,args):
 
 #### Computes the Energy given the paramters P and the Lagrange multiplier L
 def totEl(P,L,args):
-    if L < inp.L_bounds[0] or L > L_bounds[1]:
+    if L < inp.L_bounds[0] or L > inp.L_bounds[1]:
         return -5, (-1,10)
     J1,J2,J3,ans = args
     J = (J1,J2,J3)

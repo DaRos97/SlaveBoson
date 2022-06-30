@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 #import parameters from file
-ans = 'cb1'
-J1, J2, J3 = (1,0,0)
+ans = 'q0_1'
+J1, J2, J3 = (1,0.3,0)
 S = 0.5
-DM = False
+DM = 1
 pts = '13'
 
 txt_S = '05' if S == 0.5 else '03'
@@ -16,8 +16,8 @@ filename = '../Data/'+pts+'/'+txt_S+txt_DM+'/'+'J2_J3=('+'{:5.4f}'.format(J2).re
 params = fs.import_data(ans,filename)
 args = (J1,J2,J3,ans,DM)
 #compute the Ks of the minimum band
-Nx = 25     #points for looking at minima in BZ
-Ny = 25
+Nx = 13     #points for looking at minima in BZ
+Ny = 13
 K_,is_LRO = fs.find_minima(params,args,Nx,Ny)
 if not is_LRO:
     print("Not LRO, there is a gap")
@@ -27,7 +27,7 @@ print("Found Ks: ",K_)
 V = fs.get_V(K_,params,args)
 #construct the spin matrix for each sublattice and compute the coordinates
 #of the spin at each lattice site
-UC = 6
+UC = 12
 S = np.zeros((3,6,UC,UC)) #3 spin components, 6 sites in UC, ij coordinates of UC
 sigma = np.zeros((3,2,2),dtype = complex)
 sigma[0] = np.array([[0,1],[1,0]])
@@ -36,12 +36,13 @@ sigma[2] = np.array([[1,0],[0,-1]])
 a1 = np.array([1,0])
 a2 = np.array([-1,np.sqrt(3)])
 k1 = K_[0]
-v1 = V[0]#/np.linalg.norm(V[0])
-v2 = V[1]#/np.linalg.norm(V[1])
+k2 = K_[-1]
+v1 = V[0]/np.linalg.norm(V[0])
+v2 = V[-1]/np.linalg.norm(V[-1])
 m = 6
-c1 = (1)/np.sqrt(2)
+c1 = (1+1j)/np.sqrt(2)
 c1_ = np.conjugate(c1)      #what is this??
-c2 = (1j+1)/np.sqrt(2)
+c2 = (1+1j)/np.sqrt(2)
 c2_ = np.conjugate(c2)      #what is this??
 f = np.sqrt(3)/4
 d = np.array([  [1/2,-1/4,1/4,0,-3/4,-1/4],
@@ -51,11 +52,11 @@ for i in range(UC):
     for j in range(UC):
         R = i*a1 + j*a2
         for s in range(m):
-            r_ = R + d[:,s]
-            r[:,s,i,j] = r_
+            r_ = R# + d[:,s]
+            r[:,s,i,j] = R + d[:,s]
             cond = np.zeros(2,dtype=complex)
-            cond[0] = c1*v1[s]*np.exp(1j*np.dot(k1,r_)) + c2*v2[s]*np.exp(-1j*np.dot(k1,r_))
-            cond[1] = c2_*np.conjugate(v2[m+s])*np.exp(1j*np.dot(k1,r_)) + c1_*np.conjugate(v1[m+s])*np.exp(-1j*np.dot(k1,r_))
+            cond[0] = c1*v1[s]*np.exp(1j*np.dot(k1,r_)) + c2*v2[s]*np.exp(1j*np.dot(k2,r_))
+            cond[1] = c2_*np.conjugate(v2[m+s])*np.exp(-1j*np.dot(k2,r_)) + c1_*np.conjugate(v1[m+s])*np.exp(-1j*np.dot(k1,r_))
             for x in range(3):
                 S[x,s,i,j] = np.real(1/2*np.dot(np.conjugate(cond.T),np.einsum('ij,j->i',sigma[x],cond)))
             S[:,s,i,j] /= np.linalg.norm(S[:,s,i,j])
@@ -72,7 +73,7 @@ plt.subplot(2,2,3)
 plt.title("S_z")
 plt.scatter(r[0].ravel(),r[1].ravel(),c = S[2].ravel(), cmap = cm.plasma)
 plt.colorbar()
-plt.show()
+#plt.show()
 print("Chirality single triangles: ")
 for i in range(4):
     for j in range(4):
@@ -104,3 +105,4 @@ savenameSSFzz = "SSF/SSFzz_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.forma
 savenameSSFxy = "SSF/SSFxy_"+ans+'_'+txt_DM+'_'+txt_S+'_J2_J3=('+'{:5.3f}'.format(J2).replace('.','')+'_'+'{:5.3f}'.format(J3).replace('.','')+').npy'
 np.save(savenameSSFzz,SFzz)
 np.save(savenameSSFxy,SFxy)
+print("Finished")
