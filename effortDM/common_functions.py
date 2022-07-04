@@ -6,12 +6,11 @@ from scipy.optimize import minimize_scalar
 from scipy.interpolate import RectBivariateSpline as RBS
 from pathlib import Path
 import csv
-from time import time as t
 import os
 from colorama import Fore
 
-import matplotlib.pyplot as plt
-from matplotlib import cm
+#import matplotlib.pyplot as plt
+#from matplotlib import cm
 
 ####
 J = np.zeros((2*inp.m,2*inp.m))
@@ -66,6 +65,7 @@ def Sigma(P,*Args):
                 r2 = 100
             temp.append(r2)
     res = np.array(temp).sum()
+    print("Sigma: ",P,Fore.RED,res,Fore.RESET)
     return res
 ####
 def Final_Result(P,*Args):
@@ -185,8 +185,12 @@ def totE(P,args):
 
 #### Computes the Energy given the paramters P and the Lagrange multiplier L
 def totEl(P,L,args):
-    if L < inp.L_bounds[0] or L > inp.L_bounds[1]:
-        return -5, (-1,10)
+    if L < inp.L_bounds[0] :
+        res = -5-(inp.L_bounds[0]-L)
+        return res, (-1,10)
+    elif L > inp.L_bounds[1]:
+        res =-5-(L-inp.L_bounds[1])
+        return res, (-1,10)
     J1,J2,J3,ans = args
     J = (J1,J2,J3)
     j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or 1 --> problem for VERY small J2,J3 points

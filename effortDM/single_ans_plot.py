@@ -10,7 +10,7 @@ Color = {'3x3_1': ['b','orange'],
          'q0_1':  ['r','y'],
          'q0_2':  ['purple','k'],
          'cb1':  ['m','g']}
-N = '25'
+N = '13'
 S = '03'
 dirname = '../Data/'+N+'/'+S+'DM/'; title = 'With DM interactions'
 if len(sys.argv) > 1:

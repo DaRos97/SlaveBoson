@@ -13,7 +13,7 @@ a = np.array([0,0,1/2])
 b = np.array([0,-np.sqrt(3)/4,-1/4])
 c = np.array([0,np.sqrt(3)/4,-1/4])
 #cb1
-the = -np.pi/3#int(sys.argv[1])*np.pi*2/12
+the = 0#-np.pi/3#int(sys.argv[1])*np.pi*2/12
 phi = 0#int(sys.argv[2])*np.pi*2/12
 t0 = np.arccos(1/np.sqrt(3))
 a_ = np.array([1/2,0,0])

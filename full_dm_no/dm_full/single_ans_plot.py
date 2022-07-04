@@ -9,16 +9,14 @@ Color = {'3x3_1': ['b','orange'],
          '3x3_2': ['k','gray'],
          'q0_1':  ['r','y'],
          'q0_2':  ['purple','k'],
-         'cb1':  ['m','g'],
-         'cb2':  ['m','g'],
-         'oct':  ['m','g']}
-N = '25'
-S = '05'
-dirname = '../Data/'+N+'/'+S+'no_DM/'; title = 'With DM interactions'
+         'cb1':  ['m','g']}
+N = '13'
+S = '03'
+dirname = '../Data/'+N+'/'+S+'DM/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
     ans = sys.argv[1]
 else:
-    ans = input("Which ans?(3x3_1,q0_1,cb1,cb2,oct)")
+    ans = input("Which ans?(3x3_1,q0_1,cb1)")
 D = {}
 Ji = -0.3
 Jf = 0.3
