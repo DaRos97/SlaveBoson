@@ -7,7 +7,7 @@ from scipy.interpolate import RectBivariateSpline as RBS
 from pathlib import Path
 import csv
 import os
-from colorama import Fore
+#from colorama import Fore
 
 #import matplotlib.pyplot as plt
 #from matplotlib import cm
@@ -38,7 +38,6 @@ def Sigma(P,*Args):
         pp = np.array(P)
         dP = der_range[i]
         pp[i] = P[i] + dP
-        _T3 = t()
         init_plus = totE(pp,args)   #compute derivative     #2
         der1 = (init_plus[0]-init[0])/dP
         pp[i] = P[i] + 2*dP
@@ -65,7 +64,6 @@ def Sigma(P,*Args):
                 r2 = 100
             temp.append(r2)
     res = np.array(temp).sum()
-    print("Sigma: ",P,Fore.RED,res,Fore.RESET)
     return res
 ####
 def Final_Result(P,*Args):
@@ -441,13 +439,6 @@ def SaveToCsv(Data,csvfile):
 
 ##
 def IsConverged(P,bnds,Sigma):
-    for n,p in enumerate(P):
-        m = np.abs((p - bnds[n][0])/bnds[n][0]) > 1e-3 if bnds[n][0] != 0 else np.abs(p) > 1e-3
-        M = np.abs((p - bnds[n][1])/bnds[n][1]) > 1e-3 if bnds[n][0] != 0 else np.abs(p) > 1e-3
-        if m and M:
-            continue
-        else:
-            return False
     if Sigma > inp.cutoff:
         return False
     return True

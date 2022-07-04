@@ -65,7 +65,7 @@ Pi = {  '3x3_1':{'A1':0.51, 'A3':0.5, 'B1':0.25, 'B2': 0.41, 'B3': 0.25, 'phiB1'
         'q0_2':{'A1':0.51, 'A2':0.13, 'B1':0.18, 'B2': 0.18, 'B3': 0.3, 'phiA1': 0, 'phiB1': np.pi, 'phiA2': np.pi, 'phiB2': np.pi, 'phiB3': np.pi},
         'cb1':{'A1':0.51, 'A2':0.1, 'A3':0.43, 'B1':0.17, 'B2': 0.17, 'phiA1': 2*t_0, 'phiB1': np.pi, 'phiA2': np.pi+t_0, 'phiB2': t_0},
         'cb2':{'A1':0.5, 'A2':0.1, 'A3':0.43, 'B1':0.17, 'B2': 0.17, 'phiA1': 0, 'phiB1': np.pi+t_0, 'phiA2': np.pi+t_0, 'phiB2': 0},
-        'oct':{'A1':0.5, 'A2':0.35, 'B1':0.35, 'B2': 0.35, 'B3':0.35 ,'phiB1':3*np.pi/4, 'phiA2':np.pi/2}
+        'oct':{'A1':0.5, 'A2':0.35, 'B1':0.35, 'B2': 0.35, 'B3':0.35 ,'phiB1':3*np.pi/4, 'phiA2':np.pi/2, 'phiB2': np.pi/4}
         }
 lAns = header.keys()
 bounds = {}
@@ -133,10 +133,10 @@ for ans in lAns:
         bounds[ans]['A3'] = (0,1)
         bounds[ans]['B1'] = (0,0.5)
         bounds[ans]['B2'] = (0,0.5)
-        bounds[ans]['phiA1'] = (0,2*np.pi)
-        bounds[ans]['phiB1'] = (0,2*np.pi)
-        bounds[ans]['phiA2'] = (0,2*np.pi)
-        bounds[ans]['phiB2'] = (0,2*np.pi)
+        bounds[ans]['phiA1'] = (1.5,3)
+        bounds[ans]['phiB1'] = (2,4)
+        bounds[ans]['phiA2'] = (3,5)
+        bounds[ans]['phiB2'] = (4.5,6)
         num_phi[ans] = 4
     elif ans == 'cb2':
         bounds[ans]['A1'] = (0.4,0.6)
@@ -144,10 +144,10 @@ for ans in lAns:
         bounds[ans]['A3'] = (0,1)
         bounds[ans]['B1'] = (0,0.5)
         bounds[ans]['B2'] = (0,0.5)
-        bounds[ans]['phiA1'] = (0,2*np.pi)
-        bounds[ans]['phiB1'] = (0,2*np.pi)
-        bounds[ans]['phiA2'] = (0,2*np.pi)
-        bounds[ans]['phiB2'] = (0,2*np.pi)
+        bounds[ans]['phiA1'] = (-1,1)
+        bounds[ans]['phiB1'] = (3.5,5)
+        bounds[ans]['phiA2'] = (3.5,5)
+        bounds[ans]['phiB2'] = (-1,1)
         num_phi[ans] = 4
     elif ans == 'oct':
         bounds[ans]['A1'] = (0.4,0.6)
