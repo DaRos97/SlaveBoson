@@ -11,7 +11,7 @@ Color = {'3x3_1': ['b','orange'],
          'q0_2':  ['purple','k'],
          'cb1':  ['m','g']}
 N = '13'
-S = '03'
+S = '05'
 dirname = '../Data/'+N+'/'+S+'DM/'; title = 'With DM interactions'
 if len(sys.argv) > 1:
     ans = sys.argv[1]
@@ -52,6 +52,8 @@ for filename in os.listdir(dirname):
                     D[h][i2,i3] = 1 if data[N+3]=='True' else 0
 print("Non converged points: ",int(81-D['Converge'].ravel().sum()),"\n",D['Converge'])
 nP = len(head)
+for i in range(nP):
+    print("Range of ",head[i],":",np.amin(D[head[i]][np.nonzero(D[head[i]])]),"--",np.amax(D[head[i]][np.nonzero(D[head[i]])]))
 fig = plt.figure()#(figsize=(16,16))
 figManager = plt.get_current_fig_manager()
 figManager.window.showMaximized()
