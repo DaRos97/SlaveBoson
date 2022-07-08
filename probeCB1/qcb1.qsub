@@ -1,0 +1,12 @@
+#!/bin/bash
+# Template for ".qsub" files that will be run as batch files by slurm
+
+SCRATCH_DIR=$HOME/scratch/cb1
+OUTPUT_FILE=SB_${1}.out
+ERROR_FILE=SB_${1}.err
+
+ml load GCCcore/11.2.0 Python/3.9.6
+source $HOME/basEnv/bin/activate
+cd $HOME/Codes/cb1
+
+python main.py $1 > $SCRATCH_DIR/$OUTPUT_FILE 2> $SCRATCH_DIR/$ERROR_FILE
