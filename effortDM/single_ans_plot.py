@@ -12,11 +12,9 @@ Color = {'3x3_1': ['b','orange'],
          'cb1':  ['m','g']}
 N = '13'
 S = '05'
-dirname = '../Data/'+N+'/'+S+'DM/'; title = 'With DM interactions'
-if len(sys.argv) > 1:
-    ans = sys.argv[1]
-else:
-    ans = input("Which ans?(3x3_1,q0_1,cb1)")
+ans = sys.argv[1]
+phi = "{:3.2f}".format(float(sys.argv[2])).replace('.','')
+dirname = '../Data/phi'+phi+'/'+N+'/'; title = 'With DM interactions'
 D = {}
 Ji = -0.3
 Jf = 0.3
@@ -46,14 +44,25 @@ for filename in os.listdir(dirname):
                 if N != 0:
                     try:
                         D[h][i2,i3] = float(data[N+3])
+                        if D[h][i2,i3] == 0:
+                            D[h][i2,i3] = np.nan
                     except:
                         print("not good: ",h,i2,i3)
                 else:
-                    D[h][i2,i3] = 1 if data[N+3]=='True' else 0
+                    D[h][i2,i3] = 1 if data[N+3]=='True' else np.nan
 print("Non converged points: ",int(81-D['Converge'].ravel().sum()),"\n",D['Converge'])
 nP = len(head)
 for i in range(nP):
-    print("Range of ",head[i],":",np.amin(D[head[i]][np.nonzero(D[head[i]])]),"--",np.amax(D[head[i]][np.nonzero(D[head[i]])]))
+    temp = []
+    for l in range(9):
+        for j in range(9):
+            if D[head[i]][l,j] == 0:
+                D[head[i]][l,j] = np.nan
+    for p in D[head[i]][~np.isnan(D[head[i]])].ravel():
+        if p != 0 and p != np.nan and p != 'nan':
+            temp.append(p)
+    print("Range of ",head[i],":",np.amin(temp),"--",np.amax(temp))
+    #print("Range of ",head[i],":",np.amin(D[head[i]][np.nonzero(~np.isnan(D[head[i]]))]),"--",np.amax(D[head[i]][~np.isnan(D[head[i]])]))
 fig = plt.figure()#(figsize=(16,16))
 figManager = plt.get_current_fig_manager()
 figManager.window.showMaximized()
