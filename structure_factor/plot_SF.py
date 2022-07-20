@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 
-ans = 'q0_1'
-J1, J2, J3 = (1,0.3,0)
+ans = 'cb1'
+J1, J2, J3 = (1,0.3,-0.3)
 S = 0.5
 DM = 1
 

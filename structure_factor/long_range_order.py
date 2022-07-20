@@ -4,15 +4,16 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 
 #import parameters from file
-ans = 'q0_1'
-J1, J2, J3 = (1,0.3,0)
+ans = 'cb1'
+J1, J2, J3 = (1,0.3,-0.3)
 S = 0.5
 DM = 1
 pts = '13'
 
 txt_S = '05' if S == 0.5 else '03'
 txt_DM = 'DM' if DM else 'no_DM'
-filename = '../Data/'+pts+'/'+txt_S+txt_DM+'/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
+#filename = '../Data/'+pts+'/'+txt_S+txt_DM+'/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
+filename = '../Data/phi000/'+pts+'/'+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
 params = fs.import_data(ans,filename)
 args = (J1,J2,J3,ans,DM)
 #compute the Ks of the minimum band

@@ -66,6 +66,11 @@ def find_minima(pars,args,Nx,Ny):
             Ch = LA.cholesky(N)
             temp = np.dot(np.dot(Ch,J),np.conjugate(Ch.T))
             en[i,j] = LA.eigvalsh(temp)[m]
+    #fig = plt.figure()
+    #ax = fig.add_subplot(1,1,1,projection = '3d')
+    #ax.plot_surface(K[0],K[1],en,cmap=cm.plasma)
+    #plt.show()
+    #exit()
     ind1 = np.argmin(en)
     k1 = K[:,ind1//Nx,ind1%Ny]
     en[ind1//Nx,ind1%Ny] += 10
@@ -83,14 +88,16 @@ def find_minima(pars,args,Nx,Ny):
         K_ = [k1,k2]
     plt.figure()
     plt.scatter(K[0],K[1],c=en,cmap = cm.plasma)
+    plt.colorbar()
     for k in K_:
         plt.scatter(k[0],k[1],c='r',marker='*')
         print(k)
-    plt.colorbar()
     plt.show()
-    ok = input("Is it ok?[y/n]\t")
+    ok = input("Is it ok?[y/n] ([1] for keeping only first value found]\t")
     if ok == 'n':
         exit()
+    if ok == '1':
+        K_ = [k1]
     LRO = True if en[ind1//Nx,ind1%Ny] < 0.05 else False
     return K_, LRO
 ####
@@ -150,8 +157,8 @@ def Nk(K,par,args):
     DM1 = 0
     DM3 = 0
     if DM:
-        DM1 = 4*np.pi/3
-        DM3 = 2*np.pi/3
+        DM1 = 0#4*np.pi/3
+        DM3 = 0#2*np.pi/3
     t1 = np.exp(-1j*DM1/2);    t1_ = np.conjugate(t1)
     t3 = np.exp(-1j*DM3/2);    t3_ = np.conjugate(t3)
     m = 6
