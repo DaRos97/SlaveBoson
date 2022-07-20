@@ -10,7 +10,6 @@ J2, J3 = inp.J[N]
 print('\n(J2,J3) = ('+'{:5.4f}'.format(J2)+',{:5.4f}'.format(J3)+')\n')
 #######
 csvfile = inp.DataDir+'J2_J3=('+'{:5.4f}'.format(J2).replace('.','')+'_'+'{:5.4f}'.format(J3).replace('.','')+').csv'
-print("File name for saving: ",csvfile)
 ansatze = cf.CheckCsv(csvfile)
 Ti = t()
 Pinitial, done  = cf.FindInitialPoint(J2,J3,ansatze)
@@ -18,11 +17,11 @@ Bnds = cf.FindBounds(J2,J3,ansatze,done,Pinitial)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
 for ans in ansatze:
     Tti = t()
-    print("Using ansatz: ",ans)
+#    print("Using ansatz: ",ans)
     header = inp.header[ans]
     Args = (inp.J1,J2,J3,ans,DerRange[ans])
     DataDic = {}
-    print("Initial point and bounds: \n",Pinitial[ans],'\n',Bnds[ans])
+#    print("Initial point and bounds: \n",Pinitial[ans],'\n',Bnds[ans])
     #
     result = d_e(cf.Sigma,
         args = Args,

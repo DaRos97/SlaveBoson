@@ -161,9 +161,8 @@ for ans in lAns:
         num_phi[ans] = 4
 shame2 = 5
 
-print("Minimization precision (both tol and atol):",cutoff)
 print("Grid pts:",Nx,'*',Ny)
-print("Derivative distance (par / phi):",der_par,'/',der_phi)
 print("Spin: ",S)
-print("Bound on values given by smaller grids: ",s_b)
 print("Number of CPUs used: ",mp_cpu)
+print("DM angle: ",phi)
+print("L bounds: ",L_bounds)
