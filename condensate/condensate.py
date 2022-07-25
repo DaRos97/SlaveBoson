@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from pathlib import Path
 
-ans = 'q0_1'
-DM_ = 0
+ans = '3x3_1'
+DM_ = np.pi/8
 DM = "{:3.2f}".format(DM_).replace('.','')
 pts = '13'
 S = 0.5
@@ -39,6 +39,10 @@ if not Path(savefile).is_file():
         i2 = int((float(J2)+0.3)*8/0.6)
         i3 = int((float(J3)+0.3)*8/0.6)
         cond[i3,i2] = -der0+(2*S+1)
+    for i in range(9):
+        for j in range(9):
+            if cond[i,j] == 0:
+                cond[i,j] = np.nan
     np.save(savefile, cond)
 else:
     cond = np.load(savefile)
