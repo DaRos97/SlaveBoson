@@ -57,7 +57,7 @@ for ans in ansatze:
     print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter*len(Pinitial[ans]),'\n')
     Pf = tuple(result.x)
     is_min = False
-    Args = (inp.J1,J2,J3,ans,DerRange[ans],is_min)
+    Args = (inp.J1,J2,J3,ans,DerRange[ans],pars,hess_sign,is_min)
     try:
         S, E, L, gap = cf.Sigma(Pf,*Args)
     except TypeError:
