@@ -17,19 +17,38 @@ Bnds = cf.FindBounds(J2,J3,ansatze,done,Pinitial)
 DerRange = cf.ComputeDerRanges(J2,J3,ansatze)
 for ans in ansatze:
     Tti = t()
-#    print("Using ansatz: ",ans)
     header = inp.header[ans]
-    Args = (inp.J1,J2,J3,ans,DerRange[ans])
+    #
+    j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
+    j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
+    pars2 = inp.Pi[ans].keys()
+    pars = []
+    for pPp in pars2:
+        if (pPp[-1] == '1') or (pPp[-1] == '2' and j2-1) or (pPp[-1] == '3' and j3-1):
+            pars.append(pPp)
+    hess_sign = {}
+    for par in pars:
+        if par[-2] == 'A':
+            if par[-1] == '1' or (par[-1] == '2' and J2 > 0) or (par[-1] == '3' and J3 > 0):
+                hess_sign[par] = 1
+            else:
+                hess_sign[par] = -1
+        else:
+            if par[-1] == '1' or (par[-1] == '2' and J2 > 0) or (par[-1] == '3' and J3 > 0):
+                hess_sign[par] = -1
+            else:
+                hess_sign[par] = 1
+    is_min = True
+    Args = (inp.J1,J2,J3,ans,DerRange[ans],pars,hess_sign,is_min)
     DataDic = {}
-#    print("Initial point and bounds: \n",Pinitial[ans],'\n',Bnds[ans])
     #
     result = d_e(cf.Sigma,
         args = Args,
         x0 = Pinitial[ans],
         bounds = Bnds[ans],
-        popsize = 21,#inp.mp_cpu*2,
+        popsize = 21,
         maxiter = inp.MaxIter*len(Pinitial[ans]),
-#        disp = True,
+        #        disp = True,
         tol = inp.cutoff,
         atol = inp.cutoff,
         updating='deferred' if inp.mp_cpu != 1 else 'immediate',
@@ -37,8 +56,10 @@ for ans in ansatze:
         )
     print("\nNumber of iterations: ",result.nit," / ",inp.MaxIter*len(Pinitial[ans]),'\n')
     Pf = tuple(result.x)
+    is_min = False
+    Args = (inp.J1,J2,J3,ans,DerRange[ans],is_min)
     try:
-        S, HessVals, E, L, gap = cf.Final_Result(Pf,*Args)
+        S, E, L, gap = cf.Sigma(Pf,*Args)
     except TypeError:
         print("Not saving, an Hessian sign is not right")
         print("Found values: Pf=",Pf,"\nSigma = ",result.fun)

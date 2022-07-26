@@ -11,7 +11,7 @@ DM3 = phi*2
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 16
+mp_cpu = 1#6
 list_ans = ['3x3_1','q0_1','cb1','3x3_2','q0_2','cb2','oct']
 DirName = '/home/users/r/rossid/Data/phi'+"{:3.2f}".format(phi)+"/"
 #DirName = '../Data/test/'
@@ -28,6 +28,7 @@ prec_L = 1e-10       #precision required in L maximization
 cutoff_pts = 1e-12      #min difference b/w phase diagram points to be considered the same
 L_method = 'Brent'
 L_bounds = (0.4,1.1)
+L_b_2 = 0.01
 #phase diagram
 J1 = 1
 z = (4,4,2)
@@ -165,4 +166,3 @@ print("Grid pts:",Nx,'*',Ny)
 print("Spin: ",S)
 print("Number of CPUs used: ",mp_cpu)
 print("DM angle: ",phi)
-print("L bounds: ",L_bounds)

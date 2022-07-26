@@ -13,27 +13,25 @@ import os
 #from matplotlib import cm
 
 ####
-J = np.zeros((2*inp.m,2*inp.m))
+J_ = np.zeros((2*inp.m,2*inp.m))
 for i in range(inp.m):
-    J[i,i] = -1
-    J[i+inp.m,i+inp.m] = 1
+    J_[i,i] = -1
+    J_[i+inp.m,i+inp.m] = 1
 
 # Check also Hessians on the way --> more time (1 general + 2 energy evaluations for each P).
 # Calls only the totE func
 def Sigma(P,*Args):
-    J1,J2,J3,ans,der_range = Args
+    J1,J2,J3,ans,der_range,pars,hess_sign,is_min = Args
     j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
     j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
-    args = (J1,J2,J3,ans)
-    pars2 = inp.Pi[ans].keys()
-    pars = []
-    for pPp in pars2:
-        if (pPp[-1] == '1') or (pPp[-1] == '2' and j2-1) or (pPp[-1] == '3' and j3-1):
-            pars.append(pPp)
+    L_bounds = inp.L_bounds
+    args = (J1,J2,J3,ans,L_bounds)
     init = totE(P,args)         #check initial point        #1
     if init[2][0] < 0 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
         return np.abs(init[2][0])+inp.shame2
     temp = []
+    L_bounds = (init[1]-inp.L_b_2, init[1]+inp.L_b_2)
+    args = (J1,J2,J3,ans,L_bounds)
     for i in range(len(P)): #for each parameter
         pp = np.array(P)
         dP = der_range[i]
@@ -45,155 +43,45 @@ def Sigma(P,*Args):
         der2 = (init_2plus[0]-init_plus[0])/dP
         Hess = (der2-der1)/dP
         hess = int(np.sign(Hess))    #order is important!!
-        if pars[i][-2] == 'A':
-            if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
-                sign = 1
-            else:
-                sign = -1
-        else:
-            if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
-                sign = -1
-            else:
-                sign = 1
-        if sign == hess:
+        if hess == hess_sign[pars[i]]:
             temp.append(der1**2)     #add it to the sum
         else:
             try:
-                r2 = np.abs(1/der1)
+                r2 = np.sqrt(np.abs(1/der1))
             except RuntimeWarning:
                 r2 = 100
             temp.append(r2)
     res = np.array(temp).sum()
-    return res
-####
-def Final_Result(P,*Args):
-    J1,J2,J3,ans,der_range = Args
-    j2 = int(np.sign(J2)*np.sign(int(np.abs(J2)*1e8)) + 1)   #j < 0 --> 0, j == 0 --> 1, j > 0 --> 2
-    j3 = int(np.sign(J3)*np.sign(int(np.abs(J3)*1e8)) + 1)
-    args = (J1,J2,J3,ans)
-    pars2 = inp.Pi[ans].keys()
-    pars = []
-    for pPp in pars2:
-        if (pPp[-1] == '1') or (pPp[-1] == '2' and j2-1) or (pPp[-1] == '3' and j3-1):
-            pars.append(pPp)
-    init = totE(P,args)         #check initial point        #1
-    if init[2][0] < 0 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
-        print("Not good initial point: ",init[2][0],init[1])
-        return 0
-    res = 0
-    temp = []
-    final_Hess = []
-    for i in range(len(P)): #for each parameter
-        pp = np.array(P)
-        dP = der_range[i]
-        pp[i] = P[i] + dP
-        init_plus = totE(pp,args)   #compute derivative     #2
-        der1 = (init_plus[0]-init[0])/dP
-        #compute Hessian to see if it is of correct sign
-        pp[i] = P[i] + 2*dP
-        init_2plus = totE(pp,args)                          #3
-        der2 = (init_2plus[0]-init_plus[0])/dP
-        final_Hess.append((der2-der1)/dP)
-        hess = int(np.sign(final_Hess[-1]))    #order is important!!
-        if pars[i][-2] == 'A':
-            if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
-                sign = 1
-            else:
-                sign = -1
-        else:
-            if pars[i][-1] == '1' or (pars[i][-1] == '2' and J2 > 0) or (pars[i][-1] == '3' and J3 > 0):
-                sign = -1
-            else:
-                sign = 1
-        if sign == hess:
-            temp.append(der1**2)     #add it to the sum
-        else:
-            print("Sign of Hessian is not good for ans = ",ans," and i = ",i)
-            return 0
-    res += np.array(temp).sum()
-    final_E = init[0]
-    final_L = init[1]
-    final_gap = init[2][1]
-    return res, final_Hess, final_E, final_L, final_gap
-
-#### Computes the part of the energy given by the Bogoliubov eigen-modes
-def sumEigs(P,L,args):
-    J1,J2,J3,ans = args
-    Args = (J1,J2,J3,ans)
-    N = an.Nk(P,L,Args) #compute Hermitian matrix
-    res = np.zeros((inp.m,inp.Nx,inp.Ny))
-    for i in range(inp.Nx):
-        for j in range(inp.Ny):
-            Nk = N[:,:,i,j]
-            try:
-                K = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
-            except LA.LinAlgError:      #matrix not pos def for that specific kx,ky
-                res = np.amin(np.real(LA.eigvals(np.dot(J,Nk)).ravel()))
-                return res, 10      #if that's the case even for a single k in the grid, return a defined value
-            temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
-            res[:,i,j] = LA.eigvalsh(temp)[inp.m:]
-            #res[:,i,j] = np.sort(np.abs(LA.eigvalsh(temp)[:inp.m]))    #only diagonalization
-    #r1 = res.ravel().sum()/(inp.m*inp.Nx*inp.Ny)
-    #gap = np.amin(res[0].ravel())
-    #return r1, gap
-    r2 = 0
-    for i in range(inp.m):
-        func = RBS(inp.kxg,inp.kyg,res[i])
-        r2 += func.integral(0,1,0,1)
-    r2 /= inp.m
-    gap = np.amin(res[0].ravel())
-    return r2, gap
-    if 0:
-        #plot
-        print("P: ",P,"\nL:",L,"\ngap:",gap)
-        R = np.zeros((3,inp.Nx,inp.Ny))
-        for i in range(inp.Nx):
-            for j in range(inp.Ny):
-                R[0,i,j] = np.real(inp.kkg[0,i,j])
-                R[1,i,j] = np.real(inp.kkg[1,i,j])
-                R[2,i,j] = res[0,i,j]
-        func = RBS(inp.kxg,inp.kyg,res[0])
-        X,Y = np.meshgrid(inp.kxg,inp.kyg)
-        Z = func(inp.kxg,inp.kyg)
-        #fig,(ax1,ax2) = plt.subplots(1,2)#,projection='3d')
-        fig = plt.figure(figsize=(10,5))
-        plt.axis('off')
-        plt.title(str(inp.Nx)+' * '+str(inp.Ny))
-        ax1 = fig.add_subplot(131, projection='3d')
-        #ax1 = fig.gca(projection='3d')
-        ax1.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
-        ax2 = fig.add_subplot(132, projection='3d')
-        ax2.plot_surface(inp.kkgp[0],inp.kkgp[1],res[0],cmap=cm.coolwarm)
-        ax3 = fig.add_subplot(133, projection='3d')     #works only for square grid
-        ax3.plot_surface(X,Y,Z,cmap=cm.coolwarm)
-        plt.show()
-    return r2, gap
+    if is_min:
+        return res
+    else:   #last computation -> Sigma, Energy, L, gap
+        return res, init[0], init[1], init[2][1]
 
 #### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
 def totE(P,args):
     res = minimize_scalar(lambda l: -totEl(P,l,args)[0],  #maximize energy wrt L with fixed P
             method = inp.L_method,
-            bracket = inp.L_bounds,#bounds = inp.L_bounds,
+            bracket = args[-1],#bounds = inp.L_bounds,
             options={'xtol':inp.prec_L}
             )
-    L = res.x
-    minE = -res.fun
-    temp = totEl(P,L,args)[1]
+    L = res.x   #optimized L
+    minE = -res.fun #optimized energy(total)
+    temp = totEl(P,L,args)[1]   #result of sumEigs -> sum of ws and gap
     return minE, L, temp
 
 #### Computes the Energy given the paramters P and the Lagrange multiplier L
 def totEl(P,L,args):
-    if L < inp.L_bounds[0] :
-        res = -5-(inp.L_bounds[0]-L)
-        return res, (-1,10)
-    elif L > inp.L_bounds[1]:
-        res =-5-(L-inp.L_bounds[1])
-        return res, (-1,10)
-    J1,J2,J3,ans = args
+    J1,J2,J3,ans,L_bounds = args
+    if L < L_bounds[0] :
+        Res = -5-(L_bounds[0]-L)
+        return Res, (-1,10)
+    elif L > L_bounds[1]:
+        Res = -5-(L-L_bounds[1])
+        return Res, (-1,10)
     J = (J1,J2,J3)
     j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or 1 --> problem for VERY small J2,J3 points
     j3 = np.sign(int(np.abs(J3)*1e8))
-    res = 0
+    Res = 0
     n = 0
     Pp = np.zeros(6)
     Pp[0] = P[n]
@@ -212,11 +100,30 @@ def totEl(P,L,args):
         n += 1
         Pp[5] = P[n]
     for i in range(3):
-        res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
-    res -= L*(2*inp.S+1)
-    eigEn = sumEigs(P,L,args)
-    res += eigEn[0]
-    return res, eigEn
+        Res += inp.z[i]*(Pp[i]**2-Pp[i+3]**2)*J[i]/2
+    Res -= L*(2*inp.S+1)
+    #
+    N = an.Nk(P,L,args[:-1]) #compute Hermitian matrix
+    res = np.zeros((inp.m,inp.Nx,inp.Ny))
+    for i in range(inp.Nx):
+        for j in range(inp.Ny):
+            Nk = N[:,:,i,j]
+            try:
+                Ch = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
+            except LA.LinAlgError:      #matrix not pos def for that specific kx,ky
+                r4 = -5-(L_bounds[0]-L)
+                return Res+r4, (r4,10)      #if that's the case even for a single k in the grid, return a defined value
+            temp = np.dot(np.dot(Ch,J_),np.conjugate(Ch.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
+            res[:,i,j] = LA.eigvalsh(temp)[inp.m:]
+    r2 = 0
+    for i in range(inp.m):
+        func = RBS(inp.kxg,inp.kyg,res[i])
+        r2 += func.integral(0,1,0,1)
+    r2 /= inp.m
+    gap = np.amin(res[0].ravel())
+    #
+    Res += r2
+    return Res, (r2,gap)
 
 #################################################################
 #checks if the file exists and if it does, reads which ansatze have been computed and returns the remaining ones
@@ -443,3 +350,58 @@ def IsConverged(P,bnds,Sigma):
         return False
     return True
 
+
+
+
+########
+########        Additional lines of code
+########
+
+#### Computes the part of the energy given by the Bogoliubov eigen-modes
+def sumEigs(P,L,args):
+    J1,J2,J3,ans = args
+    Args = (J1,J2,J3,ans)
+    N = an.Nk(P,L,Args) #compute Hermitian matrix
+    res = np.zeros((inp.m,inp.Nx,inp.Ny))
+    for i in range(inp.Nx):
+        for j in range(inp.Ny):
+            Nk = N[:,:,i,j]
+            try:
+                K = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
+            except LA.LinAlgError:      #matrix not pos def for that specific kx,ky
+                res = -5-(inp.L_bounds[0]-L)
+                return res, 10      #if that's the case even for a single k in the grid, return a defined value
+            temp = np.dot(np.dot(K,J),np.conjugate(K.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
+            res[:,i,j] = LA.eigvalsh(temp)[inp.m:]
+    r2 = 0
+    for i in range(inp.m):
+        func = RBS(inp.kxg,inp.kyg,res[i])
+        r2 += func.integral(0,1,0,1)
+    r2 /= inp.m
+    gap = np.amin(res[0].ravel())
+    return r2, gap
+    if 0:
+        #plot
+        print("P: ",P,"\nL:",L,"\ngap:",gap)
+        R = np.zeros((3,inp.Nx,inp.Ny))
+        for i in range(inp.Nx):
+            for j in range(inp.Ny):
+                R[0,i,j] = np.real(inp.kkg[0,i,j])
+                R[1,i,j] = np.real(inp.kkg[1,i,j])
+                R[2,i,j] = res[0,i,j]
+        func = RBS(inp.kxg,inp.kyg,res[0])
+        X,Y = np.meshgrid(inp.kxg,inp.kyg)
+        Z = func(inp.kxg,inp.kyg)
+        #fig,(ax1,ax2) = plt.subplots(1,2)#,projection='3d')
+        fig = plt.figure(figsize=(10,5))
+        plt.axis('off')
+        plt.title(str(inp.Nx)+' * '+str(inp.Ny))
+        ax1 = fig.add_subplot(131, projection='3d')
+        #ax1 = fig.gca(projection='3d')
+        ax1.plot_trisurf(R[0].ravel(),R[1].ravel(),R[2].ravel())
+        ax2 = fig.add_subplot(132, projection='3d')
+        ax2.plot_surface(inp.kkgp[0],inp.kkgp[1],res[0],cmap=cm.coolwarm)
+        ax3 = fig.add_subplot(133, projection='3d')     #works only for square grid
+        ax3.plot_surface(X,Y,Z,cmap=cm.coolwarm)
+        plt.show()
+    return r2, gap
