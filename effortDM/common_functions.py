@@ -27,7 +27,7 @@ def Sigma(P,*Args):
     L_bounds = inp.L_bounds
     args = (J1,J2,J3,ans,L_bounds)
     init = totE(P,args)         #check initial point        #1
-    if init[2] > 9 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
+    if init[2] > 9 or np.abs(init[1]-L_bounds[0]) < 1e-3:
         return inp.shame2
     temp = []
     L_bounds = (init[1]-inp.L_b_2, init[1]+inp.L_b_2)
@@ -76,10 +76,10 @@ def totEl(P,L,args):
     J1,J2,J3,ans,L_bounds = args
     if L < L_bounds[0] :
         Res = -5-(L_bounds[0]-L)
-        return Res, (-1,10)
+        return Res, 10
     elif L > L_bounds[1]:
         Res = -5-(L-L_bounds[1])
-        return Res, (-1,10)
+        return Res, 10
     J = (J1,J2,J3)
     j2 = np.sign(int(np.abs(J2)*1e8))   #check if it is 0 or 1 --> problem for VERY small J2,J3 points
     j3 = np.sign(int(np.abs(J3)*1e8))
