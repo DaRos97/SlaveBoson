@@ -40,6 +40,7 @@ def Sigma(P,*Args):
         der1 = (init_plus[0]-init[0])/dP
         if pars[i][:3] == 'phi':
             temp.append(der1**2)
+            continue
         pp[i] = P[i] + 2*dP
         init_2plus = totE(pp,args)                          #3
         der2 = (init_2plus[0]-init_plus[0])/dP
