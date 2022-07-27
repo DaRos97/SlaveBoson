@@ -38,6 +38,8 @@ def Sigma(P,*Args):
         pp[i] = P[i] + dP
         init_plus = totE(pp,args)   #compute derivative     #2
         der1 = (init_plus[0]-init[0])/dP
+        if pars[i][:3] == 'phi':
+            temp.append(der1**2)
         pp[i] = P[i] + 2*dP
         init_2plus = totE(pp,args)                          #3
         der2 = (init_2plus[0]-init_plus[0])/dP
@@ -345,7 +347,10 @@ def SaveToCsv(Data,csvfile):
             writer.writerow(Data)
 
 ##
-def IsConverged(P,bnds,Sigma):
+def IsConverged(P,pars,bnds,Sigma):
+    for i in range(len(P)):
+        if np.abs(P[i] - bnds[i][0]) < 1e-3 or np.abs(P[i] - bnds[i][1]) < 1e-3:
+            return False
     if Sigma > inp.cutoff:
         return False
     return True

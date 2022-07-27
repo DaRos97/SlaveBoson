@@ -11,7 +11,7 @@ DM3 = phi*2
 ####
 Nx = 13
 Ny = 13
-mp_cpu = 1#6
+mp_cpu = 16
 list_ans = ['3x3_1','q0_1','cb1','3x3_2','q0_2','cb2','oct']
 DirName = '/home/users/r/rossid/Data/phi'+"{:3.2f}".format(phi)+"/"
 #DirName = '../Data/test/'
