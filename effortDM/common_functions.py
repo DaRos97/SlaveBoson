@@ -27,8 +27,8 @@ def Sigma(P,*Args):
     L_bounds = inp.L_bounds
     args = (J1,J2,J3,ans,L_bounds)
     init = totE(P,args)         #check initial point        #1
-    if init[2][0] < 0 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
-        return np.abs(init[2][0])+inp.shame2
+    if init[2] > 9 or np.abs(init[1]-inp.L_bounds[0]) < 1e-3:
+        return inp.shame2
     temp = []
     L_bounds = (init[1]-inp.L_b_2, init[1]+inp.L_b_2)
     args = (J1,J2,J3,ans,L_bounds)
@@ -47,15 +47,15 @@ def Sigma(P,*Args):
             temp.append(der1**2)     #add it to the sum
         else:
             try:
-                r2 = np.sqrt(np.abs(1/der1))
+                r2 = np.abs(der1)**2 + np.sqrt(np.abs(1/der1)) + np.abs(1/der1) + 10
             except RuntimeWarning:
-                r2 = 100
+                r2 = 1e5
             temp.append(r2)
     res = np.array(temp).sum()
     if is_min:
         return res
     else:   #last computation -> Sigma, Energy, L, gap
-        return res, init[0], init[1], init[2][1]
+        return res, init[0], init[1], init[2]
 
 #### Computes Energy from Parameters P, by maximizing it wrt the Lagrange multiplier L. Calls only totEl function
 def totE(P,args):
@@ -66,8 +66,8 @@ def totE(P,args):
             )
     L = res.x   #optimized L
     minE = -res.fun #optimized energy(total)
-    temp = totEl(P,L,args)[1]   #result of sumEigs -> sum of ws and gap
-    return minE, L, temp
+    gap = totEl(P,L,args)[1]   #result of sumEigs -> sum of ws and gap
+    return minE, L, gap
 
 #### Computes the Energy given the paramters P and the Lagrange multiplier L
 def totEl(P,L,args):
@@ -111,8 +111,8 @@ def totEl(P,L,args):
             try:
                 Ch = LA.cholesky(Nk)     #not always the case since for some parameters of Lambda the eigenmodes are negative
             except LA.LinAlgError:      #matrix not pos def for that specific kx,ky
-                r4 = -5-(L_bounds[0]-L)
-                return Res+r4, (r4,10)      #if that's the case even for a single k in the grid, return a defined value
+                r4 = -3+(L-L_bounds[0])
+                return Res+r4, 10      #if that's the case even for a single k in the grid, return a defined value
             temp = np.dot(np.dot(Ch,J_),np.conjugate(Ch.T))    #we need the eigenvalues of M=KJK^+ (also Hermitian)
             res[:,i,j] = LA.eigvalsh(temp)[inp.m:]
     r2 = 0
@@ -123,7 +123,7 @@ def totEl(P,L,args):
     gap = np.amin(res[0].ravel())
     #
     Res += r2
-    return Res, (r2,gap)
+    return Res, gap
 
 #################################################################
 #checks if the file exists and if it does, reads which ansatze have been computed and returns the remaining ones

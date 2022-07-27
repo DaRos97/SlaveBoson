@@ -88,7 +88,7 @@ for ans in lAns:
     if ans == '3x3_1':
         bounds[ans]['A1'] = (0.4,0.6)
         bounds[ans]['A3'] = (0,1)
-        bounds[ans]['B1'] = (0,1)
+        bounds[ans]['B1'] = (0,0.5)
         bounds[ans]['B2'] = (0,0.5)
         bounds[ans]['B3'] = (0,0.5)
         bounds[ans]['phiB1'] = (0,2*np.pi)
@@ -160,7 +160,7 @@ for ans in lAns:
         bounds[ans]['phiA2'] = (0,2*np.pi)
         bounds[ans]['phiB2'] = (0,2*np.pi)
         num_phi[ans] = 4
-shame2 = 5
+shame2 = 100
 
 print("Grid pts:",Nx,'*',Ny)
 print("Spin: ",S)
